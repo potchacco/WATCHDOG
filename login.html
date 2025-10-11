@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - PetControlX</title>
+    <link rel="stylesheet" href="login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="phone-container">
+        <div class="phone-header">
+            <div class="notch"></div>
+        </div>
+        
+        <div class="login-content">
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <div class="paw-icons">
+                    <span class="paw paw-1">🐾</span>
+                    <span class="paw paw-2">🐾</span>
+                </div>
+                <h1 class="welcome-title">Hi, Welcome!</h1>
+            </div>
+            
+            <!-- Login Form -->
+            <form class="login-form" id="loginForm">
+                <!-- Email Field -->
+                <div class="input-group">
+                    <div class="input-container">
+                        <span class="input-icon">�</span>
+                        <input type="email" name="email" placeholder="Email Address" class="form-input" required>
+                    </div>
+                </div>
+                
+                <!-- Password Field -->
+                <div class="input-group">
+                    <div class="input-container">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" name="password" placeholder="Password" class="form-input" required>
+                    </div>
+                </div>
+                
+                <!-- Forgot Password -->
+                <div class="forgot-section">
+                    <a href="#" class="forgot-link">Forgot password?</a>
+                </div>
+                
+                <!-- Login Button -->
+                <button type="submit" class="login-btn">
+                    <span class="btn-text">Log In</span>
+                    <div class="btn-loader hidden">
+                        <div class="spinner"></div>
+                    </div>
+                </button>
+                
+                <!-- Sign Up -->
+                <div class="signup-section">
+                    <span class="signup-text">New to PetControlX? </span>
+                    <a href="#" class="signup-link">Sign up</a>
+                </div>
+                
+                <!-- Divider -->
+                <div class="divider">
+                    <span class="divider-text">Or continue with</span>
+                </div>
+                
+                <!-- Social Buttons -->
+                <div class="social-buttons">
+                    <button type="button" class="social-btn facebook-btn">
+                        <span class="social-icon">📘</span>
+                        <span>Log in with Facebook</span>
+                    </button>
+                    
+                    <button type="button" class="social-btn google-btn">
+                        <span class="social-icon">🔍</span>
+                        <span>Log in with Google</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="simple-login.js"></script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WATCHDOG - Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+            background: #f5f5f5;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: #263238;
+            color: white;
+            padding: 2rem 1rem;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: #b0bec5;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: #2196F3;
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: #90a4ae;
+            font-size: 0.9rem;
+        }
+
+        .stat-card .number {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #263238;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+        }
+
+        .trend.up { color: #4caf50; }
+        .trend.down { color: #f44336; }
+
+        .recent-activity {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .activity-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .activity-icon.blue { background: #2196F3; }
+        .activity-icon.green { background: #4caf50; }
+        .activity-icon.orange { background: #ff9800; }
+
+        .activity-details h4 {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #263238;
+        }
+
+        .activity-details p {
+            margin: 0;
+            font-size: 0.8rem;
+            color: #90a4ae;
+        }
+
+        .activity-time {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: #90a4ae;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                padding: 1rem;
+            }
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="images/registration-card.png" alt="Logo" style="width: 40px; height: 40px;">
+                <span class="logo-text">WATCH<span style="color: #FFB300">DOG</span></span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#"><i class="fas fa-paw"></i> Pets</a></li>
+                <li><a href="#"><i class="fas fa-syringe"></i> Vaccinations</a></li>
+                <li><a href="#"><i class="fas fa-exclamation-triangle"></i> Incidents</a></li>
+                <li><a href="#"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+                <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="dashboard-header">
+                <h1>Dashboard</h1>
+                <div class="user-profile">
+                    <span id="userEmail"></span>
+                    <img src="https://ui-avatars.com/api/?background=random" alt="User avatar" id="userAvatar">
+                </div>
+            </div>
+
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <h3>Total Pets</h3>
+                    <div class="number">1,247</div>
+                    <div class="trend up">
+                        <i class="fas fa-arrow-up"></i> 12% from last month
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Vaccinations</h3>
+                    <div class="number">89</div>
+                    <div class="trend up">
+                        <i class="fas fa-arrow-up"></i> 8% from last month
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Cases</h3>
+                    <div class="number">13</div>
+                    <div class="trend down">
+                        <i class="fas fa-arrow-down"></i> 5% from last month
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Response Time</h3>
+                    <div class="number">1.8m</div>
+                    <div class="trend up">
+                        <i class="fas fa-arrow-up"></i> Faster by 0.3m
+                    </div>
+                </div>
+            </div>
+
+            <div class="recent-activity">
+                <div class="activity-header">
+                    <h2>Recent Activity</h2>
+                    <a href="#" class="btn btn-primary">View All</a>
+                </div>
+                <ul class="activity-list">
+                    <li class="activity-item">
+                        <div class="activity-icon blue">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>New Pet Registration</h4>
+                            <p>Max (Golden Retriever) was registered</p>
+                        </div>
+                        <span class="activity-time">2m ago</span>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon green">
+                            <i class="fas fa-syringe"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>Vaccination Complete</h4>
+                            <p>Luna received anti-rabies vaccination</p>
+                        </div>
+                        <span class="activity-time">1h ago</span>
+                    </li>
+                    <li class="activity-item">
+                        <div class="activity-icon orange">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="activity-details">
+                            <h4>Incident Report</h4>
+                            <p>Lost pet report submitted</p>
+                        </div>
+                        <span class="activity-time">3h ago</span>
+                    </li>
+                </ul>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (!user || !user.email) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            // Update UI with user info
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email)}&background=random`;
+
+            // Logout functionality
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('user');
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>
