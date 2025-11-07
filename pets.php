@@ -26,12 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
 
             if (!in_array($file_extension, $allowed_extensions)) {
-                echo json_encode(['status' => 'error', 'message' => 'Invalid file type. Only JPG, PNG, and GIF allowed']);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid file type. Only JPG, JPEG, PNG, and GIF allowed']);
                 exit;
             }
 
             // Create uploads directory if it doesn't exist
-            $upload_dir = __DIR__ . '/uploads/pets';
+            $upload_dir = __DIR__ . '../uploads/pets';
             if (!file_exists($upload_dir)) {
                 mkdir($upload_dir, 0777, true);
             }
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Generate unique filename
             $new_filename = uniqid('pet_') . '.' . $file_extension;
             $upload_path = $upload_dir . '/' . $new_filename;
-            $image_url = 'uploads/pets/' . $new_filename;  // URL path for database
+            $image_url = 'uploads/pets' . $new_filename;  // URL path for database
 
             // Check if file was uploaded successfully
             if (!move_uploaded_file($file['tmp_name'], $upload_path)) {

@@ -7,8 +7,8 @@ require_once 'check_session.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WATCHDOG - Dashboard</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="dashboard.css" />
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+    <link rel="stylesheet" href="dashboard.css?v=<?php echo time(); ?>" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
@@ -16,8 +16,7 @@ require_once 'check_session.php';
     <div class="dashboard">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <img src="images/registration-card.png" alt="Logo" style="width: 40px; height: 40px;">
-                <span class="logo-text">WATCH<span style="color: #FFB300">DOG</span></span>
+                <span class="logo-text" id="span-h2">WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</span></span>
             </div>
             <ul class="sidebar-menu">
                 <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
@@ -32,7 +31,21 @@ require_once 'check_session.php';
 
         <main class="main-content">
             <div class="dashboard-header">
-                <h1>Dashboard</h1>
+                <!-- <h1>Dashboard</h1> -->
+                 <div class="minimal-search">
+        <svg class="minimal-icon" viewBox="0 0 20 20" fill="none">
+            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" 
+                  stroke="currentColor" 
+                  stroke-width="2" 
+                  stroke-linecap="round"/>
+        </svg>
+        <input 
+            type="text" 
+            class="minimal-input" 
+            placeholder="Search by pet name, owner, or registration ID"
+            aria-label="Search"
+        >
+    </div>
                 <div class="user-profile">
                     <span id="userEmail"><?php echo htmlspecialchars($_SESSION['user_email']); ?></span>
                     <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name']); ?>&background=random" 
@@ -53,7 +66,7 @@ require_once 'check_session.php';
 
                 <div class="stat-card">
                     <div class="stat-header">
-                        <div class="stat-title">Upcoming Vaccinations</div>
+                        <div class="stat-title">Vaccination Information</div>
                         <div class="stat-icon" style="background: #FF9800;"><i class="fas fa-syringe"></i></div>
                     </div>
                     <div class="stat-value">0</div>
@@ -214,21 +227,21 @@ require_once 'check_session.php';
                     <div class="action-content">
                         Report stray animals, bites, or other pet-related incidents in your area.
                     </div>
-                    <button class="dashboard-btn btn-primary">
+                    <button class="dashboard-btn btn-primary" id="report-btn">
                         <i class="fas fa-flag"></i> Report
                     </button>
                 </div>
 
                 <div class="action-card">
                     <div class="action-header">
-                        <h3 class="action-title">Schedule Vaccination</h3>
+                        <h3 class="action-title">Edit Vaccination</h3>
                         <i class="fas fa-calendar-plus" style="color: #FF9800;"></i>
                     </div>
                     <div class="action-content">
-                        Schedule vaccination appointments and get reminders.
+                        Edit vaccinations Information for real time tracking and get reminders.
                     </div>
-                    <button class="dashboard-btn btn-primary">
-                        <i class="fas fa-calendar"></i> Schedule
+                    <button class="dashboard-btn btn-primary" id="schedule-btn">
+                        <i class="fas fa-calendar"></i> Edit
                     </button>
                 </div>
             </div>

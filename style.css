@@ -41,7 +41,7 @@ body {
 .logo-text {
   font-weight: 600;
   font-size: 1.2rem;
-  color: #263238;
+  color: #000000;
 }
 
 .sidebar-menu {
@@ -85,7 +85,6 @@ body {
 
 /* NAVBAR */
 .navbar {
-  background: #263238;
   position: fixed;
   top: 0;
   left: 0;
@@ -93,7 +92,7 @@ body {
   width: 100%;
   z-index: 1000;
   padding: 0.75rem 0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
   transition: background-color 0.3s ease;
   height: 72px; /* Fixed height for navbar */
   display: flex;
@@ -123,7 +122,7 @@ body {
 
 .logo-text {
   font-size: 1.5rem;
-  color: #fff;
+  color: black;
   font-weight: 700;
 }
 
@@ -139,7 +138,7 @@ body {
 }
 
 .nav-link {
-  color: #fff;
+  color: #000000;
   text-decoration: none;
   font-weight: 600;
   padding: 8px 12px;
@@ -149,7 +148,7 @@ body {
 
 .nav-link:hover,
 .nav-link.active {
-  background: #2196F3;
+  background: #0b2cc0;
   color: white;
 }
 
@@ -171,7 +170,7 @@ body {
   display: block;
   height: 3px;
   width: 100%;
-  background: white;
+  background: rgb(0, 0, 0);
   border-radius: 3px;
   transition: 0.25s ease-in-out;
 }
@@ -213,7 +212,7 @@ body {
     top: 72px; /* Match navbar height */
     left: 0;
     right: 0;
-    background: #263238;
+    background: #ffffff;
     flex-direction: column;
     padding: 1rem;
     gap: 10px;
@@ -266,10 +265,15 @@ body {
 }
 
 .login-btn {
-  background: transparent;
   margin-top: 23px;
-  color: #fff;
+  color: #000000;
   border: 2px solid #2196F3;
+}
+
+#loginBtn{
+  background-color: #f5f7fa;
+  color: black;
+  font-weight: 800;
 }
 
 .login-btn:hover {
@@ -279,7 +283,7 @@ body {
 }
 
 .register-btn {
-  background: #4CAF50;
+  background: #1341d8;
   color: white;
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
   }
@@ -370,7 +374,7 @@ body {
 
 /* HERO */
 .hero {
-  padding: 4rem 0;
+  padding: 2rem 0;
   background-color: #f5f7fa;
   min-height: calc(100vh - 72px); /* Subtract navbar height */
   display: flex;
@@ -423,7 +427,7 @@ body {
 }
 
 .hero-title .highlight {
-  color: #2196f3;
+  color: rgb(13, 13, 230);
 }
 
 .hero-subtitle {
@@ -436,9 +440,9 @@ body {
 
 .hero-stats {
   display: flex;
-  gap: 24px;
+  gap: 54px;
   flex-wrap: wrap;
-  margin-bottom: 3rem;
+  margin-bottom: 1.8rem;
 }
 
 .hero-stat {
@@ -454,7 +458,7 @@ body {
 .stat-number {
   font-weight: 900;
   font-size: 2rem;
-  color: #2196f3;
+  color: #2013e2;
 }
 
 .stat-label {
@@ -465,10 +469,11 @@ body {
 }
 
 .hero-buttons {
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
   display: flex;
   gap: 18px;
   flex-wrap: wrap;
+  margin-top: -20px;
 }
 
 .btn {
@@ -486,8 +491,14 @@ body {
 }
 
 .btn-primary {
-  background: #2196f3;
-  color: white;
+  background: rgb(13, 13, 230);
+}
+
+#registerPetBtn {
+  border: 3px solid rgb(11, 228, 11);
+  border-radius: 50px;
+  background-color: #f5f7fa;
+  color: black;
 }
 
 .btn-primary:hover {
@@ -496,7 +507,13 @@ body {
 
 .btn-secondary {
   background: #2ecc71;
-  color: white;
+  color: rgb(0, 0, 0);
+}
+
+#emergencyHotlineBtn {
+  border: 3px solid red;
+  border-radius: 50px;
+  background-color: #f5f7fa;
 }
 
 .btn-secondary:hover {
@@ -507,6 +524,13 @@ body {
   background: transparent;
   color: #2196f3;
   border: 2px solid #2196f3;
+}
+
+#viewDashboardBtn {
+  background-color: transparent;
+  color: black;
+  border: 3px solid blue;
+  border-radius: 50px;
 }
 
 .btn-outline:hover {
@@ -734,10 +758,10 @@ body {
 
 .stat-card {
   border-radius: 22px;
-  background: white;
+  background: transparent;
   text-align: center;
   padding: 1.7rem 1.2rem;
-  box-shadow: 0 15px 45px rgb(33 150 243 / 12%);
+  /* box-shadow: 0 15px 45px rgb(33 150 243 / 12%); */
   transition: all 0.3s ease;
 }
 

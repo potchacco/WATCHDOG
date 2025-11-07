@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Community Pet Registration & Control System</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="login.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -13,8 +13,8 @@
   <nav class="navbar">
     <div class="container nav-container">
       <div class="nav-logo">
-        <img src="images/registration-card.png" alt="Logo" class="logo-img" />
-        <span class="logo-text">WATCH<span class="logo-accent">DOG</span></span>
+        <!-- <img src="images/registration-card.png" alt="Logo" class="logo-img" /> -->
+        <span class="logo-text">WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</span></span>
       </div>
       <input type="checkbox" id="nav-toggle" aria-label="Open menu" />
       <label for="nav-toggle" class="nav-toggle-label">
@@ -38,7 +38,7 @@
   <div id="loginModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Login to WatchDog 👋</h2>
+        <h2>Login to WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</h2>
         <button type="button" class="modal-close">
           <i class="fas fa-times"></i>
         </button>
@@ -148,21 +148,21 @@
 
         <div class="hero-stats">
           <div class="stat-card">
-            <div class="stat-number" data-target="1247">0</div>
+            <div class="stat-number" data-target="1247">564</div>
             <div class="stat-label">Registered Pets</div>
           </div>
           <div class="stat-card">
-            <div class="stat-number" data-target="98.5">0</div>
+            <div class="stat-number" data-target="98.5">99%</div>
             <div class="stat-label">Success Rate</div>
           </div>
           <div class="stat-card">
             <div class="stat-number">24/7</div>
             <div class="stat-label">Support</div>
           </div>
-          <div class="stat-card">
+          <!-- <div class="stat-card">
             <div class="stat-number">50+</div>
             <div class="stat-label">Barangays</div>
-          </div>
+          </div> -->
         </div>
 
         <div class="hero-buttons">
@@ -178,7 +178,7 @@
         <div class="hero-trust">
           <span>✅ Government Certified</span>
           <span>🔒 GDPR Compliant</span>
-          <span>⚡ Real-time Updates</span>
+          <!-- <span>⚡ Real-time Updates</span> -->
           <span>📱 Mobile Optimized</span>
         </div>
       </div>
@@ -337,7 +337,6 @@
         <h2>Leading Innovation in Community Pet Management</h2>
         <p>Government-approved technology with real-time intelligence and multi-platform integration.</p>
         <ul>
-          <li>🤖 AI-powered lost & found pet matching (<strong>96% accuracy</strong>)</li>
           <li>📊 Real-time analytics and dashboards</li>
           <li>🌐 Seamless cloud and mobile integration</li>
         </ul>
@@ -355,9 +354,9 @@
         <h2 id="text-black">Protect Your Community with PetControlX</h2>
         <p>Join thousands of responsible pet owners and officials using our platform to ensure safe and healthy communities.</p>
         <div class="cta-buttons">
-          <button class="btn btn-primary" id="ctaRegisterPetBtn">Register Your Pet Now 🐕</button>
-          <button class="btn btn-secondary" id="ctaScheduleDemoBtn">Schedule a Demo 📅</button>
-          <button class="btn btn-outline" id="ctaEmergencyHotlineBtn">Emergency Hotline 🚨</button>
+          <button class="btn btn-primary" id="registerPetBtn" id>Register Your Pet Now 🐕</button>
+          <button class="btn btn-secondary" id="emergencyHotlineBtn">Schedule a Demo 📅</button>
+          <button class="btn btn-outline" id="viewDashboardBtn">Emergency Hotline 🚨</button>
         </div>
       </div>
       <div class="cta-image">
@@ -373,13 +372,6 @@
           <!-- <img src="images/registration-card.png" alt="Logo" />
           <span class="footer-logo-text">PetControl<span class="footer-logo-accent">X</span></span> -->
           <p>The country's leading digital pet registration and management platform, trusted by government units nationwide.</p>
-          <div class="footer-social">
-            <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-          </div>
         </div>
         <div class="footer-links">
           <div>
@@ -420,6 +412,13 @@
               <li>Immediate response for animal emergencies</li>
               <li>Metro Manila • Cebu • Davao</li>
             </ul>
+            <div class="footer-social">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+        </div>
           </div>
         </div>
       </div>
