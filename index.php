@@ -22,7 +22,7 @@
       </label>
       <div class="nav-menu">
         <a href="#home" class="nav-link">Home</a>
-        <a href="#services" class="nav-link">Services</a>
+        <a href="#services" class="nav-link">Services</a>  
         <a href="#about" class="nav-link">About</a>
         <a href="#stats" class="nav-link">Impact</a>
         <a href="#contact" class="nav-link">Contact</a>
@@ -67,6 +67,14 @@
             <i class="fas fa-sign-in-alt"></i> Login
           </button>
         </form>
+        <a href="#" id="forgot-link">forgot password?</a><hr>
+        <p id="login-via">or login via</p>
+        <div class="login-options">
+          <div class="options-holder">
+            <a href=""><button type="button" class="option-btn"><i class="fa-brands fa-facebook fa-xl"></i> Log in with facebook</button></a>
+            <a href=""><button type="button" class="option-btn"><i class="fa-brands fa-google fa-xl"></i> Log in with Google</button></a>
+          </div>
+        </div>
         <div class="modal-footer">
           <p>Don't have an account? <a href="#" class="switch-to-register">Register here</a></p>
         </div>
@@ -125,7 +133,14 @@
           <button type="submit" name="register" class="btn btn-primary btn-block">
             <i class="fas fa-user-plus"></i> Create Account
           </button>
-        </form>
+        </form><hr>
+        <p id="login-via">or login via</p>
+        <div class="login-options">
+          <div class="options-holder">
+            <a href=""><button type="button" class="option-btn"><i class="fa-brands fa-facebook fa-xl"></i> Log in with facebook</button></a>
+            <a href=""><button type="button" class="option-btn"><i class="fa-brands fa-google fa-xl"></i> Log in with Google</button></a>
+          </div>
+        </div>
         <div class="modal-footer">
           <p>Already have an account? <a href="#" class="switch-to-login">Login here</a></p>
         </div>
