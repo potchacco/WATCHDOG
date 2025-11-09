@@ -71,8 +71,8 @@
         <p id="login-via">or login via</p>
         <div class="login-options">
           <div class="options-holder">
-            <a href=""><button type="button" class="option-btn"><i class="fa-brands fa-facebook fa-xl"></i> Log in with facebook</button></a>
-            <a href=""><button type="button" class="option-btn"><i class="fa-brands fa-google fa-xl"></i> Log in with Google</button></a>
+            <a href="facebook-login.php"><button type="button" class="option-btn"><i class="fa-brands fa-facebook fa-xl"></i> Log in with facebook</button></a>
+            <a href="google-login.php"><button type="button" class="option-btn"><i class="fa-brands fa-google fa-xl"></i> Log in with Google</button></a>
           </div>
         </div>
         <div class="modal-footer">

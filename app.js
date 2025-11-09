@@ -147,7 +147,54 @@ document.addEventListener("DOMContentLoaded", function() {
         showMessage(messageContainer, 'Please fill in all fields', 'error');
         return;
       }
+      // Vaccination information handler
+      function initializeVaccinationInfo() {
+        const vaccineInfo = {
+          core: [
+            { name: 'Rabies', schedule: 'Annually or every 3 years', required: true },
+            { name: 'Distemper', schedule: 'Every 3 years after initial series', required: true },
+            { name: 'Parvovirus', schedule: 'Every 3 years after initial series', required: true },
+            { name: 'Adenovirus', schedule: 'Every 3 years after initial series', required: true }
+          ],
+          nonCore: [
+            { name: 'Bordetella', schedule: 'Every 6-12 months', required: false },
+            { name: 'Lyme Disease', schedule: 'Annually (in endemic areas)', required: false },
+            { name: 'Leptospirosis', schedule: 'Annually', required: false },
+            { name: 'Canine Influenza', schedule: 'Annually', required: false }
+          ]
+        };
 
+        function displayVaccineDetails(vaccines) {
+          const detailsContainer = document.getElementById('vaccine-details');
+          if (!detailsContainer) return;
+
+          let html = '<ul class="vaccine-list">';
+          vaccines.forEach(vaccine => {
+            html += `
+              <li class="vaccine-item">
+              <div class="vaccine-header">
+                <h4>${vaccine.name}</h4>
+                <span class="badge ${vaccine.required ? 'badge-required' : 'badge-optional'}">
+                ${vaccine.required ? 'Required' : 'Optional'}
+            `;
+          });
+          html += '</ul>';
+          detailsContainer.innerHTML = html;
+        }
+
+        const vaccineSection = document.getElementById('vaccination-info');
+        if (vaccineSection) {
+          vaccineSection.addEventListener('click', (e) => {
+            if (e.target.classList.contains('vaccine-details-btn')) {
+              const type = e.target.dataset.type;
+              displayVaccineDetails(vaccineInfo[type]);
+            }
+          });
+        }
+      }
+
+      // Initialize vaccination info when DOM is loaded
+      initializeVaccinationInfo();
       const formData = new FormData(loginForm);
       try {
         const response = await fetch('login.php', {
@@ -285,13 +332,6 @@ document.addEventListener("DOMContentLoaded", function() {
       closeModal(e.target);
     }
   });
-    
-    // Close modal when clicking outside
-    window.addEventListener('click', (e) => {
-      if (e.target.classList.contains('modal')) {
-        closeModal(e.target);
-      }
-    });
 
     // Close modals with Escape key
     document.addEventListener('keydown', (e) => {

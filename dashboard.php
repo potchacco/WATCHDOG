@@ -7,7 +7,6 @@ require_once 'check_session.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WATCHDOG - Dashboard</title>
-    <!-- <link rel="stylesheet" href="style.css" /> -->
     <link rel="stylesheet" href="dashboard.css?v=<?php echo time(); ?>" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -16,7 +15,7 @@ require_once 'check_session.php';
     <div class="dashboard">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <span class="logo-text" id="span-h2">WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</span></span>
+                <span class="logo-text" id="span-h2">WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</span>
             </div>
             <ul class="sidebar-menu">
                 <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
@@ -31,21 +30,19 @@ require_once 'check_session.php';
 
         <main class="main-content">
             <div class="dashboard-header">
-                <!-- <h1>Dashboard</h1> -->
-                 <div class="minimal-search">
-        <svg class="minimal-icon" viewBox="0 0 20 20" fill="none">
-            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" 
-                  stroke="currentColor" 
-                  stroke-width="2" 
-                  stroke-linecap="round"/>
-        </svg>
-        <input 
-            type="text" 
-            class="minimal-input" 
-            placeholder="Search by pet name, owner, or registration ID"
-            aria-label="Search"
-        >
-    </div>
+                <div class="minimal-search">
+                    <svg class="minimal-icon" viewBox="0 0 20 20" fill="none">
+                        <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" 
+                              stroke="currentColor" 
+                              stroke-width="2" 
+                              stroke-linecap="round"/>
+                    </svg>
+                    <input 
+                        type="text" 
+                        class="minimal-input" 
+                        placeholder="Search by pet name, owner, or registration ID"
+                        aria-label="Search">
+                </div>
                 <div class="user-profile">
                     <span id="userEmail"><?php echo htmlspecialchars($_SESSION['user_email']); ?></span>
                     <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name']); ?>&background=random" 
@@ -135,7 +132,7 @@ require_once 'check_session.php';
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="petRegistrationForm" novalidate>
+                        <form id="petRegistrationForm" enctype="multipart/form-data" novalidate>
                             <input type="hidden" name="action" value="register">
                             
                             <div class="form-group">
@@ -221,19 +218,6 @@ require_once 'check_session.php';
 
                 <div class="action-card">
                     <div class="action-header">
-                        <h3 class="action-title">Report Incident</h3>
-                        <i class="fas fa-exclamation-triangle" style="color: #F44336;"></i>
-                    </div>
-                    <div class="action-content">
-                        Report stray animals, bites, or other pet-related incidents in your area.
-                    </div>
-                    <button class="dashboard-btn btn-primary" id="report-btn">
-                        <i class="fas fa-flag"></i> Report
-                    </button>
-                </div>
-
-                <div class="action-card">
-                    <div class="action-header">
                         <h3 class="action-title">Edit Vaccination</h3>
                         <i class="fas fa-calendar-plus" style="color: #FF9800;"></i>
                     </div>
@@ -250,26 +234,183 @@ require_once 'check_session.php';
 
     <script src="dashboard.js"></script>
     <script>
-        document.getElementById('logoutBtn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-                const formData = new FormData();
-                formData.append('action', 'logout');
-
-                const response = await fetch('auth.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-                
+    // ===== Logout button =====
+    document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+        e.preventDefault();
+        const logoutBtn = e.currentTarget;
+        const originalContent = logoutBtn.innerHTML;
+        logoutBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging out...';
+        logoutBtn.disabled = true;
+        
+        try {
+            const formData = new FormData();
+            formData.append('action', 'logout');
+            const response = await fetch('auth.php', { method: 'POST', body: formData });
+            const data = await response.json();
+            setTimeout(() => {
                 if (data.status === 'success') {
                     window.location.href = 'index.php';
                 }
-            } catch (error) {
-                console.error('Logout failed:', error);
-            }
-        });
-    </script>
+            }, 2000);
+        } catch (error) {
+            console.error('Logout failed:', error);
+            logoutBtn.innerHTML = originalContent;
+            logoutBtn.disabled = false;
+        }
+    });
+
+    // ===== Helper: Reset to Dashboard =====
+    function showDashboard() {
+        // Show all default sections again
+        document.querySelectorAll('.main-content > div').forEach(div => div.style.display = '');
+        // Remove dynamic pages
+        const dynamicSections = document.querySelectorAll(
+            '.pets-content, .vaccination-content, .incidents-content, .analytics-content, .settings-content'
+        );
+        dynamicSections.forEach(section => section.remove());
+    }
+
+    // ===== Helper: Clear and prepare new page =====
+    function clearMainContent() {
+        document.querySelectorAll('.main-content > div').forEach(div => div.style.display = 'none');
+        // remove previously created dynamic sections
+        const dynamicSections = document.querySelectorAll(
+            '.pets-content, .vaccination-content, .incidents-content, .analytics-content, .settings-content'
+        );
+        dynamicSections.forEach(section => section.remove());
+    }
+
+    // ===== DASHBOARD =====
+    document.querySelector('.sidebar-menu li:nth-child(1) a').addEventListener('click', function(e) {
+        e.preventDefault();
+        showDashboard();
+    });
+
+    // ===== PETS =====
+    document.querySelector('.sidebar-menu li:nth-child(2) a').addEventListener('click', function(e) {
+        e.preventDefault();
+        clearMainContent();
+
+        const petsContent = document.createElement('div');
+        petsContent.className = 'pets-content';
+        petsContent.innerHTML = `
+            <div class="dashboard-header">
+                <h1>Pet Management</h1>
+                <button class="dashboard-btn btn-primary"><i class="fas fa-plus"></i> Add Pet</button>
+            </div>
+            <div class="pets-list">
+                <p>No pets to display yet. Click "Add Pet" to register one.</p>
+            </div>
+        `;
+        document.querySelector('.main-content').appendChild(petsContent);
+    });
+
+    // ===== VACCINATIONS =====
+    document.querySelector('.sidebar-menu li:nth-child(3) a').addEventListener('click', function(e) {
+        e.preventDefault();
+        clearMainContent();
+
+        const vaccContent = document.createElement('div');
+        vaccContent.className = 'vaccination-content';
+        vaccContent.innerHTML = `
+            <div class="dashboard-header">
+                <h1>Vaccination Records</h1>
+                <button class="dashboard-btn btn-primary"><i class="fas fa-plus"></i> Add Record</button>
+            </div>
+            <div class="vaccination-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pet Name</th>
+                            <th>Vaccine</th>
+                            <th>Date Given</th>
+                            <th>Next Due</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Luna</td>
+                            <td>Rabies</td>
+                            <td>2025-03-12</td>
+                            <td>2026-03-12</td>
+                            <td><button class="dashboard-btn btn-secondary btn-sm">Edit</button></td>
+                        </tr>
+                        <tr>
+                            <td>Max</td>
+                            <td>Parvovirus</td>
+                            <td>2025-02-20</td>
+                            <td>2026-02-20</td>
+                            <td><button class="dashboard-btn btn-secondary btn-sm">Edit</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+        document.querySelector('.main-content').appendChild(vaccContent);
+    });
+
+    // ===== INCIDENTS =====
+    document.querySelector('.sidebar-menu li:nth-child(4) a').addEventListener('click', function(e) {
+        e.preventDefault();
+        clearMainContent();
+
+        const incidentsContent = document.createElement('div');
+        incidentsContent.className = 'incidents-content';
+        incidentsContent.innerHTML = `
+            <div class="dashboard-header">
+                <h1>Incident Reports</h1>
+                <button class="dashboard-btn btn-primary"><i class="fas fa-plus"></i> Report New Incident</button>
+            </div>
+            <div class="incidents-grid">
+                <div class="no-incidents-message">
+                    <i class="fas fa-clipboard-check"></i>
+                    <p>No incidents reported. Click the button above to report an incident.</p>
+                </div>
+            </div>
+        `;
+        document.querySelector('.main-content').appendChild(incidentsContent);
+    });
+
+    // ===== ANALYTICS =====
+    document.querySelector('.sidebar-menu li:nth-child(5) a').addEventListener('click', function(e) {
+        e.preventDefault();
+        clearMainContent();
+
+        const analyticsContent = document.createElement('div');
+        analyticsContent.className = 'analytics-content';
+        analyticsContent.innerHTML = `
+            <div class="dashboard-header">
+                <h1>Analytics Dashboard</h1>
+            </div>
+            <div class="analytics-sections">
+                <div class="chart-card">
+                    <h3>Pet Registrations (Monthly)</h3>
+                    <p>Placeholder chart showing pet registrations per month.</p>
+                </div>
+                <div class="chart-card">
+                    <h3>Vaccination Status</h3>
+                    <p>Placeholder chart showing completed vs pending vaccinations.</p>
+                </div>
+            </div>
+        `;
+        document.querySelector('.main-content').appendChild(analyticsContent);
+    });
+
+    // ===== SETTINGS =====
+    document.querySelector('.sidebar-menu li:nth-child(6) a').addEventListener('click', function(e) {
+        e.preventDefault();
+        clearMainContent();
+
+        const settingsContent = document.createElement('div');
+        settingsContent.className = 'settings-content';
+        settingsContent.innerHTML = `
+            <div class="dashboard-header"><h1>Settings</h1></div>
+        `;
+        document.querySelector('.main-content').appendChild(settingsContent);
+    });
+</script>
+
+
 </body>
 </html>
