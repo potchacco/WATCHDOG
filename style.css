@@ -1226,18 +1226,16 @@ footer {
 }
 
 .input-group {
-  position: relative;
   display: flex;
   align-items: center;
   margin-bottom: 0;
 }
 
-.input-group i {
-  position: absolute;
+/* .input-group i {
   left: 12px;
   color: #90a4ae;
   font-size: 1rem;
-}
+} */
 
 .input-group input {
   width: 100%;
@@ -2038,4 +2036,3 @@ hr {
   margin-top: 20px;
 }
 
-/* loading after login */

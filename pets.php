@@ -71,4 +71,63 @@ try {
 } catch (PDOException $e) {
     echo json_encode(['status' => 'error', 'message' => 'Error fetching pets.']);
 }
+
+// ===== DELETE pet =====
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
+    $pet_id = $_POST['pet_id'] ?? '';
+    
+    if (empty($pet_id)) {
+        echo json_encode(['status' => 'error', 'message' => 'Pet ID is required.']);
+        exit;
+    }
+    
+    try {
+        // Get image URL before deleting
+        $stmt = $pdo->prepare("SELECT image_url FROM pets WHERE id = ? AND user_id = ?");
+        $stmt->execute([$pet_id, $_SESSION['user_id']]);
+        $pet = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($pet && $pet['image_url']) {
+            // Delete the image file
+            $imagePath = __DIR__ . '/' . $pet['image_url'];
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+        
+        // Delete from database
+        $stmt = $pdo->prepare("DELETE FROM pets WHERE id = ? AND user_id = ?");
+        $stmt->execute([$pet_id, $_SESSION['user_id']]);
+        echo json_encode(['status' => 'success', 'message' => 'Pet deleted successfully!']);
+    } catch (PDOException $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+// ===== UPDATE pet =====
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
+    $pet_id = $_POST['pet_id'] ?? '';
+    $name = $_POST['name'] ?? '';
+    $species = $_POST['species'] ?? '';
+    $breed = $_POST['breed'] ?? '';
+    $age = $_POST['age'] ?? '';
+    $gender = $_POST['gender'] ?? '';
+    
+    if (empty($pet_id) || empty($name) || empty($species)) {
+        echo json_encode(['status' => 'error', 'message' => 'Pet ID, name and species are required.']);
+        exit;
+    }
+    
+    try {
+        $stmt = $pdo->prepare("UPDATE pets SET name = ?, species = ?, breed = ?, age = ?, gender = ? 
+                               WHERE id = ? AND user_id = ?");
+        $stmt->execute([$name, $species, $breed, $age, $gender, $pet_id, $_SESSION['user_id']]);
+        echo json_encode(['status' => 'success', 'message' => 'Pet updated successfully!']);
+    } catch (PDOException $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
 ?>
