@@ -34,7 +34,7 @@ body {
 
 .sidebar-header {
     padding: 0 1.5rem;
-    margin-bottom: 2rem;
+    margin-bottom: 10rem;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -139,7 +139,7 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
-    background: #fff;
+    background: #3469dd5b;
     padding: 1.5rem;
     border-radius: 15px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -148,7 +148,7 @@ body {
 .dashboard-header h1 {
     margin: 0;
     font-size: 1.75rem;
-    color: #263238;
+    color: #727171;
 }
 
 .user-profile {
@@ -729,4 +729,16 @@ body {
     .dashboard-grid {
         grid-template-columns: 1fr;
     }
+    .hero-image {
+        display: none;
+    }
+    .sidebar-header {
+        margin-bottom: 0;
+    }
+}
+
+.hero-image {
+    position: absolute;
+    bottom: 50px;
+    left: 20px;
 }

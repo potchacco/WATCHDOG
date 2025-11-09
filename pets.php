@@ -130,4 +130,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     exit;
 }
 
+// After the pet INSERT statement in pets.php, add:
+$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
+                          VALUES (?, 'pet_registered', ?, NOW())");
+$logStmt->execute([$_SESSION['user_id'], "New pet registered: $name"]);
+
+$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
+                          VALUES (?, 'pet_updated', ?, NOW())");
+$logStmt->execute([$_SESSION['user_id'], "Pet updated: $name"]);
+
+$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
+                          VALUES (?, 'pet_deleted', ?, NOW())");
+$logStmt->execute([$_SESSION['user_id'], "Pet deleted"]);
+
+
 ?>

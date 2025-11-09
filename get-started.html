@@ -1,390 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WatchDog - Get Started</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Watchdog - Dog Monitoring System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
+        /* style.css */
 
-        body {
-            overflow-x: hidden;
-        }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        .hero {
-            height: 100vh;
-            width: 100%;
-            background-image: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)), url('images/try3.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    line-height: 1.6;
+    color: #000000; /* black text */
+    background-color: #f0f0f0; /* light gray background */
+    min-height: 100vh;
+}
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, transparent, rgba(0, 0, 0, 0.3));
-            z-index: 1;
-        }
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
 
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background-color: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float 15s infinite linear;
-        }
+/* Navigation */
+header {
+    padding: 2rem 0;
+}
 
-        @keyframes float {
-            0% {
-                transform: translateY(0) translateX(0);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) translateX(100px);
-                opacity: 0;
-            }
-        }
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-        .hero-content {
-            max-width: 800px;
-            padding: 2rem;
-            position: relative;
-            z-index: 2;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            animation: fadeInUp 1s ease;
-        }
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2.5rem;
+}
 
-        .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            display: inline-block;
-            background: linear-gradient(135deg, #2196F3, #64B5F6);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            position: relative;
-        }
+.nav-links a {
+    text-decoration: none;
+    color: #333333; /* dark gray text */
+    font-weight: 600;
+    transition: color 0.3s ease;
+    font-size: 0.95rem;
+}
 
-        .logo::after {
-            content: '🐕';
-            position: absolute;
-            top: -10px;
-            right: -30px;
-            font-size: 1.8rem;
-            -webkit-text-fill-color: initial;
-        }
+.nav-links a:hover {
+    color: #0052cc; /* deep blue hover */
+}
 
-        .title {
-            font-size: 4.5rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+/* Hero Section */
+.hero {
+    display: flex;
+    flex-direction: row; /* default flex-direction is row, so this ensures horizontal layout */
+    align-items: center; /* vertically centers items */
+    justify-content: center;
+    gap: 4rem;
+    padding: 0 2rem;
+    min-height: calc(100vh - 150px);
+    text-align: left;
+    flex-wrap: nowrap; /* no wrapping to keep row layout */
+}
 
-        .subtitle {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #FFB300;
-            margin-bottom: 1.5rem;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-            letter-spacing: 3px;
-            position: relative;
-            display: inline-block;
-        }
+.hero-image {
+    flex: 1 1 400px;
+    max-width: 500px;
+    height: auto;
+    border-radius: 15px;
+    box-shadow: 0 15px 40px rgba(0, 82, 204, 0.25);
+    object-fit: cover;
+}
 
-        .subtitle::before,
-        .subtitle::after {
-            content: '';
-            position: absolute;
-            height: 2px;
-            width: 30px;
-            background: #FFB300;
-            top: 50%;
-            transform: translateY(-50%);
-        }
+.hero-content {
+    flex: 1 1 400px;
+    max-width: 600px;
+    animation: fadeInUp 1s ease-out;
+}
 
-        .subtitle::before {
-            left: -40px;
-        }
 
-        .subtitle::after {
-            right: -40px;
-        }
+.hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    letter-spacing: -1.5px;
+    line-height: 1.2;
+}
 
-        .description {
-            font-size: 1.2rem;
-            margin-bottom: 2.5rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
+.hero p {
+    font-size: 1.25rem;
+    color: #444444;
+    margin-bottom: 3rem;
+    line-height: 1.8;
+    font-weight: 400;
+    max-width: 500px;
+}
 
-        .features {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2.5rem;
-        }
+@media (max-width: 900px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+        gap: 2rem;
+        padding: 1rem;
+    }
 
-        .feature {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.9);
-        }
+    .hero-content, .hero-image {
+        max-width: 100%;
+        flex: none;
+    }
 
-        .feature i {
-            color: #2196F3;
-            font-size: 1.2rem;
-        }
+    .hero h1 {
+        font-size: 2.75rem;
+        margin-bottom: 1rem;
+    }
 
-        .cta-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 1rem 2.5rem;
-            font-size: 1.2rem;
-            font-weight: 600;
-            text-decoration: none;
-            color: white;
-            background: linear-gradient(135deg, #2196F3, #1976D2);
-            border-radius: 50px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
+    .hero p {
+        font-size: 1.1rem;
+        max-width: 100%;
+        margin-bottom: 2rem;
+    }
+}
 
-        .cta-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1976D2, #2196F3);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
 
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.4);
-        }
+/* CTA Button */
+.cta-button {
+    display: inline-block;
+    padding: 1.1rem 3.5rem;
+    background: #0052cc; /* deep blue */
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1.15rem;
+    font-weight: 700;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 82, 204, 0.3);
+    letter-spacing: 0.5px;
+    margin-bottom: 3rem;
+}
 
-        .cta-button:hover::before {
-            opacity: 1;
-        }
+.cta-button:hover {
+    background: #003d99; /* darker blue on hover */
+    box-shadow: 0 15px 40px rgba(0, 61, 153, 0.5);
+    transform: translateY(-3px);
+}
 
-        .cta-button i {
-            font-size: 1.3rem;
-            position: relative;
-            z-index: 1;
-        }
+/* Features Preview */
+.features-preview {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    margin-top: 3rem;
+    flex-wrap: wrap;
+}
 
-        .cta-button span {
-            position: relative;
-            z-index: 1;
-        }
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    color: #333333; /* dark gray text */
+    font-size: 0.95rem;
+    font-weight: 600;
+}
 
-        .scroll-indicator {
-            position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            animation: bounce 2s infinite;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 2rem;
-            cursor: pointer;
-            z-index: 2;
-        }
+.feature-item .icon {
+    font-size: 2rem;
+    background: #ffffff;
+    padding: 1rem;
+    border-radius: 50%;
+    box-shadow: 0 5px 20px rgba(0, 82, 204, 0.1);
+    transition: transform 0.3s ease;
+}
 
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
-        }
+.feature-item:hover .icon {
+    transform: scale(1.1);
+}
 
-        .cta-button.loading {
-            background: #1976D2;
-            pointer-events: none;
-            position: relative;
-            color: transparent;
-        }
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
-        .cta-button.loading::after {
-            content: "";
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            top: 50%;
-            left: 50%;
-            margin: -10px 0 0 -10px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 0.8s linear infinite;
-        }
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-links {
+        gap: 1.5rem;
+    }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
+    .hero h1 {
+        font-size: 2.5rem;
+    }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .hero p {
+        font-size: 1.1rem;
+    }
 
-        @media (max-width: 768px) {
-            .title {
-                font-size: 3.5rem;
-            }
-            .subtitle {
-                font-size: 1.2rem;
-            }
-            .description {
-                font-size: 1rem;
-            }
-        }
+    .cta-button {
+        padding: 1rem 2.75rem;
+        font-size: 1rem;
+    }
 
-        @media (max-width: 480px) {
-            .title {
-                font-size: 2.5rem;
-            }
-            .hero-content {
-                padding: 0 15px;
-            }
-        }
+    .features-preview {
+        gap: 2rem;
+    }
+
+    .feature-item .icon {
+        font-size: 1.75rem;
+        padding: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 1.5rem;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .cta-button {
+        margin-bottom: 2.5rem;
+    }
+
+    .features-preview {
+        gap: 1.5rem;
+    }
+}
+
+#title {
+    font-size: 3.5rem;
+}
+
+/* Spinner style */
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #ffffff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+
+
     </style>
 </head>
 <body>
-    <section class="hero">
-        <div class="hero-content">
-            <div class="logo">WatchDog</div>
-            <h1 class="title">WATCHDOG</h1>
-            <h2 class="subtitle">SECURE PET TECH</h2>
-            <p class="description">Empowering pet owners with cutting-edge technology for a safer, smarter, and more connected pet care experience. Join the future of pet management today.</p>
-            <div class="features">
-                <div class="feature">
-                    <i class="fas fa-shield-alt"></i>
-                    <span>Government Certified</span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-clock"></i>
-                    <span>24/7 Support</span>
-                </div>
-                <div class="feature">
-                    <i class="fas fa-mobile-alt"></i>
-                    <span>Mobile Ready</span>
-                </div>
+    <div class="container">
+        <header>
+            <nav>
+                <ul class="nav-links">
+                    .
+                </ul>
+            </nav>
+        </header>
+
+        <main class="hero">
+    <img src="https://images.unsplash.com/photo-1736196674439-1adb6ccbbd31?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nzl8fGhpZ2glMjBxdWFsaXR5JTIwaW1hZ2VzJTIwb2YlMjBkb2dzfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500" alt="Playful dog" class="hero-image" />
+
+    <div class="hero-content">
+        <h2 id="title">WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</h2>
+        <h1>Keep Your Best Friend Safe & Happy</h1>
+        <p>Monitor your dog from anywhere with live video streaming, activity tracking, and intelligent alerts. Peace of mind is just a click away.</p>
+        <a href="index.php" class="cta-button" id="getStartedBtn">Get Started</a>
+        <!-- <div class="features-preview">
+            <div class="feature-item">
+                <span class="icon">📹</span>
+                <span>Live Video</span>
             </div>
-            <a href="index.php" class="cta-button" id="getStartedBtn">
-                <i class="fas fa-paw"></i>
-                <span>Get Started</span>
-            </a>
-        </div>
-        <div class="scroll-indicator">
-            <i class="fas fa-chevron-down"></i>
-        </div>
-    </section>
+            <div class="feature-item">
+                <span class="icon">🔔</span>
+                <span>Smart Alerts</span>
+            </div>
+            <div class="feature-item">
+                <span class="icon">📊</span>
+                <span>Activity Tracking</span>
+            </div>
+        </div> -->
+    </div>
+</main>
 
-    <script>
-        // Create floating particles
-        function createParticles() {
-            const hero = document.querySelector('.hero');
-            const particleCount = 20;
+    </div>
+<script> 
+    const btn = document.getElementById('getStartedBtn');
 
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                
-                // Random position
-                particle.style.left = Math.random() * 100 + 'vw';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.opacity = Math.random();
-                
-                hero.appendChild(particle);
-            }
-        }
+    btn.addEventListener('click', (event) => {
+    event.preventDefault();  // Prevent immediate navigation or form submit
 
-        // Get Started button animation
-        document.getElementById('getStartedBtn').addEventListener('click', function(e) {
-            e.preventDefault();
-            const button = this;
-            
-            // Add loading class to show animation
-            button.classList.add('loading');
-            
-            // Simulate loading time
-            setTimeout(() => {
-                window.location.href = 'index.php';
-            }, 800);
-        });
+    btn.disabled = true;
+    btn.innerHTML = 'Loading <span class="spinner"></span>';
 
-        // Scroll indicator click handler
-        document.querySelector('.scroll-indicator').addEventListener('click', function() {
-            window.scrollTo({
-                top: window.innerHeight,
-                behavior: 'smooth'
-            });
-        });
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = 'Get Started';
 
-        // Initialize particles
-        createParticles();
-    </script>
+        // Now do the actual navigation if needed
+        // For example:
+         window.location.href = 'index.php';
+    }, 3000);
+});
+
+</script>
+
+
 </body>
 </html>

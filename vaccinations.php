@@ -31,6 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
     exit;
 }
 
+$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
+                          VALUES (?, 'vaccination_added', ?, NOW())");
+$logStmt->execute([$_SESSION['user_id'], "Vaccination added: $vaccine_name"]);
+
+
 // ===== UPDATE Vaccination =====
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
     $vacc_id = $_POST['vacc_id'] ?? '';
@@ -56,6 +61,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     }
     exit;
 }
+
+$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
+                          VALUES (?, 'vaccination_updated', ?, NOW())");
+$logStmt->execute([$_SESSION['user_id'], "Vaccination updated: $vaccine_name"]);
+
 
 // ===== DELETE Vaccination =====
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {

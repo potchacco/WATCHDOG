@@ -25,6 +25,7 @@ require_once 'check_session.php';
                 <li><a href="#"><i class="fas fa-chart-bar"></i> Analytics</a></li>
                 <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
                 <li><a href="index.php" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <img src="https://i.pinimg.com/1200x/e0/d9/fc/e0d9fc9b4f89a5debdfd0955344861f9.jpg" alt="Playful dog" class="hero-image" width="240px" height="130px"/>
             </ul>
         </aside>
 
@@ -263,6 +264,113 @@ require_once 'check_session.php';
     </div>
 </div>
 
+<!-- Incident Modal -->
+<div class="modal" id="incidentModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Report New Incident</h2>
+            <button type="button" class="modal-close" id="closeIncidentModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="incidentForm">
+                <input type="hidden" name="action" value="add">
+                
+                <div class="form-group">
+                    <label for="incidentPetId">Related Pet (Optional)</label>
+                    <select id="incidentPetId" name="pet_id">
+                        <option value="">No specific pet</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="incidentType">Incident Type</label>
+                    <select id="incidentType" name="incident_type" required>
+                        <option value="">Select Type</option>
+                        <option value="Lost Pet">Lost Pet</option>
+                        <option value="Found Pet">Found Pet</option>
+                        <option value="Aggressive Behavior">Aggressive Behavior</option>
+                        <option value="Injury">Injury</option>
+                        <option value="Illness">Illness</option>
+                        <option value="Stray Animal">Stray Animal</option>
+                        <option value="Noise Complaint">Noise Complaint</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="incidentDescription">Description</label>
+                    <textarea id="incidentDescription" name="description" rows="4" required placeholder="Describe the incident..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="incidentLocation">Location</label>
+                    <input type="text" id="incidentLocation" name="location" placeholder="Street, Barangay, etc.">
+                </div>
+
+                <div class="form-group">
+                    <label for="incidentSeverity">Severity</label>
+                    <select id="incidentSeverity" name="severity" required>
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="incidentDate">Incident Date & Time</label>
+                    <input type="datetime-local" id="incidentDate" name="incident_date" required>
+                </div>
+
+                <button type="submit" class="dashboard-btn btn-primary btn-block">
+                    <i class="fas fa-exclamation-triangle"></i> Report Incident
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Update Incident Modal -->
+<div class="modal" id="updateIncidentModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Update Incident Status</h2>
+            <button type="button" class="modal-close" id="closeUpdateIncidentModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="updateIncidentForm">
+                <input type="hidden" name="action" value="update">
+                <input type="hidden" id="updateIncidentId" name="incident_id">
+                
+                <div class="form-group">
+                    <label for="updateIncidentStatus">Status</label>
+                    <select id="updateIncidentStatus" name="status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="updateIncidentNotes">Notes (Optional)</label>
+                    <textarea id="updateIncidentNotes" name="notes" rows="4" placeholder="Add notes about this status update..."></textarea>
+                </div>
+
+                <button type="submit" class="dashboard-btn btn-primary btn-block">
+                    <i class="fas fa-save"></i> Update Status
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
 
             <!-- Quick Actions -->
             <div class="dashboard-grid">
@@ -295,6 +403,7 @@ require_once 'check_session.php';
         </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="dashboard.js"></script>
     <script>
     // ===== Logout button =====
@@ -401,19 +510,25 @@ document.querySelector('.sidebar-menu li:nth-child(4) a').addEventListener('clic
     const incidentsContent = document.createElement('div');
     incidentsContent.className = 'incidents-content';
     incidentsContent.innerHTML = `
-        <div class="dashboard-header">
+        <div class="dashboard-header" style="margin-bottom: 20px;">
             <h1>Incident Reports</h1>
-            <button class="dashboard-btn btn-primary"><i class="fas fa-plus"></i> Report New Incident</button>
+            <button class="dashboard-btn btn-primary" id="reportIncidentBtn">
+                <i class="fas fa-plus"></i> Report New Incident
+            </button>
         </div>
-        <div class="incidents-grid">
-            <div class="no-incidents-message">
-                <i class="fas fa-clipboard-check"></i>
-                <p>No incidents reported. Click the button above to report an incident.</p>
-            </div>
+        <div id="incidentsContainer">
+            <p>Loading incidents...</p>
         </div>
     `;
     document.querySelector('.main-content').appendChild(incidentsContent);
+
+    document.getElementById('reportIncidentBtn').addEventListener('click', function() {
+        openIncidentModal();
+    });
+
+    loadIncidents();
 });
+
 
 // ===== ANALYTICS =====
 document.querySelector('.sidebar-menu li:nth-child(5) a').addEventListener('click', function(e) {
