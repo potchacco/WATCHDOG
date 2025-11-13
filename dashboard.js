@@ -73,9 +73,11 @@ async function loadPetsInSidebar() {
                             <button class="dashboard-btn btn-secondary btn-sm edit-pet-btn" data-pet-id="${pet.id}" style="flex: 1;">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
+                            <!--
                             <button class="dashboard-btn btn-secondary btn-sm delete-pet-btn" data-pet-id="${pet.id}" style="flex: 1; background: #f44336;">
                                 <i class="fas fa-trash"></i> Delete
                             </button>
+                            -->
                         </div>
                     </div>
                 `;

@@ -113,7 +113,7 @@ html {
   max-width: 1400px;
   margin: 0 auto;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   padding: 0 2rem;
 }
@@ -395,7 +395,7 @@ footer {
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0;
   width: 100%;
 }
 
@@ -1971,6 +1971,7 @@ footer {
 
   .hero-buttons {
     flex-direction: column;
+    margin-top: -50px;
   }
 
   .btn {
@@ -1983,6 +1984,7 @@ footer {
 
   .stat-card {
     font-size: 0.95rem;
+    margin-top: -40px;
   }
 
   .footer-links {
@@ -1997,6 +1999,10 @@ footer {
 
   .auth-buttons {
     display: flex;
+  }
+
+  .stat-card {
+    padding: 1.2rem 0.8rem;
   }
 }
 

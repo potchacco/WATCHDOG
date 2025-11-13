@@ -13,10 +13,20 @@ require_once 'check_session.php';
 </head>
 <body>
     <div class="dashboard">
-        <aside class="sidebar">
+         <!-- Hamburger button -->
+            <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+        <!-- SIDEBAR WITH BURGER MENU -->
+        <aside class="sidebar" id="sidebar">
+           
+            
             <div class="sidebar-header">
                 <span class="logo-text" id="span-h2">WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</span>
             </div>
+            
             <ul class="sidebar-menu">
                 <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
                 <li><a href="#"><i class="fas fa-paw"></i> Pets</a></li>
@@ -563,9 +573,480 @@ document.querySelector('.sidebar-menu li:nth-child(6) a').addEventListener('clic
     const settingsContent = document.createElement('div');
     settingsContent.className = 'settings-content';
     settingsContent.innerHTML = `
-        <div class="dashboard-header"><h1>Settings</h1></div>
+        <div class="dashboard-header">
+            <h1>Settings</h1>
+            <p style="color: #666; margin-top: 10px;">Manage your account preferences and application settings</p>
+        </div>
+        
+        <div class="settings-container">
+            <!-- Profile Settings -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <i class="fas fa-user-circle"></i>
+                    <h3>Profile Information</h3>
+                </div>
+                <form id="profileSettingsForm" class="settings-form">
+                    <input type="hidden" name="action" value="update_profile">
+                    
+                    <div class="form-group">
+                        <label for="settingsFullName">Full Name</label>
+                        <input type="text" id="settingsFullName" name="full_name" 
+                               value="<?php echo htmlspecialchars($_SESSION['user_name']); ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="settingsEmail">Email Address</label>
+                        <input type="email" id="settingsEmail" name="email" 
+                               value="<?php echo htmlspecialchars($_SESSION['user_email']); ?>" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="settingsPhone">Phone Number</label>
+                        <input type="tel" id="settingsPhone" name="phone" 
+                               placeholder="+63 XXX XXX XXXX">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="settingsAddress">Address</label>
+                        <input type="text" id="settingsAddress" name="address" 
+                               placeholder="Street, Barangay, City">
+                    </div>
+
+                    <button type="submit" class="dashboard-btn btn-primary">
+                        <i class="fas fa-save"></i> Save Profile Changes
+                    </button>
+                </form>
+            </div>
+
+            <!-- Security Settings -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <i class="fas fa-lock"></i>
+                    <h3>Security & Privacy</h3>
+                </div>
+                <form id="securitySettingsForm" class="settings-form">
+                    <input type="hidden" name="action" value="update_password">
+                    
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <input type="password" id="currentPassword" name="current_password" 
+                               placeholder="Enter current password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <input type="password" id="newPassword" name="new_password" 
+                               placeholder="Enter new password" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <input type="password" id="confirmPassword" name="confirm_password" 
+                               placeholder="Confirm new password" required>
+                    </div>
+
+                    <button type="submit" class="dashboard-btn btn-primary">
+                        <i class="fas fa-key"></i> Update Password
+                    </button>
+                </form>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <i class="fas fa-bell"></i>
+                    <h3>Notification Preferences</h3>
+                </div>
+                <form id="notificationSettingsForm" class="settings-form">
+                    <input type="hidden" name="action" value="update_notifications">
+                    
+                    <div class="settings-toggle-group">
+                        <div class="settings-toggle-item">
+                            <div class="toggle-info">
+                                <label for="notifVaccination">Vaccination Reminders</label>
+                                <span>Get notified before vaccination due dates</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notifVaccination" name="notif_vaccination" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="settings-toggle-item">
+                            <div class="toggle-info">
+                                <label for="notifIncidents">Incident Alerts</label>
+                                <span>Receive alerts for nearby incidents</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notifIncidents" name="notif_incidents" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="settings-toggle-item">
+                            <div class="toggle-info">
+                                <label for="notifLicense">License Renewal</label>
+                                <span>Reminders for pet license renewals</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notifLicense" name="notif_license" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="settings-toggle-item">
+                            <div class="toggle-info">
+                                <label for="notifEmail">Email Notifications</label>
+                                <span>Send notifications to your email</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="notifEmail" name="notif_email">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="dashboard-btn btn-primary">
+                        <i class="fas fa-save"></i> Save Preferences
+                    </button>
+                </form>
+            </div>
+
+            <!-- App Preferences -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <i class="fas fa-sliders-h"></i>
+                    <h3>Application Preferences</h3>
+                </div>
+                <form id="appSettingsForm" class="settings-form">
+                    <input type="hidden" name="action" value="update_app_settings">
+                    
+                    <div class="form-group">
+                        <label for="defaultView">Default Dashboard View</label>
+                        <select id="defaultView" name="default_view">
+                            <option value="overview">Overview Dashboard</option>
+                            <option value="pets">Pets Management</option>
+                            <option value="vaccinations">Vaccinations</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="itemsPerPage">Items Per Page</label>
+                        <select id="itemsPerPage" name="items_per_page">
+                            <option value="5">5 items</option>
+                            <option value="10" selected>10 items</option>
+                            <option value="20">20 items</option>
+                            <option value="50">50 items</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-toggle-group">
+                        <div class="settings-toggle-item">
+                            <div class="toggle-info">
+                                <label for="darkMode">Dark Mode</label>
+                                <span>Switch to dark theme</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="darkMode" name="dark_mode">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="dashboard-btn btn-primary">
+                        <i class="fas fa-save"></i> Save Preferences
+                    </button>
+                </form>
+            </div>
+
+            <!-- Account Actions -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <i class="fas fa-user-cog"></i>
+                    <h3>Account Management</h3>
+                </div>
+                <div class="settings-form">
+                    <div class="account-actions">
+                        <div class="account-action-item">
+                            <div>
+                                <h4>Export Data</h4>
+                                <p>Download all your pet records and data</p>
+                            </div>
+                            <button class="dashboard-btn btn-secondary" id="exportDataBtn">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+
+                        <div class="account-action-item">
+                            <div>
+                                <h4>Delete Account</h4>
+                                <p>Permanently delete your account and all data</p>
+                            </div>
+                            <button class="dashboard-btn btn-danger" id="deleteAccountBtn">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="settings-card">
+                <div class="settings-card-header">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>About</h3>
+                </div>
+                <div class="about-content">
+                    <div class="about-item">
+                        <span>Version</span>
+                        <strong>1.0.0</strong>
+                    </div>
+                    <div class="about-item">
+                        <span>Last Updated</span>
+                        <strong>November 2025</strong>
+                    </div>
+                    <div class="about-item">
+                        <span>Support</span>
+                        <a href="mailto:support@watchdog.com">support@watchdog.com</a>
+                    </div>
+                    <div class="about-item">
+                        <span>Terms & Privacy</span>
+                        <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     `;
     document.querySelector('.main-content').appendChild(settingsContent);
+
+    // Initialize settings event handlers
+    initializeSettingsHandlers();
+});
+
+// Settings handlers
+function initializeSettingsHandlers() {
+    // Profile Settings Form
+    document.getElementById('profileSettingsForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitBtn.disabled = true;
+
+        try {
+            // Simulate save - replace with actual API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            showSettingsMessage('Profile updated successfully!', 'success');
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        } catch (error) {
+            showSettingsMessage('Failed to update profile', 'error');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Security Settings Form
+    document.getElementById('securitySettingsForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (newPassword !== confirmPassword) {
+            showSettingsMessage('Passwords do not match', 'error');
+            return;
+        }
+
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        submitBtn.disabled = true;
+
+        try {
+            // Simulate password update - replace with actual API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            showSettingsMessage('Password updated successfully!', 'success');
+            this.reset();
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Updated!';
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        } catch (error) {
+            showSettingsMessage('Failed to update password', 'error');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Notification Settings Form
+    document.getElementById('notificationSettingsForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitBtn.disabled = true;
+
+        try {
+            await new Promise(resolve => setTimeout(resolve, 800));
+            showSettingsMessage('Notification preferences saved!', 'success');
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        } catch (error) {
+            showSettingsMessage('Failed to save preferences', 'error');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    // App Settings Form
+    document.getElementById('appSettingsForm')?.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        submitBtn.disabled = true;
+
+        try {
+            await new Promise(resolve => setTimeout(resolve, 800));
+            showSettingsMessage('Application preferences saved!', 'success');
+            submitBtn.innerHTML = '<i class="fas fa-check"></i> Saved!';
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 2000);
+        } catch (error) {
+            showSettingsMessage('Failed to save preferences', 'error');
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+
+    // Dark Mode Toggle
+    document.getElementById('darkMode')?.addEventListener('change', function() {
+        if (this.checked) {
+            document.body.classList.add('dark-mode');
+            showSettingsMessage('Dark mode enabled', 'success');
+        } else {
+            document.body.classList.remove('dark-mode');
+            showSettingsMessage('Dark mode disabled', 'success');
+        }
+    });
+
+    // Export Data
+    document.getElementById('exportDataBtn')?.addEventListener('click', async function() {
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exporting...';
+        this.disabled = true;
+        
+        try {
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            showSettingsMessage('Data exported successfully!', 'success');
+            this.innerHTML = '<i class="fas fa-download"></i> Export';
+            this.disabled = false;
+        } catch (error) {
+            showSettingsMessage('Export failed', 'error');
+            this.innerHTML = '<i class="fas fa-download"></i> Export';
+            this.disabled = false;
+        }
+    });
+
+    // Delete Account
+    document.getElementById('deleteAccountBtn')?.addEventListener('click', function() {
+        if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            if (confirm('This will permanently delete all your pet records and data. Continue?')) {
+                showSettingsMessage('Account deletion initiated. Please contact support.', 'warning');
+            }
+        }
+    });
+}
+
+// Helper function to show messages in settings
+function showSettingsMessage(message, type = 'success') {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `settings-message ${type}`;
+    messageDiv.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+        <span>${message}</span>
+    `;
+    
+    const settingsContainer = document.querySelector('.settings-container');
+    if (settingsContainer) {
+        settingsContainer.insertBefore(messageDiv, settingsContainer.firstChild);
+        setTimeout(() => messageDiv.remove(), 4000);
+    }
+}
+
+// ===== BURGER MENU FUNCTIONALITY =====
+const hamburger = document.getElementById('hamburger');
+const sidebar = document.getElementById('sidebar');
+let sidebarOverlay;
+
+// Create overlay for mobile
+function createOverlay() {
+    if (!sidebarOverlay) {
+        sidebarOverlay = document.createElement('div');
+        sidebarOverlay.className = 'sidebar-overlay';
+        document.body.appendChild(sidebarOverlay);
+        
+        sidebarOverlay.addEventListener('click', closeMobileMenu);
+    }
+}
+
+function toggleMobileMenu() {
+    hamburger.classList.toggle('active');
+    sidebar.classList.toggle('active');
+    
+    if (sidebarOverlay) {
+        sidebarOverlay.classList.toggle('active');
+    }
+    
+    // Prevent body scroll when menu is open
+    document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+}
+
+function closeMobileMenu() {
+    hamburger.classList.remove('active');
+    sidebar.classList.remove('active');
+    
+    if (sidebarOverlay) {
+        sidebarOverlay.classList.remove('active');
+    }
+    
+    document.body.style.overflow = '';
+}
+
+// Event listener for hamburger
+hamburger.addEventListener('click', toggleMobileMenu);
+
+// Create overlay on page load
+createOverlay();
+
+// Close menu when clicking sidebar links (mobile)
+const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+sidebarLinks.forEach(link => {
+    link.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
+            closeMobileMenu();
+        }
+    });
+});
+
+// Handle window resize
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+        closeMobileMenu();
+    }
 });
 
 </script>
