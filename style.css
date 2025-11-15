@@ -1788,3 +1788,27 @@ button[type="submit"]:disabled {
 .will-animate:nth-child(4) { transition-delay: 0.3s; }
 .will-animate:nth-child(5) { transition-delay: 0.4s; }
 .will-animate:nth-child(6) { transition-delay: 0.5s; }
+
+/* Style the role selector */
+#loginRole {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #E2E8F0;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#loginRole:focus {
+    outline: none;
+    border-color: #5B7FDB;
+    box-shadow: 0 0 0 3px rgba(91, 127, 219, 0.1);
+}
+
+#loginRole option {
+    padding: 10px;
+    font-size: 1rem;
+}

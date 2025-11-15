@@ -52,12 +52,24 @@
       </div>
       <div class="modal-body">
         <form id="loginForm" novalidate>
+          <!-- NEW: Login As Selector -->
+          <div class="form-group">
+            <label for="loginRole">Login As</label>
+            <div class="input-group">
+              <select id="loginRole" name="role" required>
+                <option value="resident">👤 Resident (Pet Owner)</option>
+                <option value="admin">🛡️ Admin (Barangay Official)</option>
+              </select>
+            </div>
+          </div>
+
           <div class="form-group">
             <label for="loginEmail">Email Address</label>
             <div class="input-group">
               <input type="email" id="loginEmail" name="email" placeholder="✉️ Enter your email address" required>
             </div>
           </div>
+          
           <div class="form-group">
             <label for="loginPassword">Password</label>
             <div class="password-input-group">
@@ -67,25 +79,31 @@
               </button>
             </div>
           </div>
+          
           <div class="form-message-container"></div>
+          
           <button type="submit" name="login" class="btn btn-primary btn-block">
             <i class="fas fa-sign-in-alt"></i> Login
           </button>
         </form>
+        
         <a href="#" id="forgot-link">forgot password?</a><hr>
         <p id="login-via">or login via</p>
+        
         <div class="login-options">
           <div class="options-holder">
             <a href="facebook-login.php"><button type="button" class="option-btn"><i class="fa-brands fa-facebook fa-xl"></i> Log in with facebook</button></a>
             <a href="google-login.php"><button type="button" class="option-btn"><i class="fa-brands fa-google fa-xl"></i> Log in with Google</button></a>
           </div>
         </div>
+        
         <div class="modal-footer">
           <p>Don't have an account? <a href="#" class="switch-to-register">Register here</a></p>
         </div>
       </div>
     </div>
   </div>
+
 
   <!-- Register Modal - UNCHANGED -->
   <div id="registerModal" class="modal">

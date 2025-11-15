@@ -22,33 +22,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
 
     $image_url = null;
 
-    // Handle image upload
-    if (isset($_FILES['petImage']) && $_FILES['petImage']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = __DIR__ . '/uploads/pets/';
-        
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-            chmod($uploadDir, 0777);
-        }
-
-        $fileExt = strtolower(pathinfo($_FILES['petImage']['name'], PATHINFO_EXTENSION));
-        $allowed = ['jpg', 'jpeg', 'png', 'gif'];
-
-        if (!in_array($fileExt, $allowed)) {
-            echo json_encode(['status' => 'error', 'message' => 'Invalid file type.']);
-            exit;
-        }
-
-        $newFilename = 'pet_' . uniqid() . '.' . $fileExt;
-        $targetPath = $uploadDir . $newFilename;
-
-        if (move_uploaded_file($_FILES['petImage']['tmp_name'], $targetPath)) {
-            $image_url = 'uploads/pets/' . $newFilename;
-        } else {
-            echo json_encode(['status' => 'error', 'message' => 'Failed to move uploaded file.']);
-            exit;
-        }
+    // Handle image upload - FIXED: Changed petImage to pet_image
+if (isset($_FILES['pet_image']) && $_FILES['pet_image']['error'] === UPLOAD_ERR_OK) {
+    $uploadDir = __DIR__ . '/uploads/pets/';
+    
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
     }
+
+    $fileExt = strtolower(pathinfo($_FILES['pet_image']['name'], PATHINFO_EXTENSION));
+    $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+
+    if (!in_array($fileExt, $allowed)) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid file type.']);
+        exit;
+    }
+
+    $newFilename = 'pet_' . uniqid() . '.' . $fileExt;
+    $targetPath = $uploadDir . $newFilename;
+
+    if (move_uploaded_file($_FILES['pet_image']['tmp_name'], $targetPath)) {
+        $image_url = 'uploads/pets/' . $newFilename;
+    }
+}
+
 
     // INSERT INTO DATABASE
     try {

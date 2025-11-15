@@ -70,10 +70,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+
+    
     
     if (loginForm) {
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             
             const isEmailValid = validateField(emailInput);
             const isPasswordValid = validateField(passwordInput);
@@ -159,4 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     console.log('PetControlX Simple Login Ready!');
+
+    
 

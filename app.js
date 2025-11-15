@@ -167,7 +167,8 @@ if (loginForm) {
         method: 'POST',
         body: formData
       });
-      const data = await response.text();
+      
+      const data = await response.json(); // Changed to JSON
       
       // Calculate remaining time to reach 3 seconds
       const elapsedTime = Date.now() - startTime;
@@ -176,22 +177,23 @@ if (loginForm) {
       // Wait for remaining time before showing result
       await new Promise(resolve => setTimeout(resolve, remainingTime));
       
-      if (data.includes('success')) {
+      if (data.status === 'success') {
         // Success animation
         submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Success!';
         submitButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
         submitButton.style.opacity = '1';
         
-        // Redirect after short delay
+        // Redirect based on role after short delay
         setTimeout(() => {
-          window.location.href = 'dashboard.php';
+          window.location.href = data.redirect; // Use the redirect from server
         }, 800);
       } else {
         // Reset button on error
         submitButton.innerHTML = originalButtonContent;
         submitButton.disabled = false;
         submitButton.style.opacity = '1';
-        showMessage(messageContainer, 'Invalid email or password', 'error');
+        submitButton.style.background = ''; // Reset background
+        showMessage(messageContainer, data.message || 'Invalid email or password', 'error');
       }
     } catch (error) {
       // Calculate remaining time even on error
@@ -203,10 +205,12 @@ if (loginForm) {
       submitButton.innerHTML = originalButtonContent;
       submitButton.disabled = false;
       submitButton.style.opacity = '1';
+      submitButton.style.background = ''; // Reset background
       showMessage(messageContainer, 'An error occurred. Please try again.', 'error');
     }
   });
 }
+
 
   if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
