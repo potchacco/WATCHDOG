@@ -995,7 +995,7 @@ let sidebarOverlay;
 // Create overlay for mobile
 function createOverlay() {
     if (!sidebarOverlay) {
-        sidebarOverlay = document.createElement('div');
+        sidebarOverlay = document.createElement('div'); 
         sidebarOverlay.className = 'sidebar-overlay';
         document.body.appendChild(sidebarOverlay);
         
@@ -1050,7 +1050,6 @@ window.addEventListener('resize', function() {
 });
 
 </script>
-
 
 </body>
 </html>

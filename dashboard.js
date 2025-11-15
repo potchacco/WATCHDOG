@@ -958,3 +958,17 @@ loadRecentAlerts();
     loadPets();
     loadDashboardStats();
 });
+
+// Hide loader when page fully loads
+window.addEventListener('load', function() {
+    const loader = document.getElementById('pageLoader');
+    if (loader) {
+        setTimeout(() => {
+            loader.style.opacity = '0';
+            loader.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }, 300);
+    }
+});
