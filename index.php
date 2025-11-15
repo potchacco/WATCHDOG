@@ -3,38 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Community Pet Registration & Control System</title>
+  <title>WATCHDOG - Community Pet Registration System</title>
   <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="login.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="shortcut icon" href="project-logo.png" type="image/x-icon">
 </head>
 <body>
-  <nav class="navbar">
-    <div class="container nav-container">
-      <div class="nav-logo">
-        <!-- <img src="images/registration-card.png" alt="Logo" class="logo-img" /> -->
-        <span class="logo-text">WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</span></span>
-      </div>
-      <input type="checkbox" id="nav-toggle" aria-label="Open menu" />
-      <label for="nav-toggle" class="nav-toggle-label">
-        <span></span><span></span><span></span>
-      </label>
-      <div class="nav-menu">
-        <a href="#home" class="nav-link">Home</a>
-        <a href="#services" class="nav-link">Services</a>  
-        <a href="#about" class="nav-link">About</a>
-        <a href="#stats" class="nav-link">Impact</a>
-        <a href="#contact" class="nav-link">Contact</a>
-        <div class="auth-buttons">
-          <button class="auth-btn login-btn" id="loginBtn">Login</button>
-          <button class="auth-btn register-btn" id="registerBtn">Register</button>
-        </div>
+  <body>
+  <!-- Enhanced Navbar -->
+<nav class="navbar">
+  <div class="container nav-container">
+    <div class="nav-logo">
+      <!-- <img src="project-logo.png" width="110px" alt="" class="project-logo"> -->
+      <span class="logo-text"><i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i></span>
+    </div>
+    <input type="checkbox" id="nav-toggle" aria-label="Open menu" />
+    <label for="nav-toggle" class="nav-toggle-label">
+      <span></span><span></span><span></span>
+    </label>
+    <div class="nav-menu">
+      <a href="#home" class="nav-link active">Home</a>
+      <a href="#services" class="nav-link">Services</a>  
+      <a href="#benefits" class="nav-link">About</a>
+      <a href="#howto" class="nav-link">How to Use</a>
+      <a href="#contact" class="nav-link">Contact</a>
+      <div class="auth-buttons">
+        <button class="auth-btn login-btn" id="loginBtn">
+           Login
+        </button>
+        <button class="auth-btn register-btn" id="registerBtn">
+          <i class="fas fa-user-plus"></i> Register
+        </button>
       </div>
     </div>
-  </nav>
+  </div>
+</nav>
 
-  <!-- Login Modal -->
+  <!-- Login Modal - UNCHANGED -->
   <div id="loginModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -48,7 +55,6 @@
           <div class="form-group">
             <label for="loginEmail">Email Address</label>
             <div class="input-group">
-              <!-- <i class="fas fa-envelope input-icon"></i> -->
               <input type="email" id="loginEmail" name="email" placeholder="✉️ Enter your email address" required>
             </div>
           </div>
@@ -59,7 +65,6 @@
               <button type="button" class="password-toggle">
                 <i class="fas fa-eye"></i>
               </button>
-              <!-- <i class="fas fa-lock input-icon"></i> -->
             </div>
           </div>
           <div class="form-message-container"></div>
@@ -82,7 +87,7 @@
     </div>
   </div>
 
-  <!-- Register Modal -->
+  <!-- Register Modal - UNCHANGED -->
   <div id="registerModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -97,14 +102,12 @@
             <label for="registerName">Full Name</label>
             <div class="input-group">
               <input type="text" id="registerName" name="name" placeholder="✉️ Enter your full name" required>
-              <!-- <i class="fas fa-user input-icon"></i> -->
             </div>
           </div>
           <div class="form-group">
             <label for="registerEmail">Email</label>
             <div class="input-group">
               <input type="email" id="registerEmail" name="email" placeholder="✉️ Enter your email" required>
-              <!-- <i class="fas fa-envelope input-icon"></i> -->
             </div>
           </div>
           <div class="form-group">
@@ -116,7 +119,6 @@
               <button type="button" class="password-toggle">
                 <i class="fas fa-eye"></i>
               </button>
-              <!-- <i class="fas fa-lock input-icon"></i> -->
             </div>
           </div>
           <div class="form-group">
@@ -126,7 +128,6 @@
               <button type="button" class="password-toggle">
                 <i class="fas fa-eye"></i>
               </button>
-              <!-- <i class="fas fa-lock input-icon"></i> -->
             </div>
           </div>
           <div class="form-message-container"></div>
@@ -148,302 +149,457 @@
     </div>
   </div>
 
+  <!-- NEW Enhanced Hero Section with Centered Dog Image -->
   <section class="hero" id="home">
+    <div class="hero-background">
+      <div class="bg-gradient"></div>
+      <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+      </div>
+    </div>
+
     <div class="container hero-container">
+      <!-- Left Side Content -->
       <div class="hero-left">
-        <!-- <span class="hero-badge">🛡️ Trusted Government Platform</span> -->
+        <div class="hero-badge">
+          <i class="fas fa-shield-alt"></i>
+          <span>Government Certified Platform</span>
+        </div>
+        
         <h1 class="hero-title">
-          Community Pet<br />
-          <span class="highlight">Registration</span><br />
-          & Control System
+          Digital Pet
+          <span class="highlight">Registration</span>
+          & Tracking Platform
         </h1>
+        
         <p class="hero-subtitle">
-          Empowering barangays with a digital platform for pet registration, real-time tracking, vaccination management, and community safety.
+          Empowering communities with digital pet management, real-time tracking, and comprehensive care solutions.
         </p>
 
-        <div class="hero-stats">
-          <div class="stat-card">
-            <div class="stat-number" data-target="1247">564</div>
-            <div class="stat-label">Registered Pets</div>
+        <div class="hero-stats-left">
+          <div class="stat-item">
+            <div class="stat-icon"><i class="fas fa-paw"></i></div>
+            <div class="stat-content">
+              <div class="stat-number">1,247+</div>
+              <div class="stat-label">Registered Pets</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-number" data-target="98.5">99%</div>
-            <div class="stat-label">Success Rate</div>
+          <div class="stat-item">
+            <div class="stat-icon"><i class="fas fa-syringe"></i></div>
+            <div class="stat-content">
+              <div class="stat-number">98.5%</div>
+              <div class="stat-label">Vaccination Rate</div>
+            </div>
           </div>
-          <div class="stat-card">
-            <div class="stat-number">24/7</div>
-            <div class="stat-label">Support</div>
-          </div>
-          <!-- <div class="stat-card">
-            <div class="stat-number">50+</div>
-            <div class="stat-label">Barangays</div>
-          </div> -->
-        </div>
-
-        <div class="hero-buttons">
-          <button class="btn btn-primary" id="registerPetBtn">
-            Register New Pet <span>🐕</span>
-          </button>
-          <button class="btn btn-secondary" id="emergencyHotlineBtn">
-            Report Emergency <span>🚨</span>
-          </button>
-          <button class="btn btn-outline" id="viewDashboardBtn">View Dashboard <span>📊</span></button>
-        </div>
-
-        <div class="hero-trust">
-          <span>✅ Government Certified</span>
-          <span>🔒 GDPR Compliant</span>
-          <!-- <span>⚡ Real-time Updates</span> -->
-          <span>📱 Mobile Optimized</span>
         </div>
       </div>
 
+      <!-- Center - Large Dog Image -->
+      <div class="hero-center">
+        <div class="dog-container">
+          <div class="dog-image-wrapper">
+            <!-- Replace with your high-quality dog image -->
+            <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&q=80" 
+                 alt="Happy Dog" 
+                 class="hero-dog-image" />
+            <div class="dog-glow"></div>
+          </div>
+          
+          <div class="floating-badge badge-1">
+            <i class="fas fa-heartbeat"></i>
+            <span>Health Monitored</span>
+          </div>
+          <div class="floating-badge badge-2">
+            <i class="fas fa-map-marker-alt"></i>
+            <span>GPS Tracked</span>
+          </div>
+          <div class="floating-badge badge-3">
+            <i class="fas fa-user-md"></i>
+            <span>Vet Connected</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side Content -->
       <div class="hero-right">
-        <img src="images/hero-registration.png" alt="Registration Interface" class="hero-main-img" />
-        <div class="hero-panels">
-          <div class="hero-panel">
-            <img src="images/vaccination-system.png" alt="Vaccination" />
-            <span>Vaccination Tracking</span>
+        <div class="quick-actions">
+          <h3>Quick Actions</h3>
+          
+          <button class="action-card" id="registerPetBtn">
+            <div class="action-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+              <i class="fas fa-plus-circle"></i>
+            </div>
+            <div class="action-content">
+              <h4>Register Pet</h4>
+              <p>Add new pet to system</p>
+            </div>
+            <i class="fas fa-arrow-right action-arrow"></i>
+          </button>
+
+          <button class="action-card" id="emergencyHotlineBtn">
+            <div class="action-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+              <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="action-content">
+              <h4>Emergency Report</h4>
+              <p>Report incidents 24/7</p>
+            </div>
+            <i class="fas fa-arrow-right action-arrow"></i>
+          </button>
+
+          <button class="action-card" id="viewDashboardBtn">
+            <div class="action-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="action-content">
+              <h4>Dashboard</h4>
+              <p>View analytics & stats</p>
+            </div>
+            <i class="fas fa-arrow-right action-arrow"></i>
+          </button>
+        </div>
+
+        <div class="trust-indicators">
+          <div class="trust-item">
+            <i class="fas fa-clock"></i>
+            <span>24/7 Support</span>
           </div>
-          <div class="hero-panel">
-            <img src="images/incident-report.png" alt="Incident" />
-            <span>Emergency Reports</span>
+          <div class="trust-item">
+            <i class="fas fa-lock"></i>
+            <span>Secure Data</span>
           </div>
-          <div class="hero-panel">
-            <img src="images/emergency-response.png" alt="Emergency Response" />
-            <span>Response Dashboard</span>
+        </div>
+                <div class="hero-features-left">
+          <div class="feature-badge">
+            <i class="fas fa-check-circle"></i> GDPR Compliant
+          </div>
+          <div class="feature-badge">
+            <i class="fas fa-mobile-alt"></i> Mobile Ready
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="services" id="services">
-    <div class="container section-container">
-
-      <header class="section-header">
-        <span class="section-badge">⚡ Comprehensive Solutions</span>
-        <h2 class="section-title">Complete Pet Management Ecosystem</h2>
-        <p class="section-description">Everything your barangay needs to manage, track, and protect pets through one integrated government platform.</p>
-      </header>
-
-      <div class="services-grid">
-        <article class="service-card blue">
-          <img src="images/registration-card.png" alt="Digital Pet Registration" />
-          <h3>Digital Pet Registration</h3>
-          <p>Official ID cards, QR codes, biometric data & database integration.</p>
-          <ul>
-            <li>✓ Official Government ID Cards</li>
-            <li>✓ Secure QR Code Generation</li>
-            <li>✓ Real-time Sync</li>
-          </ul>
-        </article>
-
-        <article class="service-card green">
-          <img src="images/vaccination-system.png" alt="Vaccination Management" />
-          <h3>Vaccination Management</h3>
-          <p>Smart reminders, analytics, and veterinary partnerships.</p>
-          <ul>
-            <li>✓ Smart Reminders</li>
-            <li>✓ Health Analytics</li>
-            <li>✓ Vet Clinic Integration</li>
-          </ul>
-        </article>
-
-        <article class="service-card orange">
-          <img src="images/incident-report.png" alt="Incident Management" />
-          <h3>Incident Management</h3>
-          <p>GPS tracking, photo evidence, priority classification & dispatch.</p>
-          <ul>
-            <li>✓ GPS Location Tracking</li>
-            <li>✓ Photo & Video Evidence</li>
-            <li>✓ Priority Classification</li>
-          </ul>
-        </article>
-
-        <article class="service-card red">
-          <img src="images/emergency-response.png" alt="Emergency Response" />
-          <h3>Emergency Response</h3>
-          <p>24/7 hotline, rapid response, real-time community coordination.</p>
-          <ul>
-            <li>✓ 24/7 Emergency Hotline</li>
-            <li>✓ Rapid Response Team</li>
-            <li>✓ Community Alerts</li>
-          </ul>
-        </article>
+    <!-- ENHANCED SERVICES SECTION -->
+  <section class="services-premium" id="services">
+    <div class="container">
+      <div class="section-header-premium">
+        <span class="badge-premium">Our Services</span>
+        <h2 class="section-title-premium">Complete Pet Care Solutions</h2>
+        <p class="section-desc-premium">Professional services designed to keep your pets healthy, safe, and happy</p>
       </div>
+
+      <div class="services-grid-premium">
+        <div class="service-circle-card">
+          <div class="service-icon-circle">
+            <i class="fas fa-id-card-alt"></i>
+          </div>
+          <h3>Digital Registration</h3>
+          <p>Quick and secure pet registration with official ID cards and QR codes for instant verification</p>
+          <a href="#" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="service-circle-card">
+          <div class="service-icon-circle">
+            <i class="fas fa-syringe"></i>
+          </div>
+          <h3>Vaccination Tracking</h3>
+          <p>Smart reminders and complete health records to keep your pet's vaccinations up to date</p>
+          <a href="#" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+        </div>
+
+        <div class="service-circle-card">
+          <div class="service-icon-circle">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3>24/7 Emergency</h3>
+          <p>Round-the-clock emergency response system for immediate assistance when you need it most</p>
+          <a href="#" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
+        </div>
+      </div>
+
+      <button class="btn-premium-outline">View All Services</button>
     </div>
   </section>
 
-  <section class="stats" id="stats">
-    <div class="container stats-container">
-      <div class="stats-content">
-        <header>
-          <span class="section-badge">📊 Community Impact</span>
-          <h2>Making a Real Difference</h2>
-          <p>Transforming pet care safety for millions of pets and families nationwide.</p>
-        </header>
-        <div class="stats-grid">
-          <div class="stat-card blue">
-            <div class="stat-icon">🐕</div>
-            <div class="stat-num" data-target="1247">0</div>
-            <div class="stat-label">Registered Pets</div>
-          </div>
-          <div class="stat-card green">
-            <div class="stat-icon">💉</div>
-            <div class="stat-num" data-target="89">0</div>
-            <div class="stat-label">Vaccinated This Month</div>
-          </div>
-          <div class="stat-card orange">
-            <div class="stat-icon">✅</div>
-            <div class="stat-num" data-target="156">0</div>
-            <div class="stat-label">Cases Resolved</div>
-          </div>
-          <!-- <div class="stat-card red">
-            <div class="stat-icon">🏢</div>
-            <div class="stat-num" data-target="50">0</div>
-            <div class="stat-label">Partner Barangays</div>
-          </div> -->
-          <div class="stat-card blue">
-            <div class="stat-icon">👮</div>
-            <div class="stat-num" data-target="12">0</div>
-            <div class="stat-label">Active Officers</div>
-          </div>
-          <!-- <div class="stat-card green">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-num" data-target="47">0</div>
-            <div class="stat-label">Satisfaction Rating</div>
-          </div> -->
-        </div>
+  <!-- ENHANCED BENEFITS SECTION (Dog with glasses style) -->
+  <section class="benefits-premium" id="benefits">
+    <div class="container">
+      <div class="section-header-premium">
+        <h2 class="section-title-premium">Benefits Of Using WatchDog</h2>
+        <p class="section-desc-premium">Discover why thousands of pet owners trust our platform for their pet care needs</p>
       </div>
-      <aside class="stats-side">
-        <img src="images/community-pets.png" alt="Community Analytics" class="stats-main-img" />
-        <div class="stats-highlights">
-          <div>
-            <span>📈</span>
-            <div>
-              <b>+285%</b>
-              <div>Registration Growth</div>
+
+      <div class="benefits-layout">
+        <div class="benefits-left">
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-user-md"></i>
+            </div>
+            <div class="benefit-content">
+              <h4>Aenean Allegra</h4>
+              <p>Professional veterinary network at your fingertips. Connect with licensed vets instantly.</p>
             </div>
           </div>
-          <div>
-            <span>🎯</span>
-            <div>
-              <b>99.2%</b>
-              <div>System Uptime</div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-dna"></i>
             </div>
-          </div>
-          <div>
-            <span>⚡</span>
-            <div>
-              <b>&lt; 2 min</b>
-              <div>Avg Response</div>
+            <div class="benefit-content">
+              <h4>Praesent</h4>
+              <p>Advanced health tracking and genetic insights to understand your pet better.</p>
             </div>
           </div>
         </div>
-      </aside>
+
+        <div class="benefits-center">
+          <div class="benefits-image-wrapper">
+            <!-- Replace with your dog with glasses image -->
+            <img src="https://images.unsplash.com/photo-1548681528-6a5c45b66b42?w=600&q=80" 
+                 alt="Happy Dog" 
+                 class="benefits-main-image" />
+            <div class="benefits-bg-circle"></div>
+          </div>
+        </div>
+
+        <div class="benefits-right">
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-pills"></i>
+            </div>
+            <div class="benefit-content">
+              <h4>Morbi sodas</h4>
+              <p>Automated medication reminders and prescription management system.</p>
+            </div>
+          </div>
+
+          <div class="benefit-item">
+            <div class="benefit-icon">
+              <i class="fas fa-heartbeat"></i>
+            </div>
+            <div class="benefit-content">
+              <h4>Vestibulum</h4>
+              <p>Real-time health monitoring and emergency alert system for peace of mind.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-premium-outline">Learn More</button>
     </div>
   </section>
 
-  <section class="about" id="about">
-    <div class="container about-container">
-      <div class="about-text">
-        <span class="section-badge">💡 Why Choose PetControlX</span>
-        <h2>Leading Innovation in Community Pet Management</h2>
-        <p>Government-approved technology with real-time intelligence and multi-platform integration.</p>
-        <ul>
-          <li>📊 Real-time analytics and dashboards</li>
-          <li>🌐 Seamless cloud and mobile integration</li>
-        </ul>
+  <!-- ENHANCED HOW TO USE SECTION (Cat style) -->
+  <section class="howto-premium" id="howto">
+    <div class="container">
+      <div class="howto-layout">
+        <div class="howto-left">
+          <div class="howto-image-wrapper">
+            <!-- Replace with your cat image -->
+            <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=600&q=80" 
+                 alt="Cat" 
+                 class="howto-main-image" />
+            <div class="howto-bg-circle"></div>
+          </div>
+        </div>
+
+        <div class="howto-right">
+          <div class="section-header-premium text-left">
+            <h2 class="section-title-premium">How To Use</h2>
+            <p class="section-desc-premium">Getting started with WatchDog is easy. Follow these simple steps to begin protecting your pet.</p>
+          </div>
+
+          <div class="howto-steps">
+            <div class="howto-step">
+              <div class="step-number">01</div>
+              <div class="step-content">
+                <h4>Create Your Account</h4>
+                <p>Sign up in seconds using email or social login. Verify your identity and you're ready to go.</p>
+              </div>
+            </div>
+
+            <div class="howto-step">
+              <div class="step-number">02</div>
+              <div class="step-content">
+                <h4>Register Your Pet</h4>
+                <p>Add your pet's details, upload photos, and get instant digital ID with QR code for tracking.</p>
+              </div>
+            </div>
+
+            <div class="howto-step">
+              <div class="step-number">03</div>
+              <div class="step-content">
+                <h4>Set Up Health Profile</h4>
+                <p>Input vaccination records, medical history, and set automated reminders for upcoming appointments.</p>
+              </div>
+            </div>
+
+            <div class="howto-step">
+              <div class="step-number">04</div>
+              <div class="step-content">
+                <h4>Monitor & Manage</h4>
+                <p>Access your dashboard anytime to track health, schedule vet visits, and connect with services.</p>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-premium">Get Started Now</button>
+        </div>
       </div>
-      <figure class="about-image">
-        <img src="images/community-stats.png" alt="Community Pets" />
-      </figure>
     </div>
   </section>
 
-  <section class="cta" id="contact">
-    <div class="container cta-container">
-      <div class="cta-text">
-        <span class="section-badge white">🚀 Ready to Get Started?</span>
-        <h2 id="text-black">Protect Your Community with PetControlX</h2>
-        <p>Join thousands of responsible pet owners and officials using our platform to ensure safe and healthy communities.</p>
-        <div class="cta-buttons">
-          <button class="btn btn-primary" id="registerPetBtn" id>Register Your Pet Now 🐕</button>
-          <button class="btn btn-secondary" id="emergencyHotlineBtn">Schedule a Demo 📅</button>
-          <button class="btn btn-outline" id="viewDashboardBtn">Emergency Hotline 🚨</button>
-        </div>
+    <!-- PREMIUM CONTACT SECTION -->
+  <section class="contact-premium" id="contact">
+    <div class="container">
+      <div class="section-header-premium">
+        <span class="badge-premium">Get In Touch</span>
+        <h2 class="section-title-premium">Contact Us</h2>
+        <p class="section-desc-premium">Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
       </div>
-      <div class="cta-image">
-        <img src="images/hero-registration.png" alt="PET Registration" />
+
+      <div class="contact-layout">
+        <!-- Left Side - Contact Info -->
+        <div class="contact-info-side">
+          <div class="contact-card">
+            <div class="contact-card-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="contact-card-content">
+              <h4>Visit Us</h4>
+              <p>123 Pet Street, Barangay Center<br>Manila, Philippines 1000</p>
+            </div>
+          </div>
+
+          <div class="contact-card">
+            <div class="contact-card-icon">
+              <i class="fas fa-phone-alt"></i>
+            </div>
+            <div class="contact-card-content">
+              <h4>Call Us</h4>
+              <p>+63 917 123 4567<br>Mon-Fri 9AM-6PM</p>
+            </div>
+          </div>
+
+          <div class="contact-card">
+            <div class="contact-card-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="contact-card-content">
+              <h4>Email Us</h4>
+              <p>support@watchdog.com<br>info@watchdog.com</p>
+            </div>
+          </div>
+
+          <div class="contact-social">
+            <h4>Follow Us</h4>
+            <div class="contact-social-links">
+              <a href="#"><i class="fab fa-facebook"></i></a>
+              <a href="#"><i class="fab fa-instagram"></i></a>
+              <a href="#"><i class="fab fa-twitter"></i></a>
+              <a href="#"><i class="fab fa-linkedin"></i></a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side - Contact Form -->
+        <div class="contact-form-side">
+          <form class="contact-form" id="contactForm">
+            <div class="form-row">
+              <div class="form-group-contact">
+                <label for="contactName">Your Name</label>
+                <input type="text" id="contactName" name="name" placeholder="Enter your name" required>
+              </div>
+              <div class="form-group-contact">
+                <label for="contactEmail">Email Address</label>
+                <input type="email" id="contactEmail" name="email" placeholder="Enter your email" required>
+              </div>
+            </div>
+
+            <div class="form-group-contact">
+              <label for="contactSubject">Subject</label>
+              <input type="text" id="contactSubject" name="subject" placeholder="What's this about?" required>
+            </div>
+
+            <div class="form-group-contact">
+              <label for="contactMessage">Message</label>
+              <textarea id="contactMessage" name="message" rows="5" placeholder="Tell us more..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn-premium">
+              <i class="fas fa-paper-plane"></i> Send Message
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </section>
 
-  <footer class="footer">
-    <div class="container footer-container">
-      <div class="footer-main">
-        <div class="footer-brand">
-          <!-- <img src="images/registration-card.png" alt="Logo" />
-          <span class="footer-logo-text">PetControl<span class="footer-logo-accent">X</span></span> -->
-          <p>The country's leading digital pet registration and management platform, trusted by government units nationwide.</p>
+  <!-- ENHANCED FOOTER -->
+  <footer class="footer-premium">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand-premium">
+          <div class="footer-logo">
+            <i class="fas fa-paw"></i>
+            <span>THE PAW ADVISOR</span>
+          </div>
+          <p>Your trusted partner in pet care and management. Join thousands of happy pet owners today.</p>
         </div>
-        <div class="footer-links">
-          <div>
-            <h4>Platform Services</h4>
-            <ul>
-              <li><a href="#">Pet Registration System</a></li>
-              <li><a href="#">Vaccination Management</a></li>
-              <li><a href="#">Incident Reporting</a></li>
-              <li><a href="#">Emergency Response</a></li>
-              <li><a href="#">Analytics Dashboard</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4>Government Partners</h4>
-            <ul>
-              <li><a href="#">DILG Partnership</a></li>
-              <li><a href="#">DOH Collaboration</a></li>
-              <li><a href="#">LGU Integration</a></li>
-              <li><a href="#">Barangay Network</a></li>
-              <li><a href="#">Training Programs</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4>Support & Resources</h4>
-            <ul>
-              <li><a href="#">Help Documentation</a></li>
-              <li><a href="#">Video Tutorials</a></li>
-              <li><a href="#">Community Forums</a></li>
-              <li><a href="#">Technical Support</a></li>
-              <li><a href="#">System Status</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4>Emergency Contact</h4>
-            <ul>
-              <li>📞 (02) 8-PET-HELP</li>
-              <li>📞 0917-123-PETS</li>
-              <li>Immediate response for animal emergencies</li>
-              <li>Metro Manila • Cebu • Davao</li>
-            </ul>
-            <div class="footer-social">
-          <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
-          <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+
+        <div class="footer-nav-premium">
+          <a href="#home">Home</a>
+          <a href="#about">About Us</a>
+          <a href="#services">Services</a>
+          <a href="#howto">How To Use</a>
+          <a href="#benefits">Benefits</a>
+          <a href="#blog">Blog</a>
+          <a href="#contact">Contact Us</a>
         </div>
+      </div>
+
+      <div class="footer-contact-premium">
+        <div class="contact-item-premium">
+          <div class="contact-icon-premium">
+            <i class="fas fa-map-marker-alt"></i>
+          </div>
+          <div class="contact-info-premium">
+            <h5>Address</h5>
+            <p>123 Pet Street<br>Manila, Philippines</p>
+          </div>
+        </div>
+
+        <div class="contact-item-premium">
+          <div class="contact-icon-premium">
+            <i class="fas fa-phone-alt"></i>
+          </div>
+          <div class="contact-info-premium">
+            <h5>Phone</h5>
+            <p>+1 234 567 890<br>Mon-Fri 9am-6pm</p>
+          </div>
+        </div>
+
+        <div class="contact-item-premium">
+          <div class="contact-icon-premium">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <div class="contact-info-premium">
+            <h5>Email</h5>
+            <p>support@watchdog.com<br>info@watchdog.com</p>
           </div>
         </div>
       </div>
-      <div class="footer-bottom">© 2025 PetControlX | DICT Certified | ISO 27001 | GDPR Compliant | 99.9% Uptime</div>
+
+      <div class="footer-bottom-premium">
+        <p>Copyright © 2025 <span>The Paw Advisor</span>. All rights reserved.</p>
+      </div>
     </div>
   </footer>
 
-      </div>
-    </div>
-  </nav>
 
   <script src="app.js"></script>
   <script>

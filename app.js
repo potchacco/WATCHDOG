@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
   console.log("Initializing app functionality...");
-
+  
   // Get all modal elements
   const loginBtn = document.getElementById('loginBtn');
   const registerBtn = document.getElementById('registerBtn');
@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('ctaScheduleDemoBtn'),
     document.getElementById('ctaEmergencyHotlineBtn')
   ];
+
+  
 
   // Function to check if user is logged in
   async function checkLoginStatus() {
@@ -138,81 +140,73 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   // Handle form submissions
-  if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const messageContainer = loginForm.querySelector('.form-message-container');
+if (loginForm) {
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const messageContainer = loginForm.querySelector('.form-message-container');
+    const submitButton = loginForm.querySelector('button[type="submit"]');
+    
+    if (!loginEmail.value || !loginPassword.value) {
+      showMessage(messageContainer, 'Please fill in all fields', 'error');
+      return;
+    }
+
+    // Show loading state
+    const originalButtonContent = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+    submitButton.style.opacity = '0.7';
+
+    const formData = new FormData(loginForm);
+    
+    // Start timer for minimum 3 seconds
+    const startTime = Date.now();
+    
+    try {
+      const response = await fetch('login.php', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.text();
       
-      if (!loginEmail.value || !loginPassword.value) {
-        showMessage(messageContainer, 'Please fill in all fields', 'error');
-        return;
-      }
-      // Vaccination information handler
-      function initializeVaccinationInfo() {
-        const vaccineInfo = {
-          core: [
-            { name: 'Rabies', schedule: 'Annually or every 3 years', required: true },
-            { name: 'Distemper', schedule: 'Every 3 years after initial series', required: true },
-            { name: 'Parvovirus', schedule: 'Every 3 years after initial series', required: true },
-            { name: 'Adenovirus', schedule: 'Every 3 years after initial series', required: true }
-          ],
-          nonCore: [
-            { name: 'Bordetella', schedule: 'Every 6-12 months', required: false },
-            { name: 'Lyme Disease', schedule: 'Annually (in endemic areas)', required: false },
-            { name: 'Leptospirosis', schedule: 'Annually', required: false },
-            { name: 'Canine Influenza', schedule: 'Annually', required: false }
-          ]
-        };
-
-        function displayVaccineDetails(vaccines) {
-          const detailsContainer = document.getElementById('vaccine-details');
-          if (!detailsContainer) return;
-
-          let html = '<ul class="vaccine-list">';
-          vaccines.forEach(vaccine => {
-            html += `
-              <li class="vaccine-item">
-              <div class="vaccine-header">
-                <h4>${vaccine.name}</h4>
-                <span class="badge ${vaccine.required ? 'badge-required' : 'badge-optional'}">
-                ${vaccine.required ? 'Required' : 'Optional'}
-            `;
-          });
-          html += '</ul>';
-          detailsContainer.innerHTML = html;
-        }
-
-        const vaccineSection = document.getElementById('vaccination-info');
-        if (vaccineSection) {
-          vaccineSection.addEventListener('click', (e) => {
-            if (e.target.classList.contains('vaccine-details-btn')) {
-              const type = e.target.dataset.type;
-              displayVaccineDetails(vaccineInfo[type]);
-            }
-          });
-        }
-      }
-
-      // Initialize vaccination info when DOM is loaded
-      initializeVaccinationInfo();
-      const formData = new FormData(loginForm);
-      try {
-        const response = await fetch('login.php', {
-          method: 'POST',
-          body: formData
-        });
-        const data = await response.text();
+      // Calculate remaining time to reach 3 seconds
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 3000 - elapsedTime);
+      
+      // Wait for remaining time before showing result
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      if (data.includes('success')) {
+        // Success animation
+        submitButton.innerHTML = '<i class="fas fa-check-circle"></i> Success!';
+        submitButton.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+        submitButton.style.opacity = '1';
         
-        if (data.includes('success')) {
+        // Redirect after short delay
+        setTimeout(() => {
           window.location.href = 'dashboard.php';
-        } else {
-          showMessage(messageContainer, 'Invalid email or password', 'error');
-        }
-      } catch (error) {
-        showMessage(messageContainer, 'An error occurred. Please try again.', 'error');
+        }, 800);
+      } else {
+        // Reset button on error
+        submitButton.innerHTML = originalButtonContent;
+        submitButton.disabled = false;
+        submitButton.style.opacity = '1';
+        showMessage(messageContainer, 'Invalid email or password', 'error');
       }
-    });
-  }
+    } catch (error) {
+      // Calculate remaining time even on error
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = Math.max(0, 3000 - elapsedTime);
+      await new Promise(resolve => setTimeout(resolve, remainingTime));
+      
+      // Reset button on error
+      submitButton.innerHTML = originalButtonContent;
+      submitButton.disabled = false;
+      submitButton.style.opacity = '1';
+      showMessage(messageContainer, 'An error occurred. Please try again.', 'error');
+    }
+  });
+}
 
   if (registerForm) {
     registerForm.addEventListener('submit', async (e) => {
@@ -452,17 +446,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
 
-  // Form submission event listeners
-  elements.loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    await handleFormSubmission(elements.loginForm, 'login.php');
-  });
-
-  elements.registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    await handleFormSubmission(elements.registerForm, 'register.php');
-  });
-
   function getOrCreateMessageContainer(form) {
     let container = form.querySelector('.form-message-container');
     if (!container) {
@@ -561,3 +544,146 @@ document.addEventListener("DOMContentLoaded", function() {
     button.addEventListener("click", () => button.blur());
   });
 });
+
+  // Active Navigation Link Handler
+  const navLinks = document.querySelectorAll('.nav-link');
+  
+  navLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Remove active class from all links
+      navLinks.forEach(nav => nav.classList.remove('active'));
+      
+      // Add active class to clicked link
+      this.classList.add('active');
+    });
+  });
+
+  // Optional: Update active link on scroll
+  window.addEventListener('scroll', () => {
+    let current = '';
+    const sections = document.querySelectorAll('section[id]');
+    
+    sections.forEach(section => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.clientHeight;
+      
+      if (window.pageYOffset >= sectionTop - 100) {
+        current = section.getAttribute('id');
+      }
+    });
+
+    navLinks.forEach(link => {
+      link.classList.remove('active');
+      if (link.getAttribute('href') === `#${current}`) {
+        link.classList.add('active');
+      }
+    });
+
+      // ============================================
+  // SAFE SCROLL ANIMATIONS
+  // ============================================
+  
+  // Add animation classes to elements
+  function initAnimations() {
+    // Navbar
+    setTimeout(() => {
+      const navbar = document.querySelector('.navbar');
+      if (navbar) navbar.classList.add('is-visible');
+    }, 100);
+
+    // Hero sections
+    const heroLeft = document.querySelector('.hero-left');
+    const heroCenter = document.querySelector('.hero-center');
+    const heroRight = document.querySelector('.hero-right');
+    
+    if (heroLeft) {
+      heroLeft.classList.add('will-animate', 'from-left');
+    }
+    if (heroCenter) {
+      heroCenter.classList.add('will-animate', 'from-center');
+    }
+    if (heroRight) {
+      heroRight.classList.add('will-animate', 'from-right');
+    }
+
+    // Service cards
+    document.querySelectorAll('.service-circle-card').forEach(card => {
+      card.classList.add('will-animate');
+    });
+
+    // Benefit items
+    document.querySelectorAll('.benefits-left .benefit-item').forEach(item => {
+      item.classList.add('will-animate', 'from-left');
+    });
+    
+    document.querySelectorAll('.benefits-right .benefit-item').forEach(item => {
+      item.classList.add('will-animate', 'from-right');
+    });
+
+    const benefitsCenter = document.querySelector('.benefits-center');
+    if (benefitsCenter) {
+      benefitsCenter.classList.add('will-animate', 'from-center');
+    }
+
+    // How to steps
+    document.querySelectorAll('.howto-step').forEach(step => {
+      step.classList.add('will-animate');
+    });
+
+    const howtoImage = document.querySelector('.howto-image-wrapper');
+    if (howtoImage) {
+      howtoImage.classList.add('will-animate', 'from-left');
+    }
+
+    // Contact cards
+    document.querySelectorAll('.contact-card').forEach(card => {
+      card.classList.add('will-animate');
+    });
+
+    // Section headers
+    document.querySelectorAll('.section-header-premium').forEach(header => {
+      header.classList.add('will-animate');
+    });
+
+    // Action cards
+    document.querySelectorAll('.action-card').forEach(card => {
+      card.classList.add('will-animate');
+    });
+
+    // Stat items
+    document.querySelectorAll('.stat-item').forEach(stat => {
+      stat.classList.add('will-animate');
+    });
+  }
+
+  // Run on page load
+  initAnimations();
+
+  // Intersection Observer
+  const animateObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        animateObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  });
+
+  // Observe all elements with will-animate class
+  setTimeout(() => {
+    document.querySelectorAll('.will-animate').forEach(element => {
+      // Check if already in viewport
+      const rect = element.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        setTimeout(() => element.classList.add('is-visible'), 100);
+      } else {
+        animateObserver.observe(element);
+      }
+    });
+  }, 100);
+
+  });
+
