@@ -9,6 +9,89 @@ function generateCalendarDates() {
     return html;
 }
 
+// Analytics Chart Initialization - FIXED VERSION
+let analyticsChartInstance = null;
+
+function initAnalyticsChart() {
+    const canvas = document.getElementById('analyticsChart');
+    if (!canvas) return;
+
+    if (analyticsChartInstance) {
+        analyticsChartInstance.destroy();
+    }
+
+    const ctx = canvas.getContext('2d');
+    
+    analyticsChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [
+                {
+                    label: 'This Month',
+                    data: [25, 35, 42, 48],
+                    borderColor: '#8B5CF6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    pointBackgroundColor: '#8B5CF6',
+                    borderWidth: 3
+                },
+                {
+                    label: 'Previous Month',
+                    data: [20, 28, 35, 40],
+                    borderColor: '#E5E7EB',
+                    backgroundColor: 'rgba(229, 231, 235, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 8,
+                    pointHoverRadius: 10,
+                    pointBackgroundColor: '#E5E7EB',
+                    borderWidth: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: '#1f2937',
+                    padding: 12,
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 13 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 60,
+                    grid: {
+                        color: '#F3F4F6'
+                    },
+                    ticks: {
+                        stepSize: 10,
+                        font: { size: 12 }
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
+    });
+}
+
 async function loadPets() {
     const petsGrid = document.getElementById('petsGrid');
     if (!petsGrid) return;
@@ -41,14 +124,12 @@ async function loadPets() {
                             <button class="pet-btn edit-btn" data-pet-id="${pet.id}">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
-                            
                         </div>
                     </div>
                 `;
                 petsGrid.appendChild(petDiv);
             });
             
-            // Add event listeners to Edit buttons
             document.querySelectorAll('.edit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const petId = this.getAttribute('data-pet-id');
@@ -56,7 +137,6 @@ async function loadPets() {
                 });
             });
             
-            // Add event listeners to Delete buttons
             document.querySelectorAll('.delete-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const petId = this.getAttribute('data-pet-id');
@@ -93,8 +173,6 @@ function editPet(petId, pets) {
     document.getElementById('petRegistrationModal').classList.add('active');
 }
 
-
-
 async function loadPetsInSidebar() {
     const sidebarPetsGrid = document.getElementById('sidebarPetsGrid');
     if (!sidebarPetsGrid) return;
@@ -121,6 +199,9 @@ async function loadPetsInSidebar() {
                         <h3>${pet.name}</h3>
                         <p>${pet.species} - ${pet.breed || 'Unknown'}</p>
                         <p>Age: ${pet.age || 'N/A'} | Gender: ${pet.gender || 'N/A'}</p>
+                        <button class="pet-btn edit-btn" data-pet-id="${pet.id}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
                     </div>
                 `;
                 sidebarPetsGrid.appendChild(petCard);
@@ -162,30 +243,78 @@ async function loadPetsWithVaccinations() {
 
         if (petsData.status === 'success') {
             if (petsData.pets.length === 0) {
-                container.innerHTML = `<div style="text-align: center; padding: 40px;"><i class="fas fa-paw" style="font-size: 64px; color: #ccc; margin-bottom: 20px;"></i><p style="font-size: 18px; color: #666;">No pets registered yet.</p></div>`;
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-paw"></i>
+                        <h3>No Pets Registered</h3>
+                        <p>Register your first pet to start tracking vaccinations</p>
+                        <button class="btn-enhanced btn-primary" onclick="document.getElementById('petRegistrationModal').classList.add('active')">
+                            <i class="fas fa-plus"></i> Register Pet
+                        </button>
+                    </div>
+                `;
                 return;
             }
 
-            container.innerHTML = '<div style="display: grid; gap: 20px;"></div>';
-            const petsContainer = container.querySelector('div');
+            container.innerHTML = '<div class="vaccination-pets-grid"></div>';
+            const petsContainer = container.querySelector('.vaccination-pets-grid');
 
             petsData.pets.forEach(pet => {
+                const imgSrc = pet.image_url && pet.image_url.trim() !== '' 
+                    ? pet.image_url 
+                    : 'https://via.placeholder.com/300x200?text=No+Image';
+                
                 const petCard = document.createElement('div');
-                petCard.style.cssText = 'background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px;';
+                petCard.className = 'vaccination-pet-card';
                 petCard.innerHTML = `
-                    <h2>${pet.name}</h2>
-                    <p>${pet.species} - ${pet.breed || 'Unknown breed'}</p>
-                    <button class="dashboard-btn btn-primary" onclick="openVaccinationModalForPet('${pet.id}', '${pet.name}')">
-                        <i class="fas fa-syringe"></i> Add Vaccination
-                    </button>
+                    <div class="pet-card-header">
+                        <div class="pet-image-small" style="background-image: url('${imgSrc}');"></div>
+                        <div class="pet-info">
+                            <h3>${pet.name}</h3>
+                            <p class="pet-breed"><i class="fas fa-dog"></i> ${pet.species} - ${pet.breed || 'Mixed Breed'}</p>
+                            <div class="pet-details-tags">
+                                <span class="tag blue"><i class="fas fa-calendar"></i> Age: ${pet.age || 'N/A'}</span>
+                                <span class="tag purple"><i class="fas fa-venus-mars"></i> ${pet.gender || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="vaccination-actions">
+                        <button class="btn-vaccination-primary" onclick="openVaccinationModalForPet('${pet.id}', '${pet.name}')">
+                            <i class="fas fa-syringe"></i> Add Vaccination Record
+                        </button>
+                        <button class="btn-vaccination-secondary" onclick="viewVaccinationHistory('${pet.id}')">
+                            <i class="fas fa-history"></i> View History
+                        </button>
+                    </div>
+                    
+                    <div class="vaccination-status">
+                        <div class="status-indicator up-to-date">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Vaccination Status: Up to Date</span>
+                        </div>
+                    </div>
                 `;
                 petsContainer.appendChild(petCard);
             });
         }
     } catch (err) {
         console.error('Error:', err);
+        container.innerHTML = `
+            <div class="empty-state error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error Loading Pets</h3>
+                <p>Unable to load pet data. Please try again.</p>
+            </div>
+        `;
     }
 }
+
+// Add this new function for viewing vaccination history
+function viewVaccinationHistory(petId) {
+    alert('Vaccination history for pet ID: ' + petId + ' (Feature coming soon!)');
+}
+
 
 async function openVaccinationModalForPet(petId, petName) {
     const modal = document.getElementById('vaccinationModal');
@@ -290,7 +419,6 @@ async function loadRecentAlerts() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Dashboard initializing...");
 
-    // Hamburger menu
     const hamburger = document.getElementById('hamburger');
     const sidebar = document.getElementById('sidebar');
     const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -311,7 +439,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Sidebar navigation
     const sidebarLinks = document.querySelectorAll('.sidebar-menu a[data-section]');
     
     sidebarLinks.forEach(link => {
@@ -326,237 +453,550 @@ document.addEventListener('DOMContentLoaded', function() {
             
             switch(section) {
                 case 'pets':
-                    mainContent.innerHTML = `<div class="dashboard-section"><div class="section-header-modern"><h2><i class="fas fa-paw"></i> My Pets</h2><button class="btn-modern btn-primary" id="registerPetBtn2"><i class="fas fa-plus"></i> Add Pet</button></div><div id="sidebarPetsGrid" class="pets-grid"></div></div>`;
-                    document.getElementById('registerPetBtn2').addEventListener('click', () => {
-                        document.getElementById('petRegistrationModal').classList.add('active');
-                    });
-                    loadPetsInSidebar();
-                    break;
+    mainContent.innerHTML = `
+        <div class="enhanced-section-wrapper">
+            <div class="section-header-enhanced">
+                <div class="header-left">
+                    <div class="icon-badge purple">
+                        <i class="fas fa-paw"></i>
+                    </div>
+                    <div>
+                        <h2>My Pets</h2>
+                        <p class="section-subtitle">Manage all your registered pets</p>
+                    </div>
+                </div>
+                <button class="btn-enhanced btn-primary" id="registerPetBtn2">
+                    <i class="fas fa-plus"></i> Add New Pet
+                </button>
+            </div>
+            
+            <div class="stats-mini-row">
+                <div class="stat-mini blue">
+                    <i class="fas fa-dog"></i>
+                    <div>
+                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-label">Total Pets</div>
+                    </div>
+                </div>
+                <div class="stat-mini green">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-label">Vaccinated</div>
+                    </div>
+                </div>
+                <div class="stat-mini orange">
+                    <i class="fas fa-calendar-check"></i>
+                    <div>
+                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-label">Upcoming</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="sidebarPetsGrid" class="pets-grid-enhanced"></div>
+        </div>
+    `;
+    document.getElementById('registerPetBtn2').addEventListener('click', () => {
+        document.getElementById('petRegistrationModal').classList.add('active');
+    });
+    loadPetsInSidebar();
+    break;
+
                     
                 case 'vaccinations':
-                    mainContent.innerHTML = `<div class="dashboard-section"><div class="section-header-modern"><h2><i class="fas fa-syringe"></i> Vaccination Records</h2></div><div id="vaccinationPetsContainer"></div></div>`;
-                    loadPetsWithVaccinations();
-                    break;
+    mainContent.innerHTML = `
+        <div class="enhanced-section-wrapper">
+            <div class="section-header-enhanced">
+                <div class="header-left">
+                    <div class="icon-badge green">
+                        <i class="fas fa-syringe"></i>
+                    </div>
+                    <div>
+                        <h2>Vaccination Records</h2>
+                        <p class="section-subtitle">Track all vaccination schedules and records</p>
+                    </div>
+                </div>
+                <button class="btn-enhanced btn-success" id="addVaccinationBtn">
+                    <i class="fas fa-plus"></i> Add Vaccination
+                </button>
+            </div>
+            
+            <div class="stats-mini-row">
+                <div class="stat-mini green">
+                    <i class="fas fa-syringe"></i>
+                    <div>
+                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-label">Total Vaccines</div>
+                    </div>
+                </div>
+                <div class="stat-mini orange">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-label">Due Soon</div>
+                    </div>
+                </div>
+                <div class="stat-mini blue">
+                    <i class="fas fa-calendar-alt"></i>
+                    <div>
+                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-label">This Month</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="vaccinationPetsContainer" class="vaccinations-grid-enhanced"></div>
+        </div>
+    `;
+    loadPetsWithVaccinations();
+    break;
+
                     
                 case 'incidents':
-                    mainContent.innerHTML = `<div class="dashboard-section"><div class="section-header-modern"><h2><i class="fas fa-exclamation-triangle"></i> Incident Reports</h2><button class="btn-modern btn-primary" onclick="openIncidentModal()"><i class="fas fa-plus"></i> Report Incident</button></div><div id="incidentsContainer"></div></div>`;
-                    loadIncidents();
-                    break;
+    mainContent.innerHTML = `
+        <div class="enhanced-section-wrapper">
+            <div class="section-header-enhanced">
+                <div class="header-left">
+                    <div class="icon-badge red">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div>
+                        <h2>Incident Reports</h2>
+                        <p class="section-subtitle">View and manage all incident reports</p>
+                    </div>
+                </div>
+                <button class="btn-enhanced btn-danger" onclick="openIncidentModal()">
+                    <i class="fas fa-plus"></i> Report Incident
+                </button>
+            </div>
+            
+            <div class="stats-mini-row">
+                <div class="stat-mini red">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div>
+                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-label">Active</div>
+                    </div>
+                </div>
+                <div class="stat-mini yellow">
+                    <i class="fas fa-hourglass-half"></i>
+                    <div>
+                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-label">Pending</div>
+                    </div>
+                </div>
+                <div class="stat-mini green">
+                    <i class="fas fa-check-double"></i>
+                    <div>
+                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-label">Resolved</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="incidentsContainer" class="incidents-grid-enhanced"></div>
+        </div>
+    `;
+    loadIncidents();
+    break;
+
                     
                 case 'analytics':
-                    mainContent.innerHTML = `<div class="dashboard-section"><h2><i class="fas fa-chart-line"></i> Analytics</h2><canvas id="analyticsTrendsChart" height="100"></canvas></div>`;
-                    setTimeout(loadAnalyticsTrendsChart, 100);
+                    mainContent.innerHTML = `
+                        <div id="analyticsSection" class="analytics-content">
+                            <div class="analytics-header">
+                                <div class="analytics-greeting">
+                                    <h1>Hello User!</h1>
+                                    <p class="subtitle">Welcome back to WATCHDOG!</p>
+                                </div>
+                                <div class="analytics-search">
+                                    <div class="search-bar">
+                                        <i class="fas fa-search"></i>
+                                        <input type="text" placeholder="Search pets, records...">
+                                    </div>
+                                    <button class="btn-add-task">
+                                        <i class="fas fa-plus"></i> Add New Pet
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="analytics-grid-centered">
+                                <div class="analytics-left">
+                                    <div class="projects-widget">
+                                        <h3>Active Categories</h3>
+                                        <ul class="project-list">
+                                            <li class="project-item">
+                                                <i class="fas fa-dog" style="color: #8B5CF6;"></i>
+                                                <span>Pet Registrations</span>
+                                            </li>
+                                            <li class="project-item">
+                                                <i class="fas fa-syringe" style="color: #3B82F6;"></i>
+                                                <span>Vaccinations</span>
+                                            </li>
+                                            <li class="project-item">
+                                                <i class="fas fa-exclamation-triangle" style="color: #EC4899;"></i>
+                                                <span>Incident Reports</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="analytics-stats-left">
+                                        <div class="stat-card-analytics purple">
+                                            <div class="stat-number">50+</div>
+                                            <div class="stat-label">REGISTERED PETS</div>
+                                            <div class="stat-icon-mini">
+                                                <i class="fas fa-paw"></i>
+                                            </div>
+                                        </div>
+
+                                        <div class="stat-card-analytics purple">
+                                            <div class="stat-number">45</div>
+                                            <div class="stat-label">VACCINATIONS</div>
+                                            <div class="stat-icon-mini">
+                                                <i class="fas fa-syringe"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activities-widget">
+                                        <h3>Recent Activities</h3>
+                                        <ul class="activity-list">
+                                            <li class="activity-item">
+                                                <i class="fas fa-dog"></i>
+                                                <div class="activity-info">
+                                                    <span class="activity-name">Pet Registration</span>
+                                                    <span class="activity-time">10:42:23 AM</span>
+                                                    <span class="activity-amount">New: Max</span>
+                                                </div>
+                                                <span class="activity-status completed">Completed</span>
+                                            </li>
+                                            <li class="activity-item">
+                                                <i class="fas fa-syringe"></i>
+                                                <div class="activity-info">
+                                                    <span class="activity-name">Vaccination Record</span>
+                                                    <span class="activity-time">09:23:46 AM</span>
+                                                    <span class="activity-amount">Updated: Bella</span>
+                                                </div>
+                                                <span class="activity-status completed">Completed</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="analytics-center-large">
+                                    <div class="chart-widget-large">
+                                        <div class="chart-header">
+                                            <div class="chart-legend">
+                                                <span class="legend-item">
+                                                    <span class="legend-dot income"></span> This Month
+                                                </span>
+                                                <span class="legend-item">
+                                                    <span class="legend-dot previous"></span> Previous Month
+                                                </span>
+                                            </div>
+                                            <div class="chart-period">
+                                                <button class="period-badge active">November 2025</button>
+                                            </div>
+                                        </div>
+                                        <div class="chart-container-large">
+                                            <canvas id="analyticsChart"></canvas>
+                                        </div>
+                                        <div class="chart-stats-row">
+                                            <div class="chart-stat-item">
+                                                <i class="fas fa-paw"></i>
+                                                <div>
+                                                    <div class="stat-value">124</div>
+                                                    <div class="stat-label">Total Pets</div>
+                                                </div>
+                                            </div>
+                                            <div class="chart-stat-item">
+                                                <i class="fas fa-syringe"></i>
+                                                <div>
+                                                    <div class="stat-value">89</div>
+                                                    <div class="stat-label">Vaccinations</div>
+                                                </div>
+                                            </div>
+                                            <div class="chart-stat-item">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                <div>
+                                                    <div class="stat-value">12</div>
+                                                    <div class="stat-label">Incidents</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="progress-widget">
+                                        <h3>Vaccination Coverage</h3>
+                                        <div class="progress-circle-container">
+                                            <svg class="progress-ring" width="200" height="200">
+                                                <circle class="progress-ring-circle-bg" stroke="#E5E7EB" stroke-width="20" fill="transparent" r="80" cx="100" cy="100"/>
+                                                <circle class="progress-ring-circle" stroke="url(#gradient)" stroke-width="20" fill="transparent" r="80" cx="100" cy="100" stroke-dasharray="502.65" stroke-dashoffset="55.66"/>
+                                                <defs>
+                                                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                        <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+                                                        <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+                                                    </linearGradient>
+                                                </defs>
+                                            </svg>
+                                            <div class="progress-text">
+                                                <div class="progress-percent">89%</div>
+                                                <div class="progress-label">Up to Date</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="analytics-right">
+                                    <div class="calendar-widget">
+                                        <div class="calendar-header">
+                                            <h3>Appointment Calendar</h3>
+                                            <span class="calendar-subtitle">November 2025</span>
+                                            <div class="calendar-nav">
+                                                <button><i class="fas fa-chevron-left"></i></button>
+                                                <button><i class="fas fa-chevron-right"></i></button>
+                                            </div>
+                                        </div>
+                                        <div class="calendar-grid">
+                                            <div class="calendar-days">
+                                                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                                            </div>
+                                            <div class="calendar-dates">
+                                                <span></span><span></span><span></span><span>1</span><span>2</span><span>3</span><span>4</span>
+                                                <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span>
+                                                <span>12</span><span class="today">13</span><span>14</span><span>15</span><span class="selected">16</span><span>17</span><span>18</span>
+                                                <span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span>
+                                                <span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span></span><span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="message-widget">
+                                        <h3>Recent Notifications</h3>
+                                        <ul class="message-list">
+                                            <li class="message-item">
+                                                <div class="message-icon"><i class="fas fa-syringe"></i></div>
+                                                <div class="message-content">
+                                                    <div class="message-name">Vaccination Due</div>
+                                                    <div class="message-text">Max needs rabies booster shot</div>
+                                                </div>
+                                            </li>
+                                            <li class="message-item">
+                                                <div class="message-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                                                <div class="message-content">
+                                                    <div class="message-name">Incident Report</div>
+                                                    <div class="message-text">New incident reported in Area 5</div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    setTimeout(initAnalyticsChart, 100);
                     break;
                     
                 case 'settings':
-    mainContent.innerHTML = `
-        <div class="settings-grid">
-            <!-- LEFT COLUMN - Profile -->
-            <div class="settings-left-col">
-                <!-- Profile Card -->
-                <div class="settings-card">
-                    <h3 class="settings-card-title">Profile</h3>
-                    <div class="profile-settings-content">
-                        <div class="profile-avatar-large">
-                            <img src="https://ui-avatars.com/api/?name=User&background=5B7FDB&color=fff&size=200" alt="Profile">
-                            <button class="edit-avatar-btn"><i class="fas fa-camera"></i></button>
-                        </div>
-                        <div class="profile-info-grid">
-                            <div class="profile-info-item">
-                                <label>Full Name</label>
-                                <input type="text" value="John Doe" class="settings-input">
+                    mainContent.innerHTML = `
+                        <div class="settings-grid">
+                            <div class="settings-left-col">
+                                <div class="settings-card">
+                                    <h3 class="settings-card-title">Profile</h3>
+                                    <div class="profile-settings-content">
+                                        <div class="profile-avatar-large">
+                                            <img src="https://ui-avatars.com/api/?name=User&background=5B7FDB&color=fff&size=200" alt="Profile">
+                                            <button class="edit-avatar-btn"><i class="fas fa-camera"></i></button>
+                                        </div>
+                                        <div class="profile-info-grid">
+                                            <div class="profile-info-item">
+                                                <label>Full Name</label>
+                                                <input type="text" value="John Doe" class="settings-input">
+                                            </div>
+                                            <div class="profile-info-item">
+                                                <label>Role</label>
+                                                <input type="text" value="Pet Owner" class="settings-input" readonly>
+                                            </div>
+                                            <div class="profile-info-item">
+                                                <label>Email</label>
+                                                <input type="email" value="user@dogmonitor.com" class="settings-input">
+                                            </div>
+                                            <div class="profile-info-item">
+                                                <label>Phone</label>
+                                                <input type="tel" value="+1 234 567 8900" class="settings-input">
+                                            </div>
+                                        </div>
+                                        <div class="profile-social-links">
+                                            <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                                            <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-card">
+                                    <div class="card-header-with-edit">
+                                        <h3 class="settings-card-title">Basic Information</h3>
+                                        <button class="edit-btn-small"><i class="fas fa-pen"></i> Edit</button>
+                                    </div>
+                                    <div class="info-badges">
+                                        <span class="info-badge blue">Pet Owner ID: #PO-123</span>
+                                        <span class="info-badge green">Status: Active</span>
+                                        <span class="info-badge purple">Level: Premium</span>
+                                        <span class="info-badge orange">Since: 2025</span>
+                                    </div>
+                                </div>
+
+                                <div class="settings-card">
+                                    <div class="card-header-with-edit">
+                                        <h3 class="settings-card-title">Personal Information</h3>
+                                        <button class="edit-btn-small"><i class="fas fa-pen"></i> Edit</button>
+                                    </div>
+                                    <div class="info-grid-two">
+                                        <div class="info-item">
+                                            <span class="info-label">Birth Date</span>
+                                            <span class="info-value">01/01/1990</span>
+                                        </div>
+                                        <div class="info-item">
+                                            <span class="info-label">Address</span>
+                                            <span class="info-value">123 Pet Street, City</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="settings-card">
+                                    <div class="card-header-with-edit">
+                                        <h3 class="settings-card-title">Pet Owner Information</h3>
+                                        <button class="edit-btn-small"><i class="fas fa-pen"></i> Edit</button>
+                                    </div>
+                                    <div class="owner-badges-grid">
+                                        <div class="owner-badge">
+                                            <i class="fas fa-dog"></i>
+                                            <span>Total Pets</span>
+                                            <strong>0</strong>
+                                        </div>
+                                        <div class="owner-badge">
+                                            <i class="fas fa-syringe"></i>
+                                            <span>Vaccinations</span>
+                                            <strong>Updated</strong>
+                                        </div>
+                                        <div class="owner-badge">
+                                            <i class="fas fa-clipboard-check"></i>
+                                            <span>Incidents</span>
+                                            <strong>0 Active</strong>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="profile-info-item">
-                                <label>Role</label>
-                                <input type="text" value="Pet Owner" class="settings-input" readonly>
-                            </div>
-                            <div class="profile-info-item">
-                                <label>Email</label>
-                                <input type="email" value="user@dogmonitor.com" class="settings-input">
-                            </div>
-                            <div class="profile-info-item">
-                                <label>Phone</label>
-                                <input type="tel" value="+1 234 567 8900" class="settings-input">
-                            </div>
-                        </div>
-                        <div class="profile-social-links">
-                            <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                            <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Basic Information -->
-                <div class="settings-card">
-                    <div class="card-header-with-edit">
-                        <h3 class="settings-card-title">Basic Information</h3>
-                        <button class="edit-btn-small"><i class="fas fa-pen"></i> Edit</button>
-                    </div>
-                    <div class="info-badges">
-                        <span class="info-badge blue">Pet Owner ID: #PO-123</span>
-                        <span class="info-badge green">Status: Active</span>
-                        <span class="info-badge purple">Level: Premium</span>
-                        <span class="info-badge orange">Since: 2025</span>
-                    </div>
-                </div>
+                            <div class="settings-right-col">
+                                <div class="settings-card">
+                                    <h3 class="settings-card-title">Calendar</h3>
+                                    <div class="calendar-widget">
+                                        <div class="calendar-header">
+                                            <button class="calendar-nav-btn"><i class="fas fa-chevron-left"></i></button>
+                                            <span class="calendar-month">November 2025</span>
+                                            <button class="calendar-nav-btn"><i class="fas fa-chevron-right"></i></button>
+                                        </div>
+                                        <div class="calendar-days">
+                                            <div class="calendar-day-label">Sun</div>
+                                            <div class="calendar-day-label">Mon</div>
+                                            <div class="calendar-day-label">Tue</div>
+                                            <div class="calendar-day-label">Wed</div>
+                                            <div class="calendar-day-label">Thu</div>
+                                            <div class="calendar-day-label">Fri</div>
+                                            <div class="calendar-day-label">Sat</div>
+                                        </div>
+                                        <div class="calendar-dates">
+                                            ${generateCalendarDates()}
+                                        </div>
+                                    </div>
+                                </div>
 
-                <!-- Personal Information -->
-                <div class="settings-card">
-                    <div class="card-header-with-edit">
-                        <h3 class="settings-card-title">Personal Information</h3>
-                        <button class="edit-btn-small"><i class="fas fa-pen"></i> Edit</button>
-                    </div>
-                    <div class="info-grid-two">
-                        <div class="info-item">
-                            <span class="info-label">Birth Date</span>
-                            <span class="info-value">01/01/1990</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Address</span>
-                            <span class="info-value">123 Pet Street, City</span>
-                        </div>
-                    </div>
-                </div>
+                                <div class="settings-card">
+                                    <div class="card-header-with-action">
+                                        <h3 class="settings-card-title">Upcoming Events</h3>
+                                        <button class="view-all-btn">View All</button>
+                                    </div>
+                                    <div class="events-list">
+                                        <div class="event-item blue">
+                                            <div class="event-time">9:00 AM - 10:00 AM</div>
+                                            <div class="event-details">
+                                                <strong>Vet Checkup - Max</strong>
+                                                <div class="event-avatars">
+                                                    <div class="event-avatar">M</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="event-item pink">
+                                            <div class="event-time">2:00 PM - 3:00 PM</div>
+                                            <div class="event-details">
+                                                <strong>Vaccination Due - Bella</strong>
+                                                <div class="event-avatars">
+                                                    <div class="event-avatar">B</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                <!-- Pet Owner Information -->
-                <div class="settings-card">
-                    <div class="card-header-with-edit">
-                        <h3 class="settings-card-title">Pet Owner Information</h3>
-                        <button class="edit-btn-small"><i class="fas fa-pen"></i> Edit</button>
-                    </div>
-                    <div class="owner-badges-grid">
-                        <div class="owner-badge">
-                            <i class="fas fa-dog"></i>
-                            <span>Total Pets</span>
-                            <strong>0</strong>
-                        </div>
-                        <div class="owner-badge">
-                            <i class="fas fa-syringe"></i>
-                            <span>Vaccinations</span>
-                            <strong>Updated</strong>
-                        </div>
-                        <div class="owner-badge">
-                            <i class="fas fa-clipboard-check"></i>
-                            <span>Incidents</span>
-                            <strong>0 Active</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- RIGHT COLUMN -->
-            <div class="settings-right-col">
-                <!-- Calendar Widget -->
-                <div class="settings-card">
-                    <h3 class="settings-card-title">Calendar</h3>
-                    <div class="calendar-widget">
-                        <div class="calendar-header">
-                            <button class="calendar-nav-btn"><i class="fas fa-chevron-left"></i></button>
-                            <span class="calendar-month">November 2025</span>
-                            <button class="calendar-nav-btn"><i class="fas fa-chevron-right"></i></button>
-                        </div>
-                        <div class="calendar-days">
-                            <div class="calendar-day-label">Sun</div>
-                            <div class="calendar-day-label">Mon</div>
-                            <div class="calendar-day-label">Tue</div>
-                            <div class="calendar-day-label">Wed</div>
-                            <div class="calendar-day-label">Thu</div>
-                            <div class="calendar-day-label">Fri</div>
-                            <div class="calendar-day-label">Sat</div>
-                        </div>
-                        <div class="calendar-dates">
-                            ${generateCalendarDates()}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Upcoming Events -->
-                <div class="settings-card">
-                    <div class="card-header-with-action">
-                        <h3 class="settings-card-title">Upcoming Events</h3>
-                        <button class="view-all-btn">View All</button>
-                    </div>
-                    <div class="events-list">
-                        <div class="event-item blue">
-                            <div class="event-time">9:00 AM - 10:00 AM</div>
-                            <div class="event-details">
-                                <strong>Vet Checkup - Max</strong>
-                                <div class="event-avatars">
-                                    <div class="event-avatar">M</div>
+                                <div class="settings-card">
+                                    <div class="card-header-with-action">
+                                        <h3 class="settings-card-title">Onboarding</h3>
+                                        <span class="progress-percentage">75% complete</span>
+                                    </div>
+                                    <div class="onboarding-list">
+                                        <div class="onboarding-item completed">
+                                            <div class="onboarding-icon"><i class="fas fa-check"></i></div>
+                                            <div class="onboarding-details">
+                                                <strong>Create your account</strong>
+                                                <span>Assigned to: You</span>
+                                            </div>
+                                            <span class="onboarding-date">07/15/2025</span>
+                                            <div class="onboarding-status">
+                                                <span class="status-badge complete">Complete</span>
+                                            </div>
+                                        </div>
+                                        <div class="onboarding-item completed">
+                                            <div class="onboarding-icon"><i class="fas fa-check"></i></div>
+                                            <div class="onboarding-details">
+                                                <strong>Add your first pet</strong>
+                                                <span>Assigned to: You</span>
+                                            </div>
+                                            <span class="onboarding-date">07/16/2025</span>
+                                            <div class="onboarding-status">
+                                                <span class="status-badge complete">Complete</span>
+                                            </div>
+                                        </div>
+                                        <div class="onboarding-item pending">
+                                            <div class="onboarding-icon"><i class="fas fa-clock"></i></div>
+                                            <div class="onboarding-details">
+                                                <strong>Complete pet profile</strong>
+                                                <span>Assigned to: You</span>
+                                            </div>
+                                            <span class="onboarding-date">07/20/2025</span>
+                                            <div class="onboarding-status">
+                                                <span class="status-badge pending">In Progress</span>
+                                            </div>
+                                        </div>
+                                        <div class="onboarding-item pending">
+                                            <div class="onboarding-icon"><i class="fas fa-clock"></i></div>
+                                            <div class="onboarding-details">
+                                                <strong>Schedule first vet visit</strong>
+                                                <span>Assigned to: You</span>
+                                            </div>
+                                            <span class="onboarding-date">07/25/2025</span>
+                                            <div class="onboarding-status">
+                                                <span class="status-badge todo">To Do</span>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="event-item pink">
-                            <div class="event-time">2:00 PM - 3:00 PM</div>
-                            <div class="event-details">
-                                <strong>Vaccination Due - Bella</strong>
-                                <div class="event-avatars">
-                                    <div class="event-avatar">B</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Onboarding Progress -->
-                <div class="settings-card">
-                    <div class="card-header-with-action">
-                        <h3 class="settings-card-title">Onboarding</h3>
-                        <span class="progress-percentage">75% complete</span>
-                    </div>
-                    <div class="onboarding-list">
-                        <div class="onboarding-item completed">
-                            <div class="onboarding-icon"><i class="fas fa-check"></i></div>
-                            <div class="onboarding-details">
-                                <strong>Create your account</strong>
-                                <span>Assigned to: You</span>
-                            </div>
-                            <span class="onboarding-date">07/15/2025</span>
-                            <div class="onboarding-status">
-                                <span class="status-badge complete">Complete</span>
-                            </div>
-                        </div>
-                        <div class="onboarding-item completed">
-                            <div class="onboarding-icon"><i class="fas fa-check"></i></div>
-                            <div class="onboarding-details">
-                                <strong>Add your first pet</strong>
-                                <span>Assigned to: You</span>
-                            </div>
-                            <span class="onboarding-date">07/16/2025</span>
-                            <div class="onboarding-status">
-                                <span class="status-badge complete">Complete</span>
-                            </div>
-                        </div>
-                        <div class="onboarding-item pending">
-                            <div class="onboarding-icon"><i class="fas fa-clock"></i></div>
-                            <div class="onboarding-details">
-                                <strong>Complete pet profile</strong>
-                                <span>Assigned to: You</span>
-                            </div>
-                            <span class="onboarding-date">07/20/2025</span>
-                            <div class="onboarding-status">
-                                <span class="status-badge pending">In Progress</span>
-                            </div>
-                        </div>
-                        <div class="onboarding-item pending">
-                            <div class="onboarding-icon"><i class="fas fa-clock"></i></div>
-                            <div class="onboarding-details">
-                                <strong>Schedule first vet visit</strong>
-                                <span>Assigned to: You</span>
-                            </div>
-                            <span class="onboarding-date">07/25/2025</span>
-                            <div class="onboarding-status">
-                                <span class="status-badge todo">To Do</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-    break;
-
+                    `;
+                    break;
                     
                 default:
                     location.reload();
@@ -570,33 +1010,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Modal close buttons
     document.querySelectorAll('.modal-close').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
         });
     });
 
-    // Register Pet Button
-    // Register Pet Button (main header)
-const registerPetBtn = document.getElementById('registerPetBtn');
-if (registerPetBtn) {
-    registerPetBtn.addEventListener('click', () => {
-        document.getElementById('petRegistrationModal').classList.add('active');
-    });
-}
+    const registerPetBtn = document.getElementById('registerPetBtn');
+    if (registerPetBtn) {
+        registerPetBtn.addEventListener('click', () => {
+            document.getElementById('petRegistrationModal').classList.add('active');
+        });
+    }
 
-// Quick Action Add Pet Button (NEW - ADD THIS)
-const quickAddPetBtn = document.getElementById('quickAddPetBtn');
-if (quickAddPetBtn) {
-    quickAddPetBtn.addEventListener('click', () => {
-        document.getElementById('petRegistrationModal').classList.add('active');
-    });
-}
+    const quickAddPetBtn = document.getElementById('quickAddPetBtn');
+    if (quickAddPetBtn) {
+        quickAddPetBtn.addEventListener('click', () => {
+            document.getElementById('petRegistrationModal').classList.add('active');
+        });
+    }
 
-    
-
-    // Image preview
     const imagePreview = document.getElementById('imagePreview');
     const petImageInput = document.getElementById('petImage');
 
@@ -618,65 +1051,60 @@ if (quickAddPetBtn) {
         });
     }
 
-    // Pet Registration Form
-const petRegistrationForm = document.getElementById('petRegistrationForm');
-if (petRegistrationForm) {
-    petRegistrationForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        console.log("🐕 Form submitted!");
-        
-        const formData = new FormData(petRegistrationForm);
-        const mode = petRegistrationForm.dataset.mode || 'register';
-
-        if (mode === 'update') {
-            formData.set('action', 'update');
-            formData.append('pet_id', petRegistrationForm.dataset.petId);
-        } else {
-            formData.set('action', 'register');
-        }
-
-        console.log("📤 Sending to pets.php...");
-
-        try {
-            const res = await fetch('pets.php', { method: 'POST', body: formData });
-            const text = await res.text();
-            console.log("📥 Response:", text);
+    const petRegistrationForm = document.getElementById('petRegistrationForm');
+    if (petRegistrationForm) {
+        petRegistrationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             
-            const data = JSON.parse(text);
+            console.log("🐕 Form submitted!");
+            
+            const formData = new FormData(petRegistrationForm);
+            const mode = petRegistrationForm.dataset.mode || 'register';
 
-            if (data.status === 'success') {
-                alert(mode === 'update' ? 'Pet updated successfully!' : 'Pet registered successfully!');
-                petRegistrationForm.reset();
-                
-                const imagePreview = document.getElementById('imagePreview');
-                imagePreview.style.backgroundImage = '';
-                imagePreview.innerHTML = `<i class="fas fa-camera"></i><span>Click to upload image</span>`;
-                
-                document.getElementById('petRegistrationModal').classList.remove('active');
-                
-                // Reset form mode
-                delete petRegistrationForm.dataset.mode;
-                delete petRegistrationForm.dataset.petId;
-                
-                // Reset submit button text
-                const submitBtn = petRegistrationForm.querySelector('button[type="submit"]');
-                submitBtn.innerHTML = '<i class="fas fa-paw"></i> Register Pet';
-                
-                loadPets();
-                loadDashboardStats();
+            if (mode === 'update') {
+                formData.set('action', 'update');
+                formData.append('pet_id', petRegistrationForm.dataset.petId);
             } else {
-                alert('Error: ' + data.message);
+                formData.set('action', 'register');
             }
-        } catch (err) {
-            console.error('❌ Error:', err);
-            alert('Error: ' + err.message);
-        }
-    });
-}
 
+            console.log("📤 Sending to pets.php...");
 
-    // Vaccination Form
+            try {
+                const res = await fetch('pets.php', { method: 'POST', body: formData });
+                const text = await res.text();
+                console.log("📥 Response:", text);
+                
+                const data = JSON.parse(text);
+
+                if (data.status === 'success') {
+                    alert(mode === 'update' ? 'Pet updated successfully!' : 'Pet registered successfully!');
+                    petRegistrationForm.reset();
+                    
+                    const imagePreview = document.getElementById('imagePreview');
+                    imagePreview.style.backgroundImage = '';
+                    imagePreview.innerHTML = `<i class="fas fa-camera"></i><span>Click to upload image</span>`;
+                    
+                    document.getElementById('petRegistrationModal').classList.remove('active');
+                    
+                    delete petRegistrationForm.dataset.mode;
+                    delete petRegistrationForm.dataset.petId;
+                    
+                    const submitBtn = petRegistrationForm.querySelector('button[type="submit"]');
+                    submitBtn.innerHTML = '<i class="fas fa-paw"></i> Register Pet';
+                    
+                    loadPets();
+                    loadDashboardStats();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            } catch (err) {
+                console.error('❌ Error:', err);
+                alert('Error: ' + err.message);
+            }
+        });
+    }
+
     const vaccinationForm = document.getElementById('vaccinationForm');
     if (vaccinationForm) {
         vaccinationForm.addEventListener('submit', async (e) => {
@@ -701,7 +1129,6 @@ if (petRegistrationForm) {
         });
     }
 
-    // Incident Form
     const incidentForm = document.getElementById('incidentForm');
     if (incidentForm) {
         incidentForm.addEventListener('submit', async (e) => {
@@ -726,7 +1153,6 @@ if (petRegistrationForm) {
         });
     }
 
-    // Logout button
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function(e) {
@@ -736,7 +1162,6 @@ if (petRegistrationForm) {
         });
     }
 
-    // Initial load
     loadPets();
     loadDashboardStats();
     loadRecentAlerts();

@@ -62,14 +62,12 @@
               </select>
             </div>
           </div>
-
           <div class="form-group">
             <label for="loginEmail">Email Address</label>
             <div class="input-group">
               <input type="email" id="loginEmail" name="email" placeholder="✉️ Enter your email address" required>
             </div>
           </div>
-          
           <div class="form-group">
             <label for="loginPassword">Password</label>
             <div class="password-input-group">
@@ -78,10 +76,8 @@
                 <i class="fas fa-eye"></i>
               </button>
             </div>
-          </div>
-          
-          <div class="form-message-container"></div>
-          
+          </div>     
+          <div class="form-message-container"></div>     
           <button type="submit" name="login" class="btn btn-primary btn-block">
             <i class="fas fa-sign-in-alt"></i> Login
           </button>
@@ -227,7 +223,7 @@
           
           <div class="floating-badge badge-1">
             <i class="fas fa-heartbeat"></i>
-            <span>Health Monitored</span>
+            <span>Vaccine Monitored</span>
           </div>
           <div class="floating-badge badge-2">
             <i class="fas fa-map-marker-alt"></i>
@@ -464,7 +460,6 @@
               </div>
             </div>
           </div>
-
           <button class="btn-premium">Get Started Now</button>
         </div>
       </div>
@@ -513,7 +508,7 @@
             </div>
           </div>
 
-          <div class="contact-social">
+          <!-- <div class="contact-social">
             <h4>Follow Us</h4>
             <div class="contact-social-links">
               <a href="#"><i class="fab fa-facebook"></i></a>
@@ -521,7 +516,7 @@
               <a href="#"><i class="fab fa-twitter"></i></a>
               <a href="#"><i class="fab fa-linkedin"></i></a>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- Right Side - Contact Form -->
