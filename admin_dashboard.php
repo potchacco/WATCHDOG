@@ -1,142 +1,149 @@
 <?php
-session_start();
+require_once 'check_session.php';
 
-// Check if user is logged in and is admin
-if (!isset($_SESSION['user_id']) || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
-    header('Location: index.php');
-    exit();
+// Check if user is admin
+if ($_SESSION['user_role'] !== 'admin') {
+    header('Location: dashboard.php');
+    exit;
 }
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WATCHDOG - Admin Dashboard</title>
-    <link rel="stylesheet" href="admin_dashboard.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Digital Pet Registration and Tracking Platform - Admin Dashboard</title>
+    <link rel="stylesheet" href="admin_dashboard.css?v=<?php echo time(); ?>" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
-    <div class="admin-container">
-        <!-- Sidebar -->
-        <aside class="admin-sidebar" id="adminSidebar">
-            <div class="sidebar-header">
+    <div class="admin-dashboard">
+        <!-- Top Navigation Bar -->
+        <nav class="admin-navbar">
+            <div class="navbar-left">
+                <!-- Hamburger for Mobile -->
+        <button class="admin-hamburger" id="adminHamburger" style="display: none;">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
                 <div class="admin-logo">
-                    <i class="fas fa-shield-dog"></i>
-                    <span>ADMIN</span>
-                </div>
-                <button class="sidebar-close" id="sidebarClose">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-link active" data-section="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-link" data-section="all-pets">
                     <i class="fas fa-paw"></i>
-                    <span>All Pets</span>
-                </a>
-                <a href="#" class="nav-link" data-section="all-owners">
-                    <i class="fas fa-users"></i>
-                    <span>Pet Owners</span>
-                </a>
-                <a href="#" class="nav-link" data-section="incidents">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span>Incidents</span>
-                </a>
-                <a href="#" class="nav-link" data-section="vaccinations">
-                    <i class="fas fa-syringe"></i>
-                    <span>Vaccinations</span>
-                </a>
-                <a href="#" class="nav-link" data-section="reports">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reports</span>
-                </a>
-                <a href="logout.php" class="nav-link logout-link">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </nav>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="admin-main">
-            <!-- Header -->
-            <header class="admin-header">
-                <button class="menu-toggle" id="menuToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="admin-title">Barangay Dog Monitoring System</h1>
+                    <span>Digital Pet Registration and Tracking Platform Admin</span>
+                </div>
+            </div>
+            <div class="navbar-right">
                 <div class="admin-profile">
-                    <span class="admin-name">
-                        <i class="fas fa-user-shield"></i>
-                        <?php echo htmlspecialchars($_SESSION['user_name']); ?>
-                    </span>
+                    <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name']); ?>&background=667eea&color=fff&size=40" alt="Admin">
+                    <span><?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
                 </div>
-            </header>
-
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card blue">
-                    <div class="stat-icon">
-                        <i class="fas fa-paw"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Total Pets</h3>
-                        <p class="stat-value" id="adminTotalPets">0</p>
-                    </div>
-                </div>
-
-                <div class="stat-card green">
-                    <div class="stat-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Pet Owners</h3>
-                        <p class="stat-value" id="adminTotalOwners">0</p>
-                    </div>
-                </div>
-
-                <div class="stat-card orange">
-                    <div class="stat-icon">
-                        <i class="fas fa-exclamation-circle"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Active Incidents</h3>
-                        <p class="stat-value" id="adminActiveIncidents">0</p>
-                    </div>
-                </div>
-
-                <div class="stat-card purple">
-                    <div class="stat-icon">
-                        <i class="fas fa-syringe"></i>
-                    </div>
-                    <div class="stat-info">
-                        <h3>Vaccinations Due</h3>
-                        <p class="stat-value" id="adminVaccinationsDue">0</p>
-                    </div>
-                </div>
+                <a href="#" class="btn-logout" id="adminLogoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
             </div>
+        </nav>
 
-            <!-- Dynamic Content Area -->
-            <div id="adminContent" class="admin-content">
-                <!-- Content will be loaded here by JavaScript -->
-                <div class="welcome-section">
-                    <h2>Welcome to Admin Dashboard!</h2>
-                    <p>Select a section from the sidebar to get started.</p>
+        <div class="admin-layout">
+            <!-- Sidebar -->
+            <aside class="admin-sidebar">
+                <ul class="admin-menu">
+                    <li><a href="#" class="active" data-section="overview">
+                        <i class="fas fa-home"></i> Overview
+                    </a></li>
+                    <li><a href="#" data-section="users">
+                        <i class="fas fa-users"></i> User Management
+                    </a></li>
+                    <li><a href="#" data-section="pets">
+                        <i class="fas fa-dog"></i> All Pets
+                    </a></li>
+                    <li><a href="#" data-section="incidents">
+                        <i class="fas fa-exclamation-triangle"></i> All Incidents
+                    </a></li>
+                    <li><a href="#" data-section="vaccinations">
+                        <i class="fas fa-syringe"></i> All Vaccinations
+                    </a></li>
+                    <li><a href="#" data-section="reports">
+                        <i class="fas fa-chart-bar"></i> Reports
+                    </a></li>
+                    <li><a href="#" data-section="settings">
+                        <i class="fas fa-cog"></i> Settings
+                    </a></li>
+                </ul>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="admin-main" id="adminMainContent">
+                <!-- Overview Section (Default) -->
+                <div class="admin-header">
+                    <h1>System Overview</h1>
+                    <p>Monitor and manage your entire pet monitoring system</p>
                 </div>
-            </div>
-        </main>
+
+                <!-- Stats Grid -->
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card blue">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card green">
+                        <div class="stat-icon">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalPets">0</h3>
+                            <p>Total Pets</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card orange">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalIncidents">0</h3>
+                            <p>Total Incidents</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card purple">
+                        <div class="stat-icon">
+                            <i class="fas fa-syringe"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalVaccinations">0</h3>
+                            <p>Vaccinations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="admin-section">
+                    <h2>Recent System Activity</h2>
+                    <div id="recentActivity" class="activity-feed">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
     </div>
 
-    <!-- Overlay for mobile -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-icon">
+            <i class="fas fa-paw"></i>
+        </div>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Logging out...</div>
+    </div>
 
-    <script src="admin_dashboard.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="admin_dashboard.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

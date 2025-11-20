@@ -8,7 +8,7 @@
 
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Nunito', sans-serif;
   background: #f8fafc;
   color: #263238;
   line-height: 1.6;
@@ -165,7 +165,7 @@ html {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
   text-transform: none;
   letter-spacing: 0;
 }
@@ -1045,7 +1045,7 @@ html {
   border: 2px solid #e0e7ff;
   border-radius: 12px;
   font-size: 1rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: all 0.3s ease;
 }
 
@@ -1350,7 +1350,7 @@ html {
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .input-group input:focus {
@@ -1372,7 +1372,7 @@ html {
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .password-input-group input:focus {
@@ -1437,7 +1437,7 @@ html {
   background: white;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Inter', sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1729,7 +1729,7 @@ hr {
   }
   .contact-form-side {
     height: 700px;
-    width: 90%;
+    width: 75%;
   }
   .contact-card {
     margin-right: 60px;
@@ -1821,7 +1821,7 @@ button[type="submit"]:disabled {
     border: 2px solid #E2E8F0;
     border-radius: 8px;
     font-size: 1rem;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
     background: white;
     cursor: pointer;
     transition: all 0.3s ease;

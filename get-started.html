@@ -1,338 +1,372 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Watchdog - Dog Monitoring System</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WATCHDOG - Pet Monitoring System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* style.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    line-height: 1.6;
-    color: #000000; /* black text */
-    background-color: #f0f0f0; /* light gray background */
-    min-height: 100vh;
-}
+        /* Animated Background */
+        .background-animation {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
 
-.container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 2rem;
-}
+        .paw-print {
+            position: absolute;
+            font-size: 40px;
+            color: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite ease-in-out;
+        }
 
-/* Navigation */
-header {
-    padding: 2rem 0;
-}
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-50px) rotate(180deg); }
+        }
 
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .paw-print:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .paw-print:nth-child(2) { top: 20%; right: 15%; animation-delay: 2s; }
+        .paw-print:nth-child(3) { bottom: 15%; left: 20%; animation-delay: 4s; }
+        .paw-print:nth-child(4) { bottom: 25%; right: 10%; animation-delay: 6s; }
 
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 2.5rem;
-}
+        /* Main Container */
+        .landing-container {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            width: 90%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+            animation: slideUp 0.8s ease;
+        }
 
-.nav-links a {
-    text-decoration: none;
-    color: #333333; /* dark gray text */
-    font-weight: 600;
-    transition: color 0.3s ease;
-    font-size: 0.95rem;
-}
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-.nav-links a:hover {
-    color: #0052cc; /* deep blue hover */
-}
+        /* Left Section - Content */
+        .content-section {
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: #f0f0f0;
+        }
 
-/* Hero Section */
-.hero {
-    display: flex;
-    flex-direction: row; /* default flex-direction is row, so this ensures horizontal layout */
-    align-items: center; /* vertically centers items */
-    justify-content: center;
-    gap: 4rem;
-    padding: 0 2rem;
-    min-height: calc(100vh - 150px);
-    text-align: left;
-    flex-wrap: nowrap; /* no wrapping to keep row layout */
-}
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
 
-.hero-image {
-    flex: 1 1 400px;
-    max-width: 500px;
-    height: auto;
-    border-radius: 15px;
-    box-shadow: 0 15px 40px rgba(0, 82, 204, 0.25);
-    object-fit: cover;
-}
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
 
-.hero-content {
-    flex: 1 1 400px;
-    max-width: 600px;
-    animation: fadeInUp 1s ease-out;
-}
+        .logo-text {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
 
-.hero h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    letter-spacing: -1.5px;
-    line-height: 1.2;
-}
+        .subtitle {
+            font-size: 18px;
+            color: #6b7280;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
 
-.hero p {
-    font-size: 1.25rem;
-    color: #444444;
-    margin-bottom: 3rem;
-    line-height: 1.8;
-    font-weight: 400;
-    max-width: 500px;
-}
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
 
-@media (max-width: 900px) {
-    .hero {
-        flex-direction: column;
-        text-align: center;
-        gap: 2rem;
-        padding: 1rem;
-    }
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #374151;
+            font-size: 16px;
+        }
 
-    .hero-content, .hero-image {
-        max-width: 100%;
-        flex: none;
-    }
+        .feature-item i {
+            color: #667eea;
+            font-size: 20px;
+        }
 
-    .hero h1 {
-        font-size: 2.75rem;
-        margin-bottom: 1rem;
-    }
+        /* Get Started Button */
+        .btn-get-started {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: fit-content;
+        }
 
-    .hero p {
-        font-size: 1.1rem;
-        max-width: 100%;
-        margin-bottom: 2rem;
-    }
-}
+        .btn-get-started:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
 
+        .btn-get-started:active {
+            transform: translateY(-1px);
+        }
 
-/* CTA Button */
-.cta-button {
-    display: inline-block;
-    padding: 1.1rem 3.5rem;
-    background: #0052cc; /* deep blue */
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 1.15rem;
-    font-weight: 700;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0, 82, 204, 0.3);
-    letter-spacing: 0.5px;
-    margin-bottom: 3rem;
-}
+        .btn-get-started.loading {
+            pointer-events: none;
+        }
 
-.cta-button:hover {
-    background: #003d99; /* darker blue on hover */
-    box-shadow: 0 15px 40px rgba(0, 61, 153, 0.5);
-    transform: translateY(-3px);
-}
+        .btn-text {
+            transition: opacity 0.3s ease;
+        }
 
-/* Features Preview */
-.features-preview {
-    display: flex;
-    justify-content: center;
-    gap: 3rem;
-    margin-top: 3rem;
-    flex-wrap: wrap;
-}
+        .btn-get-started.loading .btn-text {
+            opacity: 0;
+        }
 
-.feature-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.75rem;
-    color: #333333; /* dark gray text */
-    font-size: 0.95rem;
-    font-weight: 600;
-}
+        /* Loading Spinner */
+        .spinner {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
 
-.feature-item .icon {
-    font-size: 2rem;
-    background: #ffffff;
-    padding: 1rem;
-    border-radius: 50%;
-    box-shadow: 0 5px 20px rgba(0, 82, 204, 0.1);
-    transition: transform 0.3s ease;
-}
+        .btn-get-started.loading .spinner {
+            opacity: 1;
+        }
 
-.feature-item:hover .icon {
-    transform: scale(1.1);
-}
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
 
-/* Animations */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+        /* Right Section - Image */
+        .image-section {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .nav-links {
-        gap: 1.5rem;
-    }
+        .dog-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.9;
+        }
 
-    .hero h1 {
-        font-size: 2.5rem;
-    }
+        .image-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 30px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+            color: white;
+        }
 
-    .hero p {
-        font-size: 1.1rem;
-    }
+        .image-overlay h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
 
-    .cta-button {
-        padding: 1rem 2.75rem;
-        font-size: 1rem;
-    }
+        .image-overlay p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
 
-    .features-preview {
-        gap: 2rem;
-    }
+        /* Responsive */
+        @media (max-width: 968px) {
+            .landing-container {
+                grid-template-columns: 1fr;
+                width: 95%;
+            }
 
-    .feature-item .icon {
-        font-size: 1.75rem;
-        padding: 0.875rem;
-    }
-}
+            .image-section {
+                min-height: 300px;
+                order: -1;
+            }
 
-@media (max-width: 480px) {
-    .container {
-        padding: 0 1.5rem;
-    }
+            .content-section {
+                padding: 40px 30px;
+            }
 
-    .nav-links {
-        display: none;
-    }
+            h1 {
+                font-size: 36px;
+            }
+        }
 
-    .hero h1 {
-        font-size: 2rem;
-    }
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 28px;
+            }
 
-    .hero p {
-        font-size: 1rem;
-        margin-bottom: 2rem;
-    }
+            .subtitle {
+                font-size: 16px;
+            }
 
-    .cta-button {
-        margin-bottom: 2.5rem;
-    }
+            .btn-get-started {
+                width: 100%;
+                padding: 16px 30px;
+                font-size: 16px;
+            }
 
-    .features-preview {
-        gap: 1.5rem;
-    }
-}
-
-#title {
-    font-size: 3.5rem;
-}
-
-/* Spinner style */
-.spinner {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid #ffffff;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-    display: inline-block;
-    vertical-align: middle;
-    margin-left: 10px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-
-
+            .content-section {
+                padding: 30px 20px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <nav>
-                <ul class="nav-links">
-                    .
-                </ul>
-            </nav>
-        </header>
-
-        <main class="hero">
-    <img src="https://images.unsplash.com/photo-1736196674439-1adb6ccbbd31?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nzl8fGhpZ2glMjBxdWFsaXR5JTIwaW1hZ2VzJTIwb2YlMjBkb2dzfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=500" alt="Playful dog" class="hero-image" />
-
-    <div class="hero-content">
-        <h2 id="title">WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</h2>
-        <h1>Keep Your Best Friend Safe & Happy</h1>
-        <p>Monitor your dog from anywhere with live video streaming, activity tracking, and intelligent alerts. Peace of mind is just a click away.</p>
-        <a href="index.php" class="cta-button" id="getStartedBtn">Get Started</a>
-        <!-- <div class="features-preview">
-            <div class="feature-item">
-                <span class="icon">📹</span>
-                <span>Live Video</span>
-            </div>
-            <div class="feature-item">
-                <span class="icon">🔔</span>
-                <span>Smart Alerts</span>
-            </div>
-            <div class="feature-item">
-                <span class="icon">📊</span>
-                <span>Activity Tracking</span>
-            </div>
-        </div> -->
+    <!-- Animated Background -->
+    <div class="background-animation">
+        <div class="paw-print"><i class="fas fa-paw"></i></div>
+        <div class="paw-print"><i class="fas fa-paw"></i></div>
+        <div class="paw-print"><i class="fas fa-paw"></i></div>
+        <div class="paw-print"><i class="fas fa-paw"></i></div>
     </div>
-</main>
 
+    <!-- Main Container -->
+    <div class="landing-container">
+        <!-- Left Section - Content -->
+        <div class="content-section">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-paw"></i>
+                </div>
+                <span class="logo-text">WATCHDOG</span>
+            </div>
+
+            <h1>Keep Your Pets Safe & Healthy</h1>
+            <p class="subtitle">
+                Your complete pet monitoring solution. Track vaccinations, manage records, 
+                and ensure the well-being of your furry friends all in one place.
+            </p>
+
+            <div class="features">
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Easy Pet Registration</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Vaccination Tracking</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Incident Management</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Real-time Analytics</span>
+                </div>
+            </div>
+
+            <button class="btn-get-started" id="getStartedBtn">
+                <span class="btn-text">
+                    Get Started
+                    <i class="fas fa-arrow-right"></i>
+                </span>
+                <div class="spinner"></div>
+            </button>
+        </div>
+
+        <!-- Right Section - Image -->
+        <div class="image-section">
+            <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?q=80&w=1000&auto=format&fit=crop" 
+                 alt="Happy Dog" 
+                 class="dog-image">
+            <div class="image-overlay">
+                <h3>Trusted by Pet Owners</h3>
+                <p>Join thousands of pet parents keeping their companions safe</p>
+            </div>
+        </div>
     </div>
-<script> 
-    const btn = document.getElementById('getStartedBtn');
 
-    btn.addEventListener('click', (event) => {
-    event.preventDefault();  // Prevent immediate navigation or form submit
+    <script>
+        const getStartedBtn = document.getElementById('getStartedBtn');
 
-    btn.disabled = true;
-    btn.innerHTML = 'Loading <span class="spinner"></span>';
-
-    setTimeout(() => {
-        btn.disabled = false;
-        btn.innerHTML = 'Get Started';
-
-        // Now do the actual navigation if needed
-        // For example:
-         window.location.href = 'index.php';
-    }, 3000);
-});
-
-</script>
-
-
+        getStartedBtn.addEventListener('click', function() {
+            // Add loading state
+            this.classList.add('loading');
+            
+            // Simulate loading for 2 seconds then redirect
+            setTimeout(() => {
+                window.location.href = 'index.php';
+            }, 2000);
+        });
+    </script>
 </body>
 </html>

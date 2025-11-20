@@ -1,3 +1,145 @@
+document.addEventListener("DOMContentLoaded", function () {
+    // Hamburger + sidebar overlay references
+    const hamburger = document.getElementById("hamburger");
+    const sidebar = document.getElementById("sidebar");
+    const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+    // Show/hide hamburger based on window size
+    function updateHamburgerDisplay() {
+        if (window.innerWidth <= 768) {
+            hamburger.style.display = "flex";
+        } else {
+            hamburger.style.display = "none";
+            sidebar.classList.remove("active");
+            sidebarOverlay.classList.remove("active");
+            hamburger.classList.remove("active");
+        }
+    }
+
+    updateHamburgerDisplay();
+    window.addEventListener("resize", updateHamburgerDisplay);
+
+    // Hamburger click toggles menu
+    hamburger.addEventListener("click", function () {
+        sidebar.classList.toggle("active");
+        sidebarOverlay.classList.toggle("active");
+        hamburger.classList.toggle("active");
+    });
+
+    // Sidebar overlay click closes menu
+    sidebarOverlay.addEventListener("click", function () {
+        sidebar.classList.remove("active");
+        sidebarOverlay.classList.remove("active");
+        hamburger.classList.remove("active");
+    });
+
+    // Sidebar link click closes menu on mobile
+    document.querySelectorAll(".sidebar-menu a").forEach(function (link) {
+        link.addEventListener("click", function () {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove("active");
+                sidebarOverlay.classList.remove("active");
+                hamburger.classList.remove("active");
+            }
+        });
+    });
+    
+    // (The rest of your dashboard initialization code follows below...)
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Dashboard Loaded');
+
+    
+    
+    // ========================================
+    // MOBILE HAMBURGER MENU
+    // ========================================
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    if (hamburger && sidebar && sidebarOverlay) {
+        // Show hamburger on mobile
+        if (window.innerWidth <= 768) {
+            hamburger.style.display = 'flex';
+        }
+        
+        // Toggle sidebar
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+            hamburger.classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking overlay
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            hamburger.classList.remove('active');
+        });
+        
+        // Close sidebar when clicking menu item
+        const menuLinks = sidebar.querySelectorAll('.sidebar-menu a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                    hamburger.classList.remove('active');
+                }
+            });
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth <= 768) {
+                hamburger.style.display = 'flex';
+            } else {
+                hamburger.style.display = 'none';
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                hamburger.classList.remove('active');
+            }
+        });
+    }
+    
+    // Rest of your existing code...
+});
+
+
+
+// ========================================
+// POPUP NOTIFICATION SYSTEM (ADD AT TOP)
+// ========================================
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `notification-toast ${type}`;
+    
+    const icon = type === 'success' ? 'fa-check-circle' : 
+                 type === 'error' ? 'fa-exclamation-circle' : 
+                 type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+    
+    notification.innerHTML = `
+        <i class="fas ${icon}"></i>
+        <span>${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.classList.add('show'), 10);
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// ========================================
+// END NOTIFICATION SYSTEM
+// ========================================
+
+
 // ===== HELPER FUNCTIONS (OUTSIDE DOMContentLoaded) =====
 function generateCalendarDates() {
     let html = '';
@@ -155,23 +297,38 @@ async function loadPets() {
 
 function editPet(petId, pets) {
     const pet = pets.find(p => p.id == petId);
-    if (!pet) return;
+    if (!pet) {
+        showNotification('Pet not found', 'error');
+        return;
+    }
 
+    // Populate form fields
     document.getElementById('petName').value = pet.name;
     document.getElementById('species').value = pet.species;
     document.getElementById('breed').value = pet.breed || '';
     document.getElementById('age').value = pet.age || '';
     document.getElementById('gender').value = pet.gender || '';
 
+    // Show existing image if available
+    const imagePreview = document.getElementById('imagePreview');
+    if (pet.image_url && pet.image_url.trim() !== '') {
+        imagePreview.style.backgroundImage = `url('${pet.image_url}')`;
+        imagePreview.innerHTML = '';
+    }
+
+    // Set form to update mode
     const form = document.getElementById('petRegistrationForm');
     form.dataset.mode = 'update';
     form.dataset.petId = petId;
 
+    // Change button text
     const submitBtn = form.querySelector('button[type="submit"]');
     submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Pet';
 
+    // Open modal
     document.getElementById('petRegistrationModal').classList.add('active');
 }
+
 
 async function loadPetsInSidebar() {
     const sidebarPetsGrid = document.getElementById('sidebarPetsGrid');
@@ -205,6 +362,12 @@ async function loadPetsInSidebar() {
                     </div>
                 `;
                 sidebarPetsGrid.appendChild(petCard);
+            });
+             document.querySelectorAll('#sidebarPetsGrid .edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const petId = this.getAttribute('data-pet-id');
+                    editPet(petId, data.pets);
+                });
             });
         }
     } catch (err) {
@@ -302,7 +465,7 @@ async function loadPetsWithVaccinations() {
         console.error('Error:', err);
         container.innerHTML = `
             <div class="empty-state error">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i>
                 <h3>Error Loading Pets</h3>
                 <p>Unable to load pet data. Please try again.</p>
             </div>
@@ -407,13 +570,48 @@ async function loadRecentAlerts() {
     const alertsContainer = document.querySelector('.alerts-section');
     if (!alertsContainer) return;
 
-    alertsContainer.innerHTML = `
-        <div class="alert-item success">
-            <i class="fas fa-info-circle"></i>
-            <span>Dashboard loaded successfully</span>
-        </div>
-    `;
+    try {
+        const res = await fetch('incidents.php');
+        const data = await res.json();
+        
+        if (data.status === 'success' && data.incidents.length > 0) {
+            alertsContainer.innerHTML = '';
+            
+            // Show last 5 incidents as alerts
+            data.incidents.slice(0, 5).forEach(incident => {
+                const alertType = incident.status === 'Resolved' ? 'success' : 
+                                 incident.severity === 'Critical' || incident.severity === 'High' ? 'error' : 'warning';
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert-item ${alertType}`;
+                alertDiv.innerHTML = `
+                    <i class="fas ${alertType === 'success' ? 'fa-check-circle' : alertType === 'error' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+                    <div>
+                        <strong>${incident.incident_type}</strong>
+                        <span>${new Date(incident.incident_date).toLocaleString()}</span>
+                    </div>
+                `;
+                alertsContainer.appendChild(alertDiv);
+            });
+        } else {
+            alertsContainer.innerHTML = `
+                <div class="alert-item success">
+                    <i class="fas fa-info-circle"></i>
+                    <span>No recent incidents</span>
+                </div>
+            `;
+        }
+    } catch (err) {
+        console.error('Error loading alerts:', err);
+        alertsContainer.innerHTML = `
+            <div class="alert-item success">
+                <i class="fas fa-info-circle"></i>
+                <span>Dashboard loaded successfully</span>
+            </div>
+        `;
+    }
 }
+
 
 // ===== MAIN INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
@@ -559,7 +757,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="section-header-enhanced">
                 <div class="header-left">
                     <div class="icon-badge red">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i>
                     </div>
                     <div>
                         <h2>Incident Reports</h2>
@@ -573,7 +771,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <div class="stats-mini-row">
                 <div class="stat-mini red">
-                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i>
                     <div>
                         <div class="stat-mini-value">0</div>
                         <div class="stat-mini-label">Active</div>
@@ -635,7 +833,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 <span>Vaccinations</span>
                                             </li>
                                             <li class="project-item">
-                                                <i class="fas fa-exclamation-triangle" style="color: #EC4899;"></i>
+                                                <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i>
                                                 <span>Incident Reports</span>
                                             </li>
                                         </ul>
@@ -718,7 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 </div>
                                             </div>
                                             <div class="chart-stat-item">
-                                                <i class="fas fa-exclamation-circle"></i>
+                                                <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i>
                                                 <div>
                                                     <div class="stat-value">12</div>
                                                     <div class="stat-label">Incidents</div>
@@ -783,7 +981,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 </div>
                                             </li>
                                             <li class="message-item">
-                                                <div class="message-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                                                <div class="message-icon warning"><i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i></div>
                                                 <div class="message-content">
                                                     <div class="message-name">Incident Report</div>
                                                     <div class="message-text">New incident reported in Area 5</div>
@@ -1017,18 +1215,50 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     const registerPetBtn = document.getElementById('registerPetBtn');
-    if (registerPetBtn) {
-        registerPetBtn.addEventListener('click', () => {
-            document.getElementById('petRegistrationModal').classList.add('active');
-        });
-    }
+if (registerPetBtn) {
+    registerPetBtn.addEventListener('click', () => {
+        // Reset form for new pet
+        const form = document.getElementById('petRegistrationForm');
+        form.reset();
+        delete form.dataset.mode;
+        delete form.dataset.petId;
+        
+        // Reset image preview
+        const imagePreview = document.getElementById('imagePreview');
+        imagePreview.style.backgroundImage = '';
+        imagePreview.innerHTML = '<i class="fas fa-camera"></i><span>Click to upload image</span>';
+        
+        // Reset button text
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-paw"></i> Register Pet';
+        
+        document.getElementById('petRegistrationModal').classList.add('active');
+    });
+}
+
 
     const quickAddPetBtn = document.getElementById('quickAddPetBtn');
-    if (quickAddPetBtn) {
-        quickAddPetBtn.addEventListener('click', () => {
-            document.getElementById('petRegistrationModal').classList.add('active');
-        });
-    }
+if (quickAddPetBtn) {
+    quickAddPetBtn.addEventListener('click', () => {
+        // Reset form for new pet
+        const form = document.getElementById('petRegistrationForm');
+        form.reset();
+        delete form.dataset.mode;
+        delete form.dataset.petId;
+        
+        // Reset image preview
+        const imagePreview = document.getElementById('imagePreview');
+        imagePreview.style.backgroundImage = '';
+        imagePreview.innerHTML = '<i class="fas fa-camera"></i><span>Click to upload image</span>';
+        
+        // Reset button text
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '<i class="fas fa-paw"></i> Register Pet';
+        
+        document.getElementById('petRegistrationModal').classList.add('active');
+    });
+}
+
 
     const imagePreview = document.getElementById('imagePreview');
     const petImageInput = document.getElementById('petImage');
@@ -1078,7 +1308,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = JSON.parse(text);
 
                 if (data.status === 'success') {
-                    alert(mode === 'update' ? 'Pet updated successfully!' : 'Pet registered successfully!');
+                    showNotification(mode === 'update' ? 'Pet updated successfully!' : 'Pet registered successfully!', 'success');
+
                     petRegistrationForm.reset();
                     
                     const imagePreview = document.getElementById('imagePreview');
@@ -1116,7 +1347,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await res.json();
 
                 if (data.status === 'success') {
-                    alert('Vaccination added successfully!');
+                    showNotification('Vaccination added successfully!', 'success');
                     document.getElementById('vaccinationModal').classList.remove('active');
                     vaccinationForm.reset();
                     loadPetsWithVaccinations();
@@ -1130,28 +1361,37 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     const incidentForm = document.getElementById('incidentForm');
-    if (incidentForm) {
-        incidentForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(incidentForm);
+if (incidentForm) {
+    incidentForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(incidentForm);
+        
+        // ✅ ADD THIS LINE - THIS WAS MISSING!
+        formData.append('action', 'add');
 
-            try {
-                const res = await fetch('incidents.php', { method: 'POST', body: formData });
-                const data = await res.json();
+        try {
+            const res = await fetch('incidents.php', { method: 'POST', body: formData });
+            const data = await res.json();
 
-                if (data.status === 'success') {
-                    alert('Incident reported successfully!');
-                    document.getElementById('incidentModal').classList.remove('active');
-                    incidentForm.reset();
-                    loadIncidents();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            } catch (err) {
-                alert('Failed to report incident.');
+            if (data.status === 'success') {
+                // ✅ REPLACED alert with showNotification
+                showNotification('Incident reported successfully!', 'success');
+                document.getElementById('incidentModal').classList.remove('active');
+                incidentForm.reset();
+                loadIncidents();
+                loadRecentAlerts(); // ✅ Refresh alerts
+            } else {
+                // ✅ REPLACED alert with showNotification
+                showNotification('Error: ' + data.message, 'error');
             }
-        });
-    }
+        } catch (err) {
+            // ✅ REPLACED alert with showNotification
+            showNotification('Failed to report incident.', 'error');
+            console.error(err);
+        }
+    });
+}
+
 
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {

@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>WATCHDOG - Community Pet Registration System</title>
+  <title>Digital Pet Registration and Tracking Platform</title>
   <link rel="stylesheet" href="style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="login.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="shortcut icon" href="project-logo.png" type="image/x-icon">
+  <!-- <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"> -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+
 </head>
 <body>
   <body>
@@ -45,7 +49,7 @@
   <div id="loginModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Login to WATCHD<i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i>G</h2>
+        <h2>Login <i class="fa-solid fa-paw fa-rotate-by" style="color: #0d0de6; --fa-rotate-angle: 30deg;"></i></h2>
         <button type="button" class="modal-close">
           <i class="fas fa-times"></i>
         </button>
@@ -312,7 +316,7 @@
             <i class="fas fa-id-card-alt"></i>
           </div>
           <h3>Digital Registration</h3>
-          <p>Quick and secure pet registration with official ID cards and QR codes for instant verification</p>
+          <p>Quick and secure pet registration with official ID cards for instant verification</p>
           <a href="#" class="service-link">Learn More <i class="fas fa-arrow-right"></i></a>
         </div>
 
@@ -343,7 +347,7 @@
   <section class="benefits-premium" id="benefits">
     <div class="container">
       <div class="section-header-premium">
-        <h2 class="section-title-premium">Benefits Of Using WatchDog</h2>
+        <h2 class="section-title-premium">Benefits Of Using Digital Pet Registration and Tracking Platform</h2>
         <p class="section-desc-premium">Discover why thousands of pet owners trust our platform for their pet care needs</p>
       </div>
 
@@ -424,7 +428,7 @@
         <div class="howto-right">
           <div class="section-header-premium text-left">
             <h2 class="section-title-premium">How To Use</h2>
-            <p class="section-desc-premium">Getting started with WatchDog is easy. Follow these simple steps to begin protecting your pet.</p>
+            <p class="section-desc-premium">Getting started with Digital Pet Registration and Tracking Platform is easy. Follow these simple steps to begin protecting your pet.</p>
           </div>
 
           <div class="howto-steps">
@@ -440,7 +444,7 @@
               <div class="step-number">02</div>
               <div class="step-content">
                 <h4>Register Your Pet</h4>
-                <p>Add your pet's details, upload photos, and get instant digital ID with QR code for tracking.</p>
+                <p>Add your pet's details, upload photos, and get instant digital ID for tracking.</p>
               </div>
             </div>
 

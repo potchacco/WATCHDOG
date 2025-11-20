@@ -447,6 +447,7 @@ require_once 'check_session.php';
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="dashboard.js?v=<?php echo time(); ?>"></script>
+</body>
+</html>

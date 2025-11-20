@@ -21,8 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
     }
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO incidents (user_id, pet_id, incident_type, description, location, severity, incident_date, created_at)
-                               VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
+        $stmt = $pdo->prepare("INSERT INTO incidents (user_id, pet_id, incident_type, description, location, severity, incident_date, status, created_at)
+                               VALUES (?, ?, ?, ?, ?, ?, ?, 'Open', NOW())");
         $stmt->execute([$_SESSION['user_id'], $pet_id, $incident_type, $description, $location, $severity, $incident_date]);
         
         // Log activity
