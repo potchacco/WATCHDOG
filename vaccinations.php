@@ -1,6 +1,6 @@
 <?php
-error_reporting(0);
-ini_set('display_errors', 0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 header('Content-Type: application/json');
 
 require_once 'check_session.php';
@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
     $pet_id = $_POST['pet_id'] ?? '';
     $vaccine_name = $_POST['vaccine_name'] ?? '';
     $date_given = $_POST['date_given'] ?? '';
-    $next_due_date = $_POST['next_due_date'] ?? '';
+    $next_due_date = $_POST['next_due_date'] ?? null;
     $veterinarian = $_POST['veterinarian'] ?? '';
     $notes = $_POST['notes'] ?? '';
 
@@ -24,6 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
         $stmt = $pdo->prepare("INSERT INTO vaccinations (user_id, pet_id, vaccine_name, date_given, next_due_date, veterinarian, notes, created_at)
                                VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
         $stmt->execute([$_SESSION['user_id'], $pet_id, $vaccine_name, $date_given, $next_due_date, $veterinarian, $notes]);
+        
+        // Log activity INSIDE the try block
+        $logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
+                                  VALUES (?, 'vaccination_added', ?, NOW())");
+        $logStmt->execute([$_SESSION['user_id'], "Vaccination added: $vaccine_name"]);
+        
         echo json_encode(['status' => 'success', 'message' => 'Vaccination record added successfully!']);
     } catch (PDOException $e) {
         echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
@@ -31,18 +37,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'add')
     exit;
 }
 
-$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
-                          VALUES (?, 'vaccination_added', ?, NOW())");
-$logStmt->execute([$_SESSION['user_id'], "Vaccination added: $vaccine_name"]);
-
-
 // ===== UPDATE Vaccination =====
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
     $vacc_id = $_POST['vacc_id'] ?? '';
     $pet_id = $_POST['pet_id'] ?? '';
     $vaccine_name = $_POST['vaccine_name'] ?? '';
     $date_given = $_POST['date_given'] ?? '';
-    $next_due_date = $_POST['next_due_date'] ?? '';
+    $next_due_date = $_POST['next_due_date'] ?? null;
     $veterinarian = $_POST['veterinarian'] ?? '';
     $notes = $_POST['notes'] ?? '';
 
@@ -55,17 +56,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
         $stmt = $pdo->prepare("UPDATE vaccinations SET pet_id = ?, vaccine_name = ?, date_given = ?, next_due_date = ?, veterinarian = ?, notes = ? 
                                WHERE id = ? AND user_id = ?");
         $stmt->execute([$pet_id, $vaccine_name, $date_given, $next_due_date, $veterinarian, $notes, $vacc_id, $_SESSION['user_id']]);
+        
+        // Log activity INSIDE the try block
+        $logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
+                                  VALUES (?, 'vaccination_updated', ?, NOW())");
+        $logStmt->execute([$_SESSION['user_id'], "Vaccination updated: $vaccine_name"]);
+        
         echo json_encode(['status' => 'success', 'message' => 'Vaccination record updated successfully!']);
     } catch (PDOException $e) {
         echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
     }
     exit;
 }
-
-$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
-                          VALUES (?, 'vaccination_updated', ?, NOW())");
-$logStmt->execute([$_SESSION['user_id'], "Vaccination updated: $vaccine_name"]);
-
 
 // ===== DELETE Vaccination =====
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
