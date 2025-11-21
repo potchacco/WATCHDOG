@@ -6,7 +6,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
 }
 
 body {
@@ -496,7 +496,7 @@ body {
     background: #FAFBFC;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
 }
 
 .quick-action-btn:hover {
@@ -642,7 +642,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
 }
 
 .btn-primary {
@@ -666,7 +666,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
 }
 
 .btn-block {
@@ -793,7 +793,7 @@ body {
     border: 2px solid #E2E8F0;
     border-radius: 12px;
     font-size: 1rem;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
     transition: all 0.3s ease;
 }
 
@@ -1427,7 +1427,7 @@ textarea {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Nunito', sans-serif;
 }
 
 .edit-btn {

@@ -38,6 +38,7 @@ body {
 .navbar-left {
     display: flex;
     align-items: center;
+    vertical-align:middle;
 }
 
 .admin-logo {
@@ -292,7 +293,7 @@ body {
 }
 
 .activity-icon.orange {
-    background: #F59E0B;
+    background: #ff0000;
 }
 
 .activity-details {
@@ -1271,6 +1272,7 @@ body {
         border: none;
         cursor: pointer;
         margin-right: 15px;
+        margin-top: 10px;
     }
     
     .admin-hamburger span {
@@ -1461,3 +1463,34 @@ body {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
 }
+
+.btn-warning {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #f97316;
+    color: #fff;
+    font-size: 13px;
+}
+
+.btn-warning[disabled] {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.badge.gray {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.badge.orange {
+    background: #fed7aa;
+    color: #9a3412;
+}
+
+#transparent {
+    background: transparent;
+    border:  1px solid red;
+}
+

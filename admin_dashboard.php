@@ -103,8 +103,8 @@ if ($_SESSION['user_role'] !== 'admin') {
                     </div>
 
                     <div class="admin-stat-card orange">
-                        <div class="stat-icon">
-                            <i class="fas fa-exclamation-triangle"></i>
+                        <div class="stat-icon" id="transparent">
+                            <i class="fa-solid fa-triangle-exclamation fa-lg" style="color: #ff1900;"></i>
                         </div>
                         <div class="stat-info">
                             <h3 id="totalIncidents">0</h3>

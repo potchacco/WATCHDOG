@@ -548,7 +548,11 @@ function filterIncidents() {
 // ========================================
 // LOAD ALL VACCINATIONS SECTION
 // ========================================
-async function loadAllVaccinations() {
+// ========================================
+// LOAD ALL VACCINATIONS SECTION
+// ========================================
+
+function loadAllVaccinations() {
     const mainContent = document.getElementById('adminMainContent');
     mainContent.innerHTML = `
         <div class="admin-header">
@@ -601,6 +605,128 @@ async function fetchAllVaccinations() {
     try {
         const res = await fetch('admin_api.php?action=get_all_vaccinations');
         const data = await res.json();
+
+        const container = document.getElementById('vaccinationsContainer');
+
+        if (data.status !== 'success') {
+            container.innerHTML =
+                '<p style="text-align:center;padding:40px;color:#6b7280;">Failed to load vaccinations</p>';
+            return;
+        }
+
+        document.getElementById('vaccinatedPets').textContent = data.stats.vaccinated_pets || 0;
+        document.getElementById('dueSoon').textContent        = data.stats.due_soon || 0;
+        document.getElementById('overdue').textContent        = data.stats.overdue || 0;
+
+        if (!data.vaccinations || data.vaccinations.length === 0) {
+            container.innerHTML =
+                '<p style="text-align:center;padding:40px;color:#6b7280;">No vaccination records found</p>';
+            return;
+        }
+
+        let html = `
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pet</th>
+                            <th>Owner</th>
+                            <th>Vaccine</th>
+                            <th>Date Given</th>
+                            <th>Next Due</th>
+                            <th>Status</th>
+                            <th>Warning</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        data.vaccinations.forEach(vacc => {
+            const status = vacc.is_overdue
+                ? 'Overdue'
+                : (vacc.is_due_soon ? 'Due Soon' : 'Up to Date');
+
+            const statusClass = vacc.is_overdue
+                ? 'danger'
+                : (vacc.is_due_soon ? 'warning' : 'success');
+
+            const warningLabel = vacc.warning_status === 'Warning Sent'
+                ? 'Warning Sent'
+                : 'None';
+
+            const warningClass = vacc.warning_status === 'Warning Sent'
+                ? 'orange'
+                : 'gray';
+
+            html += `
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <i class="fas fa-paw" style="color:#667eea;font-size:20px;"></i>
+                            <span>${vacc.pet_name}</span>
+                        </div>
+                    </td>
+                    <td>${vacc.owner_name}</td>
+                    <td><strong>${vacc.vaccine_name}</strong></td>
+                    <td>${new Date(vacc.date_given).toLocaleDateString()}</td>
+                    <td>${vacc.next_due_date ? new Date(vacc.next_due_date).toLocaleDateString() : 'N/A'}</td>
+                    <td><span class="badge ${statusClass}">${status}</span></td>
+                    <td><span class="badge ${warningClass}">${warningLabel}</span></td>
+                    <td>
+                        <button class="btn-warning"
+                                onclick="sendVaccinationWarning(${vacc.id})"
+                                ${vacc.warning_status === 'Warning Sent' ? 'disabled' : ''}>
+                            Send Warning
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        container.innerHTML = html;
+    } catch (err) {
+        console.error('Error loading vaccinations:', err);
+        document.getElementById('vaccinationsContainer').innerHTML =
+            '<p style="text-align:center;padding:40px;color:#6b7280;">Error loading vaccinations</p>';
+    }
+}
+
+async function sendVaccinationWarning(vaccId) {
+    const note = prompt('Enter warning note (optional):');
+    if (note === null) return; // cancelled
+
+    try {
+        const formData = new FormData();
+        formData.append('action', 'send_warning');
+        formData.append('vacc_id', vaccId);
+        formData.append('note', note);
+
+        const res  = await fetch('admin_api.php', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            alert('Warning sent successfully');
+            fetchAllVaccinations();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Failed to send warning');
+    }
+}
+
+async function fetchAllVaccinations() {
+    try {
+        const res = await fetch('admin_api.php?action=get_all_vaccinations');
+        const data = await res.json();
         
         if (data.status === 'success') {
             document.getElementById('vaccinatedPets').textContent = data.stats.vaccinated_pets || 0;
@@ -628,28 +754,37 @@ async function fetchAllVaccinations() {
                 `;
                 
                 data.vaccinations.forEach(vacc => {
-                    const status = vacc.is_overdue ? 'Overdue' : 
-                                  vacc.is_due_soon ? 'Due Soon' : 'Up to Date';
-                    const statusClass = vacc.is_overdue ? 'danger' : 
-                                       vacc.is_due_soon ? 'warning' : 'success';
-                    
-                    html += `
-                        <tr>
-                            <td>
-                                <div class="user-cell">
-                                    <i class="fas fa-paw" style="color: #667eea; font-size: 20px;"></i>
-                                    <span>${vacc.pet_name}</span>
-                                </div>
-                            </td>
-                            <td>${vacc.owner_name}</td>
-                            <td><strong>${vacc.vaccine_type}</strong></td>
-                            <td>${new Date(vacc.vaccination_date).toLocaleDateString()}</td>
-                            <td>${vacc.next_due_date ? new Date(vacc.next_due_date).toLocaleDateString() : 'N/A'}</td>
-                            <td><span class="badge blue">${vacc.owner_name}</span></td>
-                            <td><span class="badge ${statusClass}">${status}</span></td>
-                        </tr>
-                    `;
-                });
+    const status = vacc.is_overdue ? 'Overdue' : vacc.is_due_soon ? 'Due Soon' : 'Up to Date';
+    const statusClass = vacc.is_overdue ? 'danger' : vacc.is_due_soon ? 'warning' : 'success';
+
+    html += `
+        <tr>
+            <td>
+                <div class="user-cell">
+                    <i class="fas fa-paw" style="color: #667eea; font-size: 20px;"></i>
+                    <span>${vacc.pet_name}</span>
+                </div>
+            </td>
+            <td>${vacc.owner_name}</td>
+            <td><strong>${vacc.vaccine_type}</strong></td>
+            <td>${new Date(vacc.vaccination_date).toLocaleDateString()}</td>
+            <td>${vacc.next_due_date ? new Date(vacc.next_due_date).toLocaleDateString() : 'N/A'}</td>
+            <td><span class="badge blue">${vacc.owner_name}</span></td>
+            <td><span class="badge ${statusClass}">${status}</span></td>
+            <td>
+                <span class="badge ${vacc.warning_status === 'Warning Sent' ? 'orange' : 'gray'}">
+                    ${vacc.warning_status === 'Warning Sent' ? 'Warning Sent' : 'None'}
+                </span>
+            </td>
+            <td>
+                <button class="btn-warning" onclick="sendVaccinationWarning(${vacc.id})" ${vacc.warning_status === 'Warning Sent' ? 'disabled' : ''}>
+                    Send Warning
+                </button>
+            </td>
+        </tr>
+    `;
+});
+
                 
                 html += `
                             </tbody>
@@ -830,3 +965,88 @@ function searchPets(query) {
         card.style.display = text.includes(query) ? '' : 'none';
     });
 }
+
+async function sendVaccinationWarning(vaccId) {
+    const note = prompt('Enter warning note (optional):');
+    
+    if (note === null) return; // Cancelled
+    
+    try {
+        const formData = new FormData();
+        formData.append('action', 'send_warning');
+        formData.append('vacc_id', vaccId);
+        formData.append('note', note);
+        
+        const res = await fetch('admin_api.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await res.json();
+        if (data.status === 'success') {
+            alert('Warning sent successfully');
+            fetchAllVaccinations(); // Refresh list
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (err) {
+        alert('Failed to send warning');
+    }
+}
+
+data.vaccinations.forEach(vacc => {
+    const status = vacc.is_overdue ? 'Overdue' : vacc.is_due_soon ? 'Due Soon' : 'Up to Date';
+    const statusClass = vacc.is_overdue ? 'danger' : vacc.is_due_soon ? 'warning' : 'success';
+
+    html += `
+        <tr>
+            <td>
+                <div class="user-cell">
+                    <i class="fas fa-paw" style="color: #667eea; font-size: 20px;"></i>
+                    <span>${vacc.pet_name}</span>
+                </div>
+            </td>
+            <td>${vacc.owner_name}</td>
+            <td><strong>${vacc.vaccine_type}</strong></td>
+            <td>${new Date(vacc.vaccination_date).toLocaleDateString()}</td>
+            <td>${vacc.next_due_date ? new Date(vacc.next_due_date).toLocaleDateString() : 'N/A'}</td>
+            <td><span class="badge blue">${vacc.owner_name}</span></td>
+            <td><span class="badge ${statusClass}">${status}</span></td>
+            <td>
+                <span class="badge ${vacc.warning_status === 'Warning Sent' ? 'orange' : 'gray'}">
+                    ${vacc.warning_status === 'Warning Sent' ? 'Warning Sent' : 'None'}
+                </span>
+            </td>
+            <td>
+                <button class="btn-warning" onclick="sendVaccinationWarning(${vacc.id})" ${vacc.warning_status === 'Warning Sent' ? 'disabled' : ''}>
+                    Send Warning
+                </button>
+            </td>
+        </tr>
+    `;
+    async function sendVaccinationWarning(vaccId) {
+    const note = prompt('Enter warning note (optional):');
+    if (note === null) return; // cancelled
+
+    try {
+        const formData = new FormData();
+        formData.append('action', 'send_warning');
+        formData.append('vacc_id', vaccId);
+        formData.append('note', note);
+
+        const res  = await fetch('admin_api.php', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            alert('Warning sent successfully');
+            fetchAllVaccinations();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    } catch (err) {
+        console.error(err);
+        alert('Failed to send warning');
+    }
+}
+
+});
