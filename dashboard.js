@@ -50,8 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Dashboard Loaded');
-
-    
     
     // ========================================
     // MOBILE HAMBURGER MENU
@@ -778,10 +776,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load vaccination history
     loadVaccinationHistory();
     break;
-
-
-
-                    
+          
                 case 'incidents':
     mainContent.innerHTML = `
         <div class="enhanced-section-wrapper">
@@ -802,7 +797,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <div class="stats-mini-row">
                 <div class="stat-mini red">
-                    <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i>
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #ffffffff;"></i>
                     <div>
                         <div class="stat-mini-value">0</div>
                         <div class="stat-mini-label">Active</div>

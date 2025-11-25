@@ -611,7 +611,7 @@ body {
 
 .alert-item.success { border-left-color: #22C55E; }
 .alert-item.warning { border-left-color: #F59E0B; }
-.alert-item.danger { border-left-color: #EF4444; }
+.alert-item.danger { border-left-color: #ff0000; }
 
 .alert-item i {
     font-size: 1.25rem;
@@ -2220,7 +2220,7 @@ textarea {
 
 .icon-badge.purple { background: rgba(139, 92, 246, 0.3); }
 .icon-badge.green { background: rgba(16, 185, 129, 0.3); }
-.icon-badge.red { background: rgba(239, 68, 68, 0.3); }
+.icon-badge.red { background: rgb(255, 255, 255); }
 
 .section-header-enhanced h2 {
     margin: 0;
@@ -3757,4 +3757,8 @@ textarea {
     .action-btn {
         width: 100%;
     }
+}
+
+.stat-mini .red {
+    background-color: white;
 }
