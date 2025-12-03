@@ -7,13 +7,26 @@ header('Content-Type: application/json');
 require_once 'check_session.php';
 require_once 'config/database.php';
 
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Not authenticated']);
+    exit;
+}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'register') {
-    $name = $_POST['name'] ?? '';
+$userId = $_SESSION['user_id'];
+$method = $_SERVER['REQUEST_METHOD'];
+$action = $_POST['action'] ?? '';
+
+/**
+ * ==============
+ * REGISTER PET
+ * ==============
+ */
+if ($method === 'POST' && $action === 'register') {
+    $name    = $_POST['name']    ?? '';
     $species = $_POST['species'] ?? '';
-    $breed = $_POST['breed'] ?? '';
-    $age = $_POST['age'] ?? '';
-    $gender = $_POST['gender'] ?? '';
+    $breed   = $_POST['breed']   ?? '';
+    $age     = $_POST['age']     ?? '';
+    $gender  = $_POST['gender']  ?? '';
 
     if (empty($name) || empty($species)) {
         echo json_encode(['status' => 'error', 'message' => 'Pet name and species are required.']);
@@ -22,36 +35,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'regis
 
     $image_url = null;
 
-    // Handle image upload - FIXED: Changed petImage to pet_image
-if (isset($_FILES['pet_image']) && $_FILES['pet_image']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = __DIR__ . '/uploads/pets/';
-    
-    if (!file_exists($uploadDir)) {
-        mkdir($uploadDir, 0777, true);
+    // Image upload - expects field name "pet_image"
+    if (isset($_FILES['pet_image']) && $_FILES['pet_image']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/uploads/pets/';
+
+        if (!file_exists($uploadDir)) {
+            mkdir($uploadDir, 0777, true);
+        }
+
+        $fileExt  = strtolower(pathinfo($_FILES['pet_image']['name'], PATHINFO_EXTENSION));
+        $allowed  = ['jpg', 'jpeg', 'png', 'gif'];
+
+        if (!in_array($fileExt, $allowed)) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid file type.']);
+            exit;
+        }
+
+        $newFilename = 'pet_' . uniqid() . '.' . $fileExt;
+        $targetPath  = $uploadDir . $newFilename;
+
+        if (move_uploaded_file($_FILES['pet_image']['tmp_name'], $targetPath)) {
+            $image_url = 'uploads/pets/' . $newFilename;
+        }
     }
 
-    $fileExt = strtolower(pathinfo($_FILES['pet_image']['name'], PATHINFO_EXTENSION));
-    $allowed = ['jpg', 'jpeg', 'png', 'gif'];
-
-    if (!in_array($fileExt, $allowed)) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid file type.']);
-        exit;
-    }
-
-    $newFilename = 'pet_' . uniqid() . '.' . $fileExt;
-    $targetPath = $uploadDir . $newFilename;
-
-    if (move_uploaded_file($_FILES['pet_image']['tmp_name'], $targetPath)) {
-        $image_url = 'uploads/pets/' . $newFilename;
-    }
-}
-
-
-    // INSERT INTO DATABASE
     try {
-        $stmt = $pdo->prepare("INSERT INTO pets (user_id, name, species, breed, age, gender, image_url, created_at)
-                               VALUES (?, ?, ?, ?, ?, ?, ?, NOW())");
-        $stmt->execute([$_SESSION['user_id'], $name, $species, $breed, $age, $gender, $image_url]);
+        $stmt = $pdo->prepare("
+            INSERT INTO pets (user_id, name, species, breed, age, gender, image_url, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, NOW())
+        ");
+        $stmt->execute([$userId, $name, $species, $breed, $age, $gender, $image_url]);
+
+        // Log activity
+        $logStmt = $pdo->prepare("
+            INSERT INTO activity_log (user_id, activity_type, description, created_at)
+            VALUES (?, 'pet_registered', ?, NOW())
+        ");
+        $logStmt->execute([$userId, "New pet registered: $name"]);
+
         echo json_encode(['status' => 'success', 'message' => 'Pet registered successfully!']);
     } catch (PDOException $e) {
         echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
@@ -59,67 +80,41 @@ if (isset($_FILES['pet_image']) && $_FILES['pet_image']['error'] === UPLOAD_ERR_
     exit;
 }
 
-// GET request: Fetch pets
-try {
-    $stmt = $pdo->prepare("SELECT * FROM pets WHERE user_id = ? ORDER BY created_at DESC");
-    $stmt->execute([$_SESSION['user_id']]);
-    $pets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    echo json_encode(['status' => 'success', 'pets' => $pets]);
-} catch (PDOException $e) {
-    echo json_encode(['status' => 'error', 'message' => 'Error fetching pets.']);
-}
+/**
+ * ==============
+ * UPDATE PET
+ * ==============
+ */
+if ($method === 'POST' && $action === 'update') {
+    // Accept both "petid" and "pet_id" to match existing JS
+    $pet_id = $_POST['petid'] ?? $_POST['pet_id'] ?? '';
 
-// ===== DELETE pet =====
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
-    $pet_id = $_POST['pet_id'] ?? '';
-    
-    if (empty($pet_id)) {
-        echo json_encode(['status' => 'error', 'message' => 'Pet ID is required.']);
-        exit;
-    }
-    
-    try {
-        // Get image URL before deleting
-        $stmt = $pdo->prepare("SELECT image_url FROM pets WHERE id = ? AND user_id = ?");
-        $stmt->execute([$pet_id, $_SESSION['user_id']]);
-        $pet = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($pet && $pet['image_url']) {
-            // Delete the image file
-            $imagePath = __DIR__ . '/' . $pet['image_url'];
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
-            }
-        }
-        
-        // Delete from database
-        $stmt = $pdo->prepare("DELETE FROM pets WHERE id = ? AND user_id = ?");
-        $stmt->execute([$pet_id, $_SESSION['user_id']]);
-        echo json_encode(['status' => 'success', 'message' => 'Pet deleted successfully!']);
-    } catch (PDOException $e) {
-        echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
-    }
-    exit;
-}
-
-// ===== UPDATE pet =====
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'update') {
-    $pet_id = $_POST['pet_id'] ?? '';
-    $name = $_POST['name'] ?? '';
+    $name    = $_POST['name']    ?? '';
     $species = $_POST['species'] ?? '';
-    $breed = $_POST['breed'] ?? '';
-    $age = $_POST['age'] ?? '';
-    $gender = $_POST['gender'] ?? '';
-    
+    $breed   = $_POST['breed']   ?? '';
+    $age     = $_POST['age']     ?? '';
+    $gender  = $_POST['gender']  ?? '';
+
     if (empty($pet_id) || empty($name) || empty($species)) {
         echo json_encode(['status' => 'error', 'message' => 'Pet ID, name and species are required.']);
         exit;
     }
-    
+
     try {
-        $stmt = $pdo->prepare("UPDATE pets SET name = ?, species = ?, breed = ?, age = ?, gender = ? 
-                               WHERE id = ? AND user_id = ?");
-        $stmt->execute([$name, $species, $breed, $age, $gender, $pet_id, $_SESSION['user_id']]);
+        $stmt = $pdo->prepare("
+            UPDATE pets
+               SET name = ?, species = ?, breed = ?, age = ?, gender = ?
+             WHERE id = ? AND user_id = ?
+        ");
+        $stmt->execute([$name, $species, $breed, $age, $gender, $pet_id, $userId]);
+
+        // Log activity
+        $logStmt = $pdo->prepare("
+            INSERT INTO activity_log (user_id, activity_type, description, created_at)
+            VALUES (?, 'pet_updated', ?, NOW())
+        ");
+        $logStmt->execute([$userId, "Pet updated: $name"]);
+
         echo json_encode(['status' => 'success', 'message' => 'Pet updated successfully!']);
     } catch (PDOException $e) {
         echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
@@ -127,18 +122,63 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'updat
     exit;
 }
 
-// After the pet INSERT statement in pets.php, add:
-$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
-                          VALUES (?, 'pet_registered', ?, NOW())");
-$logStmt->execute([$_SESSION['user_id'], "New pet registered: $name"]);
+/**
+ * ==============
+ * DELETE PET
+ * ==============
+ */
+if ($method === 'POST' && $action === 'delete') {
+    $pet_id = $_POST['pet_id'] ?? '';
 
-$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
-                          VALUES (?, 'pet_updated', ?, NOW())");
-$logStmt->execute([$_SESSION['user_id'], "Pet updated: $name"]);
+    if (empty($pet_id)) {
+        echo json_encode(['status' => 'error', 'message' => 'Pet ID is required.']);
+        exit;
+    }
 
-$logStmt = $pdo->prepare("INSERT INTO activity_log (user_id, activity_type, description, created_at) 
-                          VALUES (?, 'pet_deleted', ?, NOW())");
-$logStmt->execute([$_SESSION['user_id'], "Pet deleted"]);
+    try {
+        // Get image URL before deleting
+        $stmt = $pdo->prepare("SELECT image_url, name FROM pets WHERE id = ? AND user_id = ?");
+        $stmt->execute([$pet_id, $userId]);
+        $pet = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        if ($pet && $pet['image_url']) {
+            $imagePath = __DIR__ . '/' . $pet['image_url'];
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
 
-?>
+        // Delete from database
+        $stmt = $pdo->prepare("DELETE FROM pets WHERE id = ? AND user_id = ?");
+        $stmt->execute([$pet_id, $userId]);
+
+        // Log activity
+        $petName = $pet['name'] ?? 'Unknown pet';
+        $logStmt = $pdo->prepare("
+            INSERT INTO activity_log (user_id, activity_type, description, created_at)
+            VALUES (?, 'pet_deleted', ?, NOW())
+        ");
+        $logStmt->execute([$userId, "Pet deleted: $petName"]);
+
+        echo json_encode(['status' => 'success', 'message' => 'Pet deleted successfully!']);
+    } catch (PDOException $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+    exit;
+}
+
+/**
+ * ==============
+ * DEFAULT: LIST PETS (GET or no action)
+ * ==============
+ */
+try {
+    $stmt = $pdo->prepare("SELECT * FROM pets WHERE user_id = ? ORDER BY created_at DESC");
+    $stmt->execute([$userId]);
+    $pets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode(['status' => 'success', 'pets' => $pets]);
+} catch (PDOException $e) {
+    echo json_encode(['status' => 'error', 'message' => 'Error fetching pets.']);
+}
+exit;

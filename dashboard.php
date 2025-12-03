@@ -6,7 +6,7 @@ require_once 'check_session.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WATCHDOG - Dashboard</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="dashboard.css?v=<?php echo time(); ?>" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
@@ -26,7 +26,7 @@ require_once 'check_session.php';
                 <div class="sidebar-logo">
                     <i class="fas fa-shield-dog"></i>
                 </div>
-                <span class="sidebar-brand">WATCHDOG</span>
+                <span class="sidebar-brand"></span>
             </div>
             
             <nav class="sidebar-nav">
@@ -660,6 +660,27 @@ require_once 'check_session.php';
             </div>
         </div>
     </div>
+
+    <!-- Global message modal -->
+<div class="modal" id="appMessageModal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title-text">Message</h2>
+      <button type="button" class="modal-close" data-app-modal-close>
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-body-text"></p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-primary" data-app-modal-close>
+        OK
+      </button>
+    </div>
+  </div>
+</div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="dashboard.js?v=<?php echo time(); ?>"></script>
