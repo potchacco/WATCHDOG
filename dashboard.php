@@ -569,8 +569,24 @@ require_once 'check_session.php';
                 <button class="modal-close"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
+      <form id="incidentForm" enctype="multipart/form-data">
+        <!-- IMAGE UPLOAD FOR INCIDENT -->
+        <div class="image-upload-container">
+          <div id="incidentImagePreview" class="image-preview">
+            <i class="fas fa-camera"></i>
+            <span>Click to upload incident photo</span>
+          </div>
+          <input
+            type="file"
+            id="incidentImage"
+            name="incident_image"
+            class="image-input"
+            accept="image/*"
+          >
+        </div>
+            <div class="modal-body">
                 <form id="incidentForm">
-                    <div class="form-group">
+            <div class="form-group">
     <label for="incidentSpecies">
         <i class="fas fa-paw"></i> Animal Type *
     </label>
@@ -606,9 +622,22 @@ require_once 'check_session.php';
                     </div>
 
                     <div class="form-group">
-                        <label for="incidentLocationOld">Location</label>
-                        <input type="text" id="incidentLocationOld" name="location" placeholder="Where did it happen?">
-                    </div>
+  <label for="incidentLocation">
+    <i class="fas fa-location-dot"></i>
+    Barangay
+  </label>
+  <select id="incidentLocation" name="location" required>
+    <option value="">Select barangay</option>
+    <!-- Replace these with your real barangay list -->
+    <option value="Barangay 1">Barangay 1</option>
+    <option value="Barangay 2">Barangay 2</option>
+    <option value="Barangay 3">Barangay 3</option>
+    <option value="Barangay 4">Barangay 4</option>
+    <option value="Barangay 5">Barangay 5</option>
+  </select>
+  <span class="form-hint">Only official barangays are allowed as locations.</span>
+</div>
+
 
                     <div class="form-group">
                         <label for="incidentDescriptionOld">Description *</label>

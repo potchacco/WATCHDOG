@@ -2,36 +2,36 @@
 // ADMIN DASHBOARD JAVASCRIPT
 // ========================================
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('Admin Dashboard Loaded');
-    
+
     // ========================================
     // MOBILE HAMBURGER MENU (ADMIN)
     // ========================================
     const adminHamburger = document.getElementById('adminHamburger');
     const adminSidebar = document.querySelector('.admin-sidebar');
-    
+
     if (adminHamburger && adminSidebar) {
         // Show hamburger on mobile
         if (window.innerWidth <= 968) {
             adminHamburger.style.display = 'flex';
         }
-        
+
         // Toggle sidebar
         adminHamburger.addEventListener('click', () => {
             adminSidebar.classList.toggle('active');
         });
-        
+
         // Close sidebar when clicking menu item
-        const menuLinks = adminSidebar.querySelectorAll('.admin-menu a');
-        menuLinks.forEach(link => {
+        const sidebarLinks = adminSidebar.querySelectorAll('.admin-menu a');
+        sidebarLinks.forEach(link => {
             link.addEventListener('click', () => {
                 if (window.innerWidth <= 968) {
                     adminSidebar.classList.remove('active');
                 }
             });
         });
-        
+
         // Handle window resize
         window.addEventListener('resize', () => {
             if (window.innerWidth <= 968) {
@@ -48,40 +48,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // ========================================
     const adminLogoutBtn = document.getElementById('adminLogoutBtn');
     if (adminLogoutBtn) {
-        adminLogoutBtn.addEventListener('click', function(e) {
+        adminLogoutBtn.addEventListener('click', function (e) {
             e.preventDefault();
-            
-            // Show loading overlay
+
             const loadingOverlay = document.getElementById('loadingOverlay');
-            loadingOverlay.classList.add('active');
-            
-            // Simulate loading for 1.5 seconds then redirect
+            if (loadingOverlay) {
+                loadingOverlay.classList.add('active');
+            }
+
             setTimeout(() => {
                 window.location.href = 'logout.php';
             }, 1500);
         });
     }
-    
+
     // ========================================
     // SIDEBAR NAVIGATION
     // ========================================
     const menuLinks = document.querySelectorAll('.admin-menu a');
     menuLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
+        link.addEventListener('click', function (e) {
             e.preventDefault();
-            
-            // Remove active class from all
+
             menuLinks.forEach(l => l.classList.remove('active'));
-            
-            // Add active to clicked
             this.classList.add('active');
-            
+
             const section = this.getAttribute('data-section');
             loadAdminSection(section);
         });
     });
-    
-    // Load initial stats
+
+    // Initial overview (page already has overview HTML)
     loadAdminStats();
     loadRecentActivity();
 });
@@ -93,15 +90,26 @@ async function loadAdminStats() {
     try {
         const res = await fetch('admin_api.php?action=stats');
         const data = await res.json();
+        if (data.status !== 'success') return;
 
-        if (data.status === 'success') {
-            document.getElementById('totalUsers').textContent = data.stats.total_users || 0;
-            document.getElementById('totalPets').textContent = data.stats.total_pets || 0;
-            document.getElementById('totalIncidents').textContent = data.stats.total_incidents || 0;
-            document.getElementById('totalVaccinations').textContent = data.stats.total_vaccinations || 0;
-        }
+        const s = data.stats || {};
+
+        const totalUsers        = s.total_users        ?? s.totalUsers        ?? 0;
+        const totalPets         = s.total_pets         ?? s.totalPets         ?? 0;
+        const totalIncidents    = s.total_incidents    ?? s.totalIncidents    ?? 0;
+        const totalVaccinations = s.total_vaccinations ?? s.totalVaccinations ?? 0;
+
+        const uEl  = document.getElementById('totalUsers');
+        const pEl  = document.getElementById('totalPets');
+        const iEl  = document.getElementById('totalIncidents');
+        const vEl  = document.getElementById('totalVaccinations');
+
+        if (uEl) uEl.textContent = totalUsers;
+        if (pEl) pEl.textContent = totalPets;
+        if (iEl) iEl.textContent = totalIncidents;
+        if (vEl) vEl.textContent = totalVaccinations;
     } catch (err) {
-        console.error('Error loading stats:', err);
+        console.error('Error loading stats', err);
     }
 }
 
@@ -114,17 +122,22 @@ async function loadRecentActivity() {
         const data = await res.json();
 
         const container = document.getElementById('recentActivity');
-        
-        if (data.status === 'success' && data.activities.length > 0) {
+        if (!container) return;
+
+        if (data.status === 'success' && data.activities && data.activities.length > 0) {
             container.innerHTML = '';
-            
+
             data.activities.forEach(activity => {
-                const iconClass = activity.type === 'user' ? 'blue' : 
-                                 activity.type === 'pet' ? 'green' : 'orange';
-                
-                const icon = activity.type === 'user' ? 'fa-user-plus' :
-                            activity.type === 'pet' ? 'fa-paw' : 'fa-exclamation-triangle';
-                
+                const type = activity.type || 'incident';
+
+                const iconClass =
+                    type === 'user' ? 'blue' :
+                    type === 'pet'  ? 'green' : 'orange';
+
+                const icon =
+                    type === 'user' ? 'fa-user-plus' :
+                    type === 'pet'  ? 'fa-paw' : 'fa-exclamation-triangle';
+
                 const div = document.createElement('div');
                 div.className = 'activity-item';
                 div.innerHTML = `
@@ -139,7 +152,8 @@ async function loadRecentActivity() {
                 container.appendChild(div);
             });
         } else {
-            container.innerHTML = '<p style="text-align: center; color: #6b7280;">No recent activity</p>';
+            container.innerHTML =
+                '<p style="text-align:center;color:#6b7280;">No recent activity</p>';
         }
     } catch (err) {
         console.error('Error loading activity:', err);
@@ -151,43 +165,107 @@ async function loadRecentActivity() {
 // ========================================
 function loadAdminSection(section) {
     const mainContent = document.getElementById('adminMainContent');
-    
-    switch(section) {
+    if (!mainContent) return;
+
+    switch (section) {
         case 'overview':
-            location.reload();
+            // Rebuild overview in-place (no page reload)
+            mainContent.innerHTML = `
+                <div class="admin-header">
+                    <h1>System Overview</h1>
+                    <p>Monitor and manage your entire pet monitoring system</p>
+                </div>
+
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card blue">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card green">
+                        <div class="stat-icon">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalPets">0</h3>
+                            <p>Total Pets</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card orange">
+                        <div class="stat-icon" id="transparent">
+                            <i class="fa-solid fa-triangle-exclamation fa-lg" style="color:#ff1900;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalIncidents">0</h3>
+                            <p>Total Incidents</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card purple">
+                        <div class="stat-icon">
+                            <i class="fas fa-syringe"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalVaccinations">0</h3>
+                            <p>Vaccinations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h2>Recent System Activity</h2>
+                    <div id="recentActivity" class="activity-feed">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            `;
+            loadAdminStats();
+            loadRecentActivity();
             break;
-            
+
         case 'users':
             loadUsersSection();
             break;
-            
+
         case 'pets':
             loadAllPets();
             break;
-            
+
         case 'incidents':
             loadAllIncidents();
             break;
-            
+
         case 'vaccinations':
             loadAllVaccinations();
             break;
-    
+
         case 'reports':
             loadReports();
             break;
-            
+
         case 'settings':
-            mainContent.innerHTML = '<div class="admin-section"><h2>Settings - Coming Soon</h2></div>';
+            mainContent.innerHTML =
+                '<div class="admin-section"><h2>Settings - Coming Soon</h2></div>';
+            break;
+
+        default:
             break;
     }
 }
 
 // ========================================
-// LOAD USERS SECTION
+// USERS SECTION
 // ========================================
 async function loadUsersSection() {
     const mainContent = document.getElementById('adminMainContent');
+    if (!mainContent) return;
+
     mainContent.innerHTML = `
         <div class="admin-header">
             <h1>User Management</h1>
@@ -202,7 +280,7 @@ async function loadUsersSection() {
                 </div>
             </div>
             <div id="usersTableContainer">
-                <p style="text-align: center; padding: 40px;">Loading users...</p>
+                <p style="text-align:center;padding:40px;">Loading users...</p>
             </div>
         </div>
     `;
@@ -210,15 +288,15 @@ async function loadUsersSection() {
     loadAllUsers();
 }
 
-
 async function loadAllUsers() {
     try {
         const res = await fetch('admin_api.php?action=get_users');
         const data = await res.json();
 
         const container = document.getElementById('usersTableContainer');
+        if (!container) return;
 
-        if (data.status === 'success' && data.users.length > 0) {
+        if (data.status === 'success' && data.users && data.users.length > 0) {
             let html = `
                 <div class="data-table">
                     <table>
@@ -250,21 +328,31 @@ async function loadAllUsers() {
                         <td>${user.email}</td>
                         <td>${user.address || ''}</td>
                         <td>
-                            <span class="badge ${user.status === 'approved' ? 'green' : user.status === 'pending' ? 'orange' : 'red'}">
+                            <span class="badge ${
+                                user.status === 'approved'
+                                    ? 'green'
+                                    : user.status === 'pending'
+                                    ? 'orange'
+                                    : 'red'
+                            }">
                                 ${user.status}
                             </span>
                         </td>
                         <td>${new Date(user.created_at).toLocaleDateString()}</td>
                         <td><span class="badge blue">${user.pet_count || 0} pets</span></td>
                         <td>
-                            ${user.status === 'pending' ? `
+                            ${
+                                user.status === 'pending'
+                                    ? `
                                 <button class="btn-icon btn-approve" onclick="updateUserStatus(${user.id}, 'approved')" title="Approve">
                                     <i class="fas fa-check"></i>
                                 </button>
                                 <button class="btn-icon btn-reject" onclick="updateUserStatus(${user.id}, 'rejected')" title="Reject">
                                     <i class="fas fa-times"></i>
                                 </button>
-                            ` : ''}
+                            `
+                                    : ''
+                            }
                             <button class="btn-icon btn-view" onclick="viewUserDetails(${user.id})" title="View">
                                 <i class="fas fa-eye"></i>
                             </button>
@@ -284,31 +372,35 @@ async function loadAllUsers() {
 
             container.innerHTML = html;
         } else {
-            container.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">No users found</p>';
+            container.innerHTML =
+                '<p style="text-align:center;padding:40px;color:#6b7280;">No users found</p>';
         }
     } catch (err) {
         console.error('Error loading users:', err);
     }
 }
 
-
 function viewUserDetails(userId) {
     showNotification('User details view coming soon!', 'info');
 }
 
 async function deleteUser(userId, userName) {
-    if (!confirm(`Are you sure you want to delete user "${userName}"? This will also delete all their pets and records.`)) {
+    if (
+        !confirm(
+            `Are you sure you want to delete user "${userName}"? This will also delete all their pets and records.`
+        )
+    ) {
         return;
     }
-    
+
     try {
         const formData = new FormData();
         formData.append('action', 'delete_user');
         formData.append('user_id', userId);
-        
+
         const res = await fetch('admin_api.php', { method: 'POST', body: formData });
         const data = await res.json();
-        
+
         if (data.status === 'success') {
             showNotification('User deleted successfully', 'success');
             loadAllUsers();
@@ -342,7 +434,10 @@ async function updateUserStatus(userId, newStatus) {
             loadAllUsers();
             loadAdminStats();
         } else {
-            showNotification('Error: ' + (data.message || 'Failed to update user'), 'error');
+            showNotification(
+                'Error: ' + (data.message || 'Failed to update user'),
+                'error'
+            );
         }
     } catch (err) {
         console.error(err);
@@ -350,12 +445,13 @@ async function updateUserStatus(userId, newStatus) {
     }
 }
 
-
 // ========================================
-// LOAD ALL PETS SECTION
+// ALL PETS SECTION
 // ========================================
 async function loadAllPets() {
     const mainContent = document.getElementById('adminMainContent');
+    if (!mainContent) return;
+
     mainContent.innerHTML = `
         <div class="admin-header">
             <h1>All Pets</h1>
@@ -370,11 +466,11 @@ async function loadAllPets() {
                 </div>
             </div>
             <div id="petsGridContainer">
-                <p style="text-align: center; padding: 40px;">Loading pets...</p>
+                <p style="text-align:center;padding:40px;">Loading pets...</p>
             </div>
         </div>
     `;
-    
+
     fetchAllPets();
 }
 
@@ -382,21 +478,27 @@ async function fetchAllPets() {
     try {
         const res = await fetch('admin_api.php?action=get_all_pets');
         const data = await res.json();
-        
+
         const container = document.getElementById('petsGridContainer');
-        
-        if (data.status === 'success' && data.pets.length > 0) {
+        if (!container) return;
+
+        if (data.status === 'success' && data.pets && data.pets.length > 0) {
             container.innerHTML = '<div class="pets-grid-admin"></div>';
             const grid = container.querySelector('.pets-grid-admin');
-            
+
             data.pets.forEach(pet => {
-                const imgSrc = pet.image_url || 'https://via.placeholder.com/300x200?text=No+Image';
-                
+                const imgSrc =
+                    pet.imageurl && pet.imageurl.trim()
+                        ? pet.imageurl
+                        : 'https://via.placeholder.com/300x200?text=No+Image';
+
                 const card = document.createElement('div');
                 card.className = 'pet-card-admin';
                 card.innerHTML = `
-                    <div class="pet-image-admin" style="background-image: url('${imgSrc}')">
-                        <button class="btn-delete-overlay" onclick="deletePet(${pet.id}, '${pet.name}')" title="Delete Pet">
+                    <div class="pet-image-admin" style="background-image:url('${imgSrc}')">
+                        <button class="btn-delete-overlay"
+                                onclick="deletePet(${pet.id}, '${pet.name}')"
+                                title="Delete Pet">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
@@ -413,7 +515,8 @@ async function fetchAllPets() {
                 grid.appendChild(card);
             });
         } else {
-            container.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">No pets found</p>';
+            container.innerHTML =
+                '<p style="text-align:center;padding:40px;color:#6b7280;">No pets found</p>';
         }
     } catch (err) {
         console.error('Error loading pets:', err);
@@ -421,18 +524,22 @@ async function fetchAllPets() {
 }
 
 async function deletePet(petId, petName) {
-    if (!confirm(`Are you sure you want to delete "${petName}"? This will also delete all vaccination records for this pet.`)) {
+    if (
+        !confirm(
+            `Are you sure you want to delete "${petName}"? This will also delete all vaccination records for this pet.`
+        )
+    ) {
         return;
     }
-    
+
     try {
         const formData = new FormData();
         formData.append('action', 'delete_pet');
         formData.append('pet_id', petId);
-        
+
         const res = await fetch('admin_api.php', { method: 'POST', body: formData });
         const data = await res.json();
-        
+
         if (data.status === 'success') {
             showNotification('Pet deleted successfully', 'success');
             fetchAllPets();
@@ -446,10 +553,12 @@ async function deletePet(petId, petName) {
 }
 
 // ========================================
-// LOAD ALL INCIDENTS SECTION
+// ALL INCIDENTS SECTION
 // ========================================
 async function loadAllIncidents() {
     const mainContent = document.getElementById('adminMainContent');
+    if (!mainContent) return;
+
     mainContent.innerHTML = `
         <div class="admin-header">
             <h1>All Incidents</h1>
@@ -468,11 +577,11 @@ async function loadAllIncidents() {
                 </select>
             </div>
             <div id="incidentsContainer">
-                <p style="text-align: center; padding: 40px;">Loading incidents...</p>
+                <p style="text-align:center;padding:40px;">Loading incidents...</p>
             </div>
         </div>
     `;
-    
+
     fetchAllIncidents();
 }
 
@@ -480,25 +589,37 @@ async function fetchAllIncidents() {
     try {
         const res = await fetch('admin_api.php?action=get_all_incidents');
         const data = await res.json();
-        
+
         const container = document.getElementById('incidentsContainer');
-        
-        if (data.status === 'success' && data.incidents.length > 0) {
+        if (!container) return;
+
+        if (data.status === 'success' && data.incidents && data.incidents.length > 0) {
             let html = '<div class="incidents-list">';
-            
+
             data.incidents.forEach(incident => {
-                const statusClass = incident.status === 'Resolved' || incident.status === 'Closed' ? 'success' :
-                                   incident.status === 'Open' || incident.status === 'Pending' ? 'warning' : 'info';
-                
-                const severityClass = incident.severity === 'Critical' || incident.severity === 'High' ? 'danger' : 
-                                     incident.severity === 'Medium' ? 'warning' : 'info';
-                
+                const statusClass =
+                    incident.status === 'Resolved' || incident.status === 'Closed'
+                        ? 'success'
+                        : incident.status === 'Open' || incident.status === 'Pending'
+                        ? 'warning'
+                        : 'info';
+
+                const severityClass =
+                    incident.severity === 'Critical' || incident.severity === 'High'
+                        ? 'danger'
+                        : incident.severity === 'Medium'
+                        ? 'warning'
+                        : 'info';
+
                 html += `
-                    <div class="incident-card-admin">
+                    <div class="incident-card-admin" data-status="${incident.status}">
                         <div class="incident-header-admin">
                             <div>
                                 <h3>${incident.incident_type}</h3>
-                                <p class="incident-user"><i class="fas fa-user"></i> Reported by: ${incident.reporter_name}</p>
+                                <p class="incident-user">
+                                    <i class="fas fa-user"></i>
+                                    Reported by: ${incident.reporter_name}
+                                </p>
                             </div>
                             <div class="incident-badges">
                                 <span class="badge ${statusClass}">${incident.status}</span>
@@ -507,22 +628,31 @@ async function fetchAllIncidents() {
                         </div>
                         <p class="incident-description">${incident.description}</p>
                         <div class="incident-footer">
-                            <span class="incident-date"><i class="fas fa-calendar"></i> ${new Date(incident.incident_date).toLocaleString()}</span>
-                            ${incident.location ? `<span><i class="fas fa-map-marker-alt"></i> ${incident.location}</span>` : ''}
+                            <span class="incident-date">
+                                <i class="fas fa-calendar"></i>
+                                ${new Date(incident.incident_date).toLocaleString()}
+                            </span>
+                            ${
+                                incident.location
+                                    ? `<span><i class="fas fa-map-marker-alt"></i> ${incident.location}</span>`
+                                    : ''
+                            }
                         </div>
                         <div class="incident-actions">
-                            <button class="btn-update-status" onclick="updateIncidentStatus(${incident.id}, '${incident.status}')">
+                            <button class="btn-update-status"
+                                    onclick="updateIncidentStatus(${incident.id}, '${incident.status}')">
                                 <i class="fas fa-edit"></i> Update Status
                             </button>
                         </div>
                     </div>
                 `;
             });
-            
+
             html += '</div>';
             container.innerHTML = html;
         } else {
-            container.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">No incidents found</p>';
+            container.innerHTML =
+                '<p style="text-align:center;padding:40px;color:#6b7280;">No incidents found</p>';
         }
     } catch (err) {
         console.error('Error loading incidents:', err);
@@ -536,7 +666,8 @@ function updateIncidentStatus(incidentId, currentStatus) {
         <div class="status-modal-content">
             <div class="status-modal-header">
                 <h3><i class="fas fa-edit"></i> Update Incident Status</h3>
-                <button class="status-modal-close" onclick="this.closest('.status-modal').remove()">
+                <button class="status-modal-close"
+                        onclick="this.closest('.status-modal').remove()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -545,42 +676,52 @@ function updateIncidentStatus(incidentId, currentStatus) {
                 <select id="newStatus" class="status-select">
                     <option value="Open" ${currentStatus === 'Open' ? 'selected' : ''}>Open</option>
                     <option value="Pending" ${currentStatus === 'Pending' ? 'selected' : ''}>Pending</option>
-                    <option value="In Progress" ${currentStatus === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                    <option value="Resolved" ${currentStatus === 'Resolved' ? 'selected' : ''}>Resolved</option>
-                    <option value="Closed" ${currentStatus === 'Closed' ? 'selected' : ''}>Closed</option>
+                    <option value="In Progress" ${
+                        currentStatus === 'In Progress' ? 'selected' : ''
+                    }>In Progress</option>
+                    <option value="Resolved" ${
+                        currentStatus === 'Resolved' ? 'selected' : ''
+                    }>Resolved</option>
+                    <option value="Closed" ${
+                        currentStatus === 'Closed' ? 'selected' : ''
+                    }>Closed</option>
                 </select>
-                
-                <label style="margin-top: 15px;">Notes (Optional):</label>
-                <textarea id="statusNotes" rows="3" placeholder="Add any notes about this status update..." class="status-textarea"></textarea>
-                
+
+                <label style="margin-top:15px;">Notes (Optional):</label>
+                <textarea id="statusNotes" rows="3"
+                          class="status-textarea"
+                          placeholder="Add any notes about this status update..."></textarea>
+
                 <button class="btn-save-status" onclick="saveIncidentStatus(${incidentId})">
                     <i class="fas fa-save"></i> Save Status
                 </button>
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
 }
 
 async function saveIncidentStatus(incidentId) {
     const newStatus = document.getElementById('newStatus').value;
     const notes = document.getElementById('statusNotes').value;
-    
+
     try {
         const formData = new FormData();
         formData.append('action', 'update_incident_status');
         formData.append('incident_id', incidentId);
         formData.append('status', newStatus);
         formData.append('notes', notes);
-        
+
         const res = await fetch('admin_api.php', { method: 'POST', body: formData });
         const data = await res.json();
-        
+
         if (data.status === 'success') {
             showNotification('Incident status updated successfully', 'success');
-            document.querySelector('.status-modal').remove();
+            const modal = document.querySelector('.status-modal');
+            if (modal) modal.remove();
             fetchAllIncidents();
+            loadAdminStats();
         } else {
             showNotification('Error: ' + data.message, 'error');
         }
@@ -590,24 +731,35 @@ async function saveIncidentStatus(incidentId) {
 }
 
 function filterIncidents() {
-    showNotification('Filter functionality coming soon!', 'info');
+    const select = document.getElementById('statusFilter');
+    if (!select) return;
+
+    const value = select.value;
+    const cards = document.querySelectorAll('.incident-card-admin');
+
+    cards.forEach(card => {
+        const status = card.getAttribute('data-status');
+        if (!value || status === value) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
 }
 
 // ========================================
-// LOAD ALL VACCINATIONS SECTION
+// VACCINATIONS SECTION
 // ========================================
-// ========================================
-// LOAD ALL VACCINATIONS SECTION
-// ========================================
-
 function loadAllVaccinations() {
     const mainContent = document.getElementById('adminMainContent');
+    if (!mainContent) return;
+
     mainContent.innerHTML = `
         <div class="admin-header">
             <h1>Vaccination Management</h1>
             <p>Monitor vaccination records across all pets</p>
         </div>
-        
+
         <div class="admin-stats-row">
             <div class="mini-stat-card green">
                 <i class="fas fa-check-circle"></i>
@@ -631,7 +783,7 @@ function loadAllVaccinations() {
                 </div>
             </div>
         </div>
-        
+
         <div class="admin-section">
             <div class="section-header-flex">
                 <h2><i class="fas fa-syringe"></i> All Vaccination Records</h2>
@@ -641,11 +793,11 @@ function loadAllVaccinations() {
                 </div>
             </div>
             <div id="vaccinationsContainer">
-                <p style="text-align: center; padding: 40px;">Loading vaccinations...</p>
+                <p style="text-align:center;padding:40px;">Loading vaccinations...</p>
             </div>
         </div>
     `;
-    
+
     fetchAllVaccinations();
 }
 
@@ -655,6 +807,7 @@ async function fetchAllVaccinations() {
         const data = await res.json();
 
         const container = document.getElementById('vaccinationsContainer');
+        if (!container) return;
 
         if (data.status !== 'success') {
             container.innerHTML =
@@ -662,9 +815,14 @@ async function fetchAllVaccinations() {
             return;
         }
 
-        document.getElementById('vaccinatedPets').textContent = data.stats.vaccinated_pets || 0;
-        document.getElementById('dueSoon').textContent        = data.stats.due_soon || 0;
-        document.getElementById('overdue').textContent        = data.stats.overdue || 0;
+        const stats = data.stats || {};
+        const vEl = document.getElementById('vaccinatedPets');
+        const dEl = document.getElementById('dueSoon');
+        const oEl = document.getElementById('overdue');
+
+        if (vEl) vEl.textContent = stats.vaccinated_pets || 0;
+        if (dEl) dEl.textContent = stats.due_soon || 0;
+        if (oEl) oEl.textContent = stats.overdue || 0;
 
         if (!data.vaccinations || data.vaccinations.length === 0) {
             container.innerHTML =
@@ -693,19 +851,21 @@ async function fetchAllVaccinations() {
         data.vaccinations.forEach(vacc => {
             const status = vacc.is_overdue
                 ? 'Overdue'
-                : (vacc.is_due_soon ? 'Due Soon' : 'Up to Date');
+                : vacc.is_due_soon
+                ? 'Due Soon'
+                : 'Up to Date';
 
             const statusClass = vacc.is_overdue
                 ? 'danger'
-                : (vacc.is_due_soon ? 'warning' : 'success');
+                : vacc.is_due_soon
+                ? 'warning'
+                : 'success';
 
-            const warningLabel = vacc.warning_status === 'Warning Sent'
-                ? 'Warning Sent'
-                : 'None';
+            const warningLabel =
+                vacc.warning_status === 'Warning Sent' ? 'Warning Sent' : 'None';
 
-            const warningClass = vacc.warning_status === 'Warning Sent'
-                ? 'orange'
-                : 'gray';
+            const warningClass =
+                vacc.warning_status === 'Warning Sent' ? 'orange' : 'gray';
 
             html += `
                 <tr>
@@ -718,13 +878,21 @@ async function fetchAllVaccinations() {
                     <td>${vacc.owner_name}</td>
                     <td><strong>${vacc.vaccine_name}</strong></td>
                     <td>${new Date(vacc.date_given).toLocaleDateString()}</td>
-                    <td>${vacc.next_due_date ? new Date(vacc.next_due_date).toLocaleDateString() : 'N/A'}</td>
+                    <td>${
+                        vacc.next_due_date
+                            ? new Date(vacc.next_due_date).toLocaleDateString()
+                            : 'N/A'
+                    }</td>
                     <td><span class="badge ${statusClass}">${status}</span></td>
                     <td><span class="badge ${warningClass}">${warningLabel}</span></td>
                     <td>
                         <button class="btn-warning"
                                 onclick="sendVaccinationWarning(${vacc.id})"
-                                ${vacc.warning_status === 'Warning Sent' ? 'disabled' : ''}>
+                                ${
+                                    vacc.warning_status === 'Warning Sent'
+                                        ? 'disabled'
+                                        : ''
+                                }>
                             Send Warning
                         </button>
                     </td>
@@ -748,7 +916,7 @@ async function fetchAllVaccinations() {
 
 async function sendVaccinationWarning(vaccId) {
     const note = prompt('Enter warning note (optional):');
-    if (note === null) return; // cancelled
+    if (note === null) return;
 
     try {
         const formData = new FormData();
@@ -756,9 +924,12 @@ async function sendVaccinationWarning(vaccId) {
         formData.append('vacc_id', vaccId);
         formData.append('note', note);
 
-        const res  = await fetch('admin_api.php', { method: 'POST', body: formData });
-        const data = await res.json();
+        const res = await fetch('admin_api.php', {
+            method: 'POST',
+            body: formData
+        });
 
+        const data = await res.json();
         if (data.status === 'success') {
             alert('Warning sent successfully');
             fetchAllVaccinations();
@@ -771,96 +942,19 @@ async function sendVaccinationWarning(vaccId) {
     }
 }
 
-async function fetchAllVaccinations() {
-    try {
-        const res = await fetch('admin_api.php?action=get_all_vaccinations');
-        const data = await res.json();
-        
-        if (data.status === 'success') {
-            document.getElementById('vaccinatedPets').textContent = data.stats.vaccinated_pets || 0;
-            document.getElementById('dueSoon').textContent = data.stats.due_soon || 0;
-            document.getElementById('overdue').textContent = data.stats.overdue || 0;
-            
-            const container = document.getElementById('vaccinationsContainer');
-            
-            if (data.vaccinations.length > 0) {
-                let html = `
-                    <div class="data-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Pet</th>
-                                    <th>Owner</th>
-                                    <th>Vaccine Type</th>
-                                    <th>Date Given</th>
-                                    <th>Next Due</th>
-                                    <th>Added By</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                `;
-                
-                data.vaccinations.forEach(vacc => {
-    const status = vacc.is_overdue ? 'Overdue' : vacc.is_due_soon ? 'Due Soon' : 'Up to Date';
-    const statusClass = vacc.is_overdue ? 'danger' : vacc.is_due_soon ? 'warning' : 'success';
-
-    html += `
-        <tr>
-            <td>
-                <div class="user-cell">
-                    <i class="fas fa-paw" style="color: #667eea; font-size: 20px;"></i>
-                    <span>${vacc.pet_name}</span>
-                </div>
-            </td>
-            <td>${vacc.owner_name}</td>
-            <td><strong>${vacc.vaccine_type}</strong></td>
-            <td>${new Date(vacc.vaccination_date).toLocaleDateString()}</td>
-            <td>${vacc.next_due_date ? new Date(vacc.next_due_date).toLocaleDateString() : 'N/A'}</td>
-            <td><span class="badge blue">${vacc.owner_name}</span></td>
-            <td><span class="badge ${statusClass}">${status}</span></td>
-            <td>
-                <span class="badge ${vacc.warning_status === 'Warning Sent' ? 'orange' : 'gray'}">
-                    ${vacc.warning_status === 'Warning Sent' ? 'Warning Sent' : 'None'}
-                </span>
-            </td>
-            <td>
-                <button class="btn-warning" onclick="sendVaccinationWarning(${vacc.id})" ${vacc.warning_status === 'Warning Sent' ? 'disabled' : ''}>
-                    Send Warning
-                </button>
-            </td>
-        </tr>
-    `;
-});
-
-                
-                html += `
-                            </tbody>
-                        </table>
-                    </div>
-                `;
-                
-                container.innerHTML = html;
-            } else {
-                container.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">No vaccination records found</p>';
-            }
-        }
-    } catch (err) {
-        console.error('Error loading vaccinations:', err);
-    }
-}
-
 // ========================================
-// LOAD REPORTS SECTION
+// REPORTS SECTION
 // ========================================
 async function loadReports() {
     const mainContent = document.getElementById('adminMainContent');
+    if (!mainContent) return;
+
     mainContent.innerHTML = `
         <div class="admin-header">
             <h1>System Reports</h1>
             <p>View analytics and generate reports</p>
         </div>
-        
+
         <div class="reports-grid">
             <div class="report-card">
                 <div class="report-icon blue">
@@ -872,7 +966,7 @@ async function loadReports() {
                     <i class="fas fa-eye"></i> View Report
                 </button>
             </div>
-            
+
             <div class="report-card">
                 <div class="report-icon green">
                     <i class="fas fa-syringe"></i>
@@ -883,7 +977,7 @@ async function loadReports() {
                     <i class="fas fa-eye"></i> View Report
                 </button>
             </div>
-            
+
             <div class="report-card">
                 <div class="report-icon orange">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -894,7 +988,7 @@ async function loadReports() {
                     <i class="fas fa-eye"></i> View Report
                 </button>
             </div>
-            
+
             <div class="report-card">
                 <div class="report-icon purple">
                     <i class="fas fa-download"></i>
@@ -906,28 +1000,31 @@ async function loadReports() {
                 </button>
             </div>
         </div>
-        
+
         <div id="reportDetailContainer"></div>
     `;
 }
 
 async function viewReport(type) {
     const container = document.getElementById('reportDetailContainer');
-    
+    if (!container) return;
+
     try {
         const res = await fetch(`admin_api.php?action=get_report&type=${type}`);
         const data = await res.json();
-        
+
         if (data.status === 'success') {
             container.innerHTML = `
-                <div class="admin-section" style="margin-top: 30px;">
-                    <h2><i class="fas fa-chart-bar"></i> ${type.charAt(0).toUpperCase() + type.slice(1)} Report</h2>
+                <div class="admin-section" style="margin-top:30px;">
+                    <h2><i class="fas fa-chart-bar"></i> ${
+                        type.charAt(0).toUpperCase() + type.slice(1)
+                    } Report</h2>
                     <div class="chart-container-report">
                         <canvas id="reportChart"></canvas>
                     </div>
                 </div>
             `;
-            
+
             renderReportChart(type, data.chart_data);
         }
     } catch (err) {
@@ -937,24 +1034,35 @@ async function viewReport(type) {
 }
 
 function renderReportChart(type, chartData) {
-    const ctx = document.getElementById('reportChart').getContext('2d');
-    
+    const canvas = document.getElementById('reportChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+
     new Chart(ctx, {
         type: type === 'registrations' ? 'line' : 'bar',
         data: {
             labels: chartData.labels,
-            datasets: [{
-                label: chartData.label,
-                data: chartData.data,
-                backgroundColor: type === 'registrations' ? 'rgba(102, 126, 234, 0.2)' :
-                                type === 'vaccinations' ? 'rgba(16, 185, 129, 0.2)' :
-                                'rgba(245, 158, 11, 0.2)',
-                borderColor: type === 'registrations' ? '#667eea' :
-                            type === 'vaccinations' ? '#10b981' :
-                            '#f59e0b',
-                borderWidth: 2,
-                tension: 0.4
-            }]
+            datasets: [
+                {
+                    label: chartData.label,
+                    data: chartData.data,
+                    backgroundColor:
+                        type === 'registrations'
+                            ? 'rgba(102, 126, 234, 0.2)'
+                            : type === 'vaccinations'
+                            ? 'rgba(16, 185, 129, 0.2)'
+                            : 'rgba(245, 158, 11, 0.2)',
+                    borderColor:
+                        type === 'registrations'
+                            ? '#667eea'
+                            : type === 'vaccinations'
+                            ? '#10b981'
+                            : '#f59e0b',
+                    borderWidth: 2,
+                    tension: 0.4
+                }
+            ]
         },
         options: {
             responsive: true,
@@ -982,7 +1090,7 @@ function exportData() {
 // ========================================
 // SEARCH FUNCTIONALITY
 // ========================================
-document.addEventListener('input', function(e) {
+document.addEventListener('input', function (e) {
     if (e.target.id === 'userSearch') {
         searchTable(e.target.value, 'usersTableContainer');
     } else if (e.target.id === 'petSearch') {
@@ -994,10 +1102,11 @@ document.addEventListener('input', function(e) {
 
 function searchTable(query, containerId) {
     const container = document.getElementById(containerId);
+    if (!container) return;
+
     const rows = container.querySelectorAll('tbody tr');
-    
-    query = query.toLowerCase();
-    
+    query = (query || '').toLowerCase();
+
     rows.forEach(row => {
         const text = row.textContent.toLowerCase();
         row.style.display = text.includes(query) ? '' : 'none';
@@ -1006,95 +1115,10 @@ function searchTable(query, containerId) {
 
 function searchPets(query) {
     const cards = document.querySelectorAll('.pet-card-admin');
-    query = query.toLowerCase();
-    
+    query = (query || '').toLowerCase();
+
     cards.forEach(card => {
         const text = card.textContent.toLowerCase();
         card.style.display = text.includes(query) ? '' : 'none';
     });
 }
-
-async function sendVaccinationWarning(vaccId) {
-    const note = prompt('Enter warning note (optional):');
-    
-    if (note === null) return; // Cancelled
-    
-    try {
-        const formData = new FormData();
-        formData.append('action', 'send_warning');
-        formData.append('vacc_id', vaccId);
-        formData.append('note', note);
-        
-        const res = await fetch('admin_api.php', {
-            method: 'POST',
-            body: formData
-        });
-        
-        const data = await res.json();
-        if (data.status === 'success') {
-            alert('Warning sent successfully');
-            fetchAllVaccinations(); // Refresh list
-        } else {
-            alert('Error: ' + data.message);
-        }
-    } catch (err) {
-        alert('Failed to send warning');
-    }
-}
-
-data.vaccinations.forEach(vacc => {
-    const status = vacc.is_overdue ? 'Overdue' : vacc.is_due_soon ? 'Due Soon' : 'Up to Date';
-    const statusClass = vacc.is_overdue ? 'danger' : vacc.is_due_soon ? 'warning' : 'success';
-
-    html += `
-        <tr>
-            <td>
-                <div class="user-cell">
-                    <i class="fas fa-paw" style="color: #667eea; font-size: 20px;"></i>
-                    <span>${vacc.pet_name}</span>
-                </div>
-            </td>
-            <td>${vacc.owner_name}</td>
-            <td><strong>${vacc.vaccine_type}</strong></td>
-            <td>${new Date(vacc.vaccination_date).toLocaleDateString()}</td>
-            <td>${vacc.next_due_date ? new Date(vacc.next_due_date).toLocaleDateString() : 'N/A'}</td>
-            <td><span class="badge blue">${vacc.owner_name}</span></td>
-            <td><span class="badge ${statusClass}">${status}</span></td>
-            <td>
-                <span class="badge ${vacc.warning_status === 'Warning Sent' ? 'orange' : 'gray'}">
-                    ${vacc.warning_status === 'Warning Sent' ? 'Warning Sent' : 'None'}
-                </span>
-            </td>
-            <td>
-                <button class="btn-warning" onclick="sendVaccinationWarning(${vacc.id})" ${vacc.warning_status === 'Warning Sent' ? 'disabled' : ''}>
-                    Send Warning
-                </button>
-            </td>
-        </tr>
-    `;
-    async function sendVaccinationWarning(vaccId) {
-    const note = prompt('Enter warning note (optional):');
-    if (note === null) return; // cancelled
-
-    try {
-        const formData = new FormData();
-        formData.append('action', 'send_warning');
-        formData.append('vacc_id', vaccId);
-        formData.append('note', note);
-
-        const res  = await fetch('admin_api.php', { method: 'POST', body: formData });
-        const data = await res.json();
-
-        if (data.status === 'success') {
-            alert('Warning sent successfully');
-            fetchAllVaccinations();
-        } else {
-            alert('Error: ' + data.message);
-        }
-    } catch (err) {
-        console.error(err);
-        alert('Failed to send warning');
-    }
-}
-
-});

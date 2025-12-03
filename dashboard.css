@@ -1350,8 +1350,12 @@ body {
 
 .modal-body {
     padding: 24px;
-    overflow-y: auto;
+    overflow: scroll;
     max-height: calc(90vh - 80px);
+}
+
+body.modal-open {
+  overflow: hidden;
 }
 
 /* ==================== FORMS ==================== */

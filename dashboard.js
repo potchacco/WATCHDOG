@@ -608,6 +608,7 @@ async function openVaccinationModalForPet(petId, petName) {
     modal.classList.add('active');
 }
 
+// ================= INCIDENTS: LOAD LIST =================
 async function loadIncidents() {
     const container = document.getElementById('incidentsContainer');
     if (!container) return;
@@ -617,60 +618,194 @@ async function loadIncidents() {
         const data = await res.json();
 
         if (data.status === 'success') {
-            if (data.incidents.length === 0) {
-                container.innerHTML = `<div style="text-align: center; padding: 40px;"><i class="fas fa-clipboard-check" style="font-size: 64px; color: #ccc;"></i><p>No incidents reported.</p></div>`;
+            if (!data.incidents || data.incidents.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <i class="fas fa-clipboard-check" style="font-size: 64px; color: #ccc;"></i>
+                        <p>No incidents reported.</p>
+                    </div>
+                `;
                 return;
             }
 
-            container.innerHTML = '<div style="display: grid; gap: 20px;"></div>';
+            container.innerHTML = `<div style="display: grid; gap: 20px;"></div>`;
             const incidentsGrid = container.querySelector('div');
 
             data.incidents.forEach(incident => {
-                const incidentCard = document.createElement('div');
-                incidentCard.style.cssText = 'background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);';
-                incidentCard.innerHTML = `
-                    <h3>${incident.incident_type}</h3>
-                    <p>${incident.description}</p>
-                    <p><small>Status: ${incident.status} | ${new Date(incident.incident_date).toLocaleString()}</small></p>
-                `;
-                incidentsGrid.appendChild(incidentCard);
-                // After filling incidentsGrid with cards
-const incidents = data.incidents || [];
+  const incidentCard = document.createElement('div');
+  incidentCard.style.cssText = 'background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1)';
+  incidentCard.innerHTML = `
+    <h3>${incident.incident_type}</h3>
+    <p>${incident.description}</p>
+    <p><small>Status: ${incident.status} • ${new Date(incident.incident_date).toLocaleString()}</small></p>
+  `;
+  incidentsGrid.appendChild(incidentCard);
+});
+// Update incident status mini stats
+let active = 0, pending = 0, resolved = 0;
 
-// Basic per-status counts
-let activeCount = 0;
-let pendingCount = 0;
-let resolvedCount = 0;
+data.incidents.forEach(incident => {
+  const status = (incident.status || '').toLowerCase();
 
-incidents.forEach(incident => {
-    const status = (incident.status || '').toLowerCase();
-
-    if (status === 'resolved') {
-        resolvedCount++;
-    } else if (status === 'pending') {
-        pendingCount++;
-    } else {
-        // Treat anything not resolved/pending as active (e.g. "New", "In Progress")
-        activeCount++;
-    }
+  if (status === 'open' || status === 'active') {
+    active++;
+  } else if (status === 'pending') {
+    pending++;
+  } else if (status === 'resolved' || status === 'closed') {
+    resolved++;
+  }
 });
 
-// Update mini-stat UI
 const activeEl   = document.getElementById('incActiveCount');
 const pendingEl  = document.getElementById('incPendingCount');
 const resolvedEl = document.getElementById('incResolvedCount');
 
-if (activeEl)   activeEl.textContent   = activeCount;
-if (pendingEl)  pendingEl.textContent  = pendingCount;
-if (resolvedEl) resolvedEl.textContent = resolvedCount;
+if (activeEl)   activeEl.textContent   = active;
+if (pendingEl)  pendingEl.textContent  = pending;
+if (resolvedEl) resolvedEl.textContent = resolved;
 
-            });
+
+        } else {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px;">
+                    <i class="fas fa-triangle-exclamation" style="font-size: 48px; color: #f97316;"></i>
+                    <p>Failed to load incidents.</p>
+                </div>
+            `;
         }
     } catch (err) {
-        console.error('Error:', err);
+        console.error('Error loading incidents', err);
+        container.innerHTML = `
+            <div style="text-align: center; padding: 40px;">
+                <i class="fas fa-triangle-exclamation" style="font-size: 48px; color: #ef4444;"></i>
+                <p>Error loading incidents. Please try again.</p>
+            </div>
+        `;
     }
-    
 }
+
+// ================= INCIDENTS: OPEN MODAL =================
+async function openIncidentModal() {
+    const modal = document.getElementById('incidentModal');
+    const form = document.getElementById('incidentForm');
+    if (!modal || !form) return;
+
+    // Reset form fields
+    form.reset();
+
+    // Reset preview
+    const incidentImagePreview = document.getElementById('incidentImagePreview');
+    if (incidentImagePreview) {
+        incidentImagePreview.style.backgroundImage = '';
+        incidentImagePreview.innerHTML = `
+            <i class="fas fa-camera"></i>
+            <span>Click to upload incident photo</span>
+        `;
+    }
+
+    // Set current local datetime (uses your existing incidentDateOld id)
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    const dateInput = document.getElementById('incidentDateOld');
+    if (dateInput) {
+        dateInput.value = now.toISOString().slice(0, 16);
+    }
+
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+// ================= INCIDENT IMAGE PREVIEW =================
+const incidentImagePreview = document.getElementById('incidentImagePreview');
+const incidentImageInput   = document.getElementById('incidentImage');
+
+if (incidentImagePreview && incidentImageInput) {
+  incidentImagePreview.addEventListener('click', () => incidentImageInput.click());
+
+  incidentImageInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      incidentImagePreview.style.backgroundImage = `url(${e.target.result})`;
+      incidentImagePreview.innerHTML = '';
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+
+// ================= INCIDENT FORM SUBMIT =================
+const incidentForm = document.getElementById('incidentForm');
+if (incidentForm) {
+    incidentForm.addEventListener('submit', async e => {
+        e.preventDefault();
+
+        const formData = new FormData(incidentForm);
+        formData.append('action', 'add'); // matches your existing incidents.php handler
+
+        try {
+            const res = await fetch('incidents.php', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                // Close modal and reset
+                document.getElementById('incidentModal').classList.remove('active');
+                incidentForm.reset();
+
+                // Reset preview UI
+                if (incidentImagePreview) {
+                    incidentImagePreview.style.backgroundImage = '';
+                    incidentImagePreview.innerHTML = `
+                        <i class="fas fa-camera"></i>
+                        <span>Click to upload incident photo</span>
+                    `;
+                }
+
+                // Refresh UI parts
+                loadIncidents();
+                if (typeof loadRecentAlerts === 'function') {
+                    loadRecentAlerts();
+                }
+                if (typeof loadDashboardStats === 'function') {
+                    loadDashboardStats();
+                }
+
+                // Use your app-wide modal/notification
+                if (typeof showAppModal === 'function') {
+                    showAppModal('Success', 'Incident reported successfully!');
+                } else if (typeof showNotification === 'function') {
+                    showNotification('Incident reported successfully!', 'success');
+                }
+            } else {
+                if (typeof showAppModal === 'function') {
+                    showAppModal('Error', data.message || 'Failed to report incident.');
+                } else if (typeof showNotification === 'function') {
+                    showNotification(data.message || 'Failed to report incident.', 'error');
+                }
+            }
+        } catch (err) {
+            console.error(err);
+            if (typeof showAppModal === 'function') {
+                showAppModal('Error', 'Connection error. Please try again.');
+            } else if (typeof showNotification === 'function') {
+                showNotification('Connection error. Please try again.', 'error');
+            }
+        }
+    });
+}
+
+// ================= WIRE "REPORT INCIDENT" BUTTON =================
+// This should run after you render the Incidents section HTML (inside your switch-case)
+const reportBtn = document.getElementById('reportIncidentBtn');
+if (reportBtn) {
+    reportBtn.addEventListener('click', openIncidentModal);
+}
+
 
 
 
@@ -692,6 +827,7 @@ async function openIncidentModal() {
 
     // Show modal
     modal.classList.add('active');
+    document.body.classList.add('modal-open');
 }
 
 
@@ -1424,10 +1560,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.querySelectorAll('.modal-close').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
-        });
-    });
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.modal').forEach(modal => modal.classList.remove('active'));
+    document.body.classList.remove('modal-open');
+  });
+});
+
 
     const registerPetBtn = document.getElementById('registerPetBtn');
 if (registerPetBtn) {
