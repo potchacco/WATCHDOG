@@ -70,16 +70,6 @@ if ($method === 'POST' && $action === 'add') {
  * UPDATE VACCINATION (action=update)
  * ==============
  */
-/**
- * ==============
- * UPDATE VACCINATION (action=update)
- * ==============
- */
-/**
- * ==============
- * UPDATE VACCINATION (action=update)
- * ==============
- */
 if ($method === 'POST' && $action === 'update') {
     // JS sends "vaccid" for updates
     $vaccId = $_POST['vaccid'] ?? $_POST['vacc_id'] ?? '';

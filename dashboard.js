@@ -414,6 +414,12 @@ async function loadPetsInSidebar() {
                 `;
                 sidebarPetsGrid.appendChild(petCard);
             });
+                // Update My Pets mini total from actual list
+    const petsTotalMini = document.getElementById('petsTotalMini');
+    if (petsTotalMini) {
+        petsTotalMini.textContent = data.pets.length;
+    }
+
              document.querySelectorAll('#sidebarPetsGrid .edit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const petId = this.getAttribute('data-pet-id');
@@ -428,55 +434,73 @@ async function loadPetsInSidebar() {
 }
 
 async function loadDashboardStats() {
-  try {
-    const res = await fetch('user-api.php?action=stats');
-    const data = await res.json();
-    if (data.status !== 'success') return;
+    try {
+        const res = await fetch('user-api.php?action=stats');
+        const data = await res.json();
+        if (data.status !== 'success') return;
 
-    const s = data.stats || {};
+        const s = data.stats || {};
 
-    // Top stat cards
-    const totalPetsEl = document.querySelector('.stat-card-modern.blue .stat-value');
-    const vaccDueEl   = document.querySelector('.stat-card-modern.green .stat-value');
-    const incidentsEl = document.querySelector('.stat-card-modern.purple .stat-value');
-    const apptEl      = document.querySelector('.stat-card-modern.orange .stat-value');
+        // Normalize keys from backend (supports snake_case and old names)
+        const totalPets         = s.total_pets         ?? s.totalpets         ?? 0;
+        const vaccinationsDue   = s.vaccinations_due   ?? s.vaccinationsdue   ?? 0;
+        const totalIncidents    = s.total_incidents    ?? s.totalincidents    ?? s.active_incidents ?? 0;
+        const appointments      = s.appointments       ?? s.total_appointments ?? 0;
+        const totalVaccinations = s.total_vaccinations ?? s.totalvaccinations ?? 0;
+        const vaccThisMonth     = s.vaccinations_this_month ?? s.vaccinationsthismonth ?? 0;
 
-    if (totalPetsEl) totalPetsEl.textContent = s.total_pets ?? 0;
-    if (vaccDueEl)   vaccDueEl.textContent   = s.vaccinations_due ?? 0;
-    if (incidentsEl) incidentsEl.textContent = s.total_incidents ?? 0;
-    if (apptEl)      apptEl.textContent      = s.appointments ?? 0;
+        // Top stat cards
+        const totalPetsEl = document.querySelector('.stat-card-modern.blue .stat-value');
+        const vaccDueEl   = document.querySelector('.stat-card-modern.green .stat-value');
+        const incidentsEl = document.querySelector('.stat-card-modern.purple .stat-value');
+        const apptEl      = document.querySelector('.stat-card-modern.orange .stat-value');
 
-    // Profile mini stats on the right
-    const profilePets  = document.querySelector('.profile-stat:nth-child(1) .stat-number');
-    const profileRecs  = document.querySelector('.profile-stat:nth-child(2) .stat-number');
-    const profileRep   = document.querySelector('.profile-stat:nth-child(3) .stat-number');
+        if (totalPetsEl) totalPetsEl.textContent = totalPets;
+        if (vaccDueEl)   vaccDueEl.textContent   = vaccinationsDue;
+        if (incidentsEl) incidentsEl.textContent = totalIncidents;
+        if (apptEl)      apptEl.textContent      = appointments;
 
-    if (profilePets) profilePets.textContent = s.total_pets ?? 0;
-    if (profileRecs) profileRecs.textContent = s.vaccinations_due ?? 0; // or another metric you prefer
-    if (profileRep)  profileRep.textContent  = s.total_incidents ?? 0;
+        // Profile mini stats
+        const profilePets = document.querySelector('.profile-stat:nth-child(1) .stat-number');
+        const profileRecs = document.querySelector('.profile-stat:nth-child(2) .stat-number');
+        const profileRep  = document.querySelector('.profile-stat:nth-child(3) .stat-number');
+        if (profilePets) profilePets.textContent = totalPets;
+        if (profileRecs) profileRecs.textContent = vaccinationsDue;
+        if (profileRep)  profileRep.textContent  = totalIncidents;
 
-    // Mini stats in Pets section (if that view is active)
-const petsTotalMini      = document.getElementById('petsTotalMini');
-const petsVaccinatedMini = document.getElementById('petsVaccinatedMini');
-const petsUpcomingMini   = document.getElementById('petsUpcomingMini');
+        // Vaccinations mini stats
+        const vaccTotal = document.getElementById('totalVaccinesCount');
+        const vaccDue   = document.getElementById('dueSoonCount');
+        const vaccMonth = document.getElementById('thisMonthCount');
+        if (vaccTotal) vaccTotal.textContent = totalVaccinations;
+        if (vaccDue)   vaccDue.textContent   = vaccinationsDue;
+        if (vaccMonth) vaccMonth.textContent = vaccThisMonth;
 
-if (petsTotalMini)      petsTotalMini.textContent      = s.total_pets ?? 0;
-if (petsVaccinatedMini) petsVaccinatedMini.textContent = s.vaccinated_pets ?? 0; // if you add this to API later
-if (petsUpcomingMini)   petsUpcomingMini.textContent   = s.upcoming_appointments ?? 0; // or another metric
+        // Analytics cards (left + chart row)
+        const analyticsTotalPetsEl  = document.getElementById('analyticsTotalPets');
+        const analyticsTotalVaccEl  = document.getElementById('analyticsTotalVaccinations');
+        const chartPetsEl           = document.getElementById('analyticsChartTotalPets');
+        const chartVaccEl           = document.getElementById('analyticsChartTotalVaccinations');
+        const chartIncEl            = document.getElementById('analyticsChartTotalIncidents');
+        const coverageEl            = document.getElementById('analyticsVaccinationCoverage');
 
-// Mini stats in Vaccinations section
-const vaccTotal = document.getElementById('totalVaccinesCount');
-const vaccDue   = document.getElementById('dueSoonCount');
-const vaccMonth = document.getElementById('thisMonthCount');
+        if (analyticsTotalPetsEl) analyticsTotalPetsEl.textContent = totalPets;
+        if (analyticsTotalVaccEl) analyticsTotalVaccEl.textContent = totalVaccinations;
+        if (chartPetsEl)          chartPetsEl.textContent          = totalPets;
+        if (chartVaccEl)          chartVaccEl.textContent          = totalVaccinations;
+        if (chartIncEl)           chartIncEl.textContent           = totalIncidents;
 
-if (vaccTotal) vaccTotal.textContent = s.total_vaccinations ?? 0;
-if (vaccDue)   vaccDue.textContent   = s.vaccinations_due ?? 0;
-if (vaccMonth) vaccMonth.textContent = s.vaccinations_this_month ?? 0;
-
-  } catch (err) {
-    console.error('Error loading dashboard stats:', err);
-  }
+        if (coverageEl) {
+            const coverage = totalPets > 0
+                ? Math.min(100, Math.round((totalVaccinations / totalPets) * 100))
+                : 0;
+            coverageEl.textContent = coverage + '%';
+        }
+    } catch (err) {
+        console.error('Error loading dashboard stats', err);
+    }
 }
+
 
 
 async function loadPetsWithVaccinations() {
@@ -610,12 +634,45 @@ async function loadIncidents() {
                     <p><small>Status: ${incident.status} | ${new Date(incident.incident_date).toLocaleString()}</small></p>
                 `;
                 incidentsGrid.appendChild(incidentCard);
+                // After filling incidentsGrid with cards
+const incidents = data.incidents || [];
+
+// Basic per-status counts
+let activeCount = 0;
+let pendingCount = 0;
+let resolvedCount = 0;
+
+incidents.forEach(incident => {
+    const status = (incident.status || '').toLowerCase();
+
+    if (status === 'resolved') {
+        resolvedCount++;
+    } else if (status === 'pending') {
+        pendingCount++;
+    } else {
+        // Treat anything not resolved/pending as active (e.g. "New", "In Progress")
+        activeCount++;
+    }
+});
+
+// Update mini-stat UI
+const activeEl   = document.getElementById('incActiveCount');
+const pendingEl  = document.getElementById('incPendingCount');
+const resolvedEl = document.getElementById('incResolvedCount');
+
+if (activeEl)   activeEl.textContent   = activeCount;
+if (pendingEl)  pendingEl.textContent  = pendingCount;
+if (resolvedEl) resolvedEl.textContent = resolvedCount;
+
             });
         }
     } catch (err) {
         console.error('Error:', err);
     }
+    
 }
+
+
 
 async function openIncidentModal() {
     const modal = document.getElementById('incidentModal');
@@ -919,21 +976,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="stat-mini red">
                     <i class="fa-solid fa-triangle-exclamation" style="color: #ffffff;"></i>
                     <div>
-                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-value" id="incActiveCount">0</div>
                         <div class="stat-mini-label">Active</div>
                     </div>
                 </div>
                 <div class="stat-mini yellow">
                     <i class="fas fa-hourglass-half"></i>
                     <div>
-                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-value" id="incPendingCount">0</div>
                         <div class="stat-mini-label">Pending</div>
                     </div>
                 </div>
                 <div class="stat-mini green">
                     <i class="fas fa-check-double"></i>
                     <div>
-                        <div class="stat-mini-value">0</div>
+                        <div class="stat-mini-value" id="incResolvedCount">0</div>
                         <div class="stat-mini-label">Resolved</div>
                     </div>
                 </div>
@@ -997,7 +1054,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                                     <div class="analytics-stats-left">
                                         <div class="stat-card-analytics purple">
-                                            <div class="stat-number">50+</div>
+                                            <div class="stat-number" id="analyticsTotalPets">0</div>
                                             <div class="stat-label">REGISTERED PETS</div>
                                             <div class="stat-icon-mini">
                                                 <i class="fas fa-paw"></i>
@@ -1005,7 +1062,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </div>
 
                                         <div class="stat-card-analytics purple">
-                                            <div class="stat-number">45</div>
+                                            <div class="stat-number" id="analyticsTotalVaccinations">0</div>
                                             <div class="stat-label">VACCINATIONS</div>
                                             <div class="stat-icon-mini">
                                                 <i class="fas fa-syringe"></i>
@@ -1060,21 +1117,21 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <div class="chart-stat-item">
                                                 <i class="fas fa-paw"></i>
                                                 <div>
-                                                    <div class="stat-value">124</div>
+                                                    <div class="stat-value" id="analyticsChartTotalPets">0</div>
                                                     <div class="stat-label">Total Pets</div>
                                                 </div>
                                             </div>
                                             <div class="chart-stat-item">
                                                 <i class="fas fa-syringe"></i>
                                                 <div>
-                                                    <div class="stat-value">89</div>
+                                                    <div class="stat-value" id="analyticsChartTotalPets">0</div>
                                                     <div class="stat-label">Vaccinations</div>
                                                 </div>
                                             </div>
                                             <div class="chart-stat-item">
                                                 <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i>
                                                 <div>
-                                                    <div class="stat-value">12</div>
+                                                    <div class="stat-value" id="analyticsChartTotalPets">0</div>
                                                     <div class="stat-label">Incidents</div>
                                                 </div>
                                             </div>
@@ -1095,7 +1152,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                 </defs>
                                             </svg>
                                             <div class="progress-text">
-                                                <div class="progress-percent">89%</div>
+                                                <div class="progress-percent" id="analyticsVaccinationCoverage">0%</div>
                                                 <div class="progress-label">Up to Date</div>
                                             </div>
                                         </div>
@@ -1149,7 +1206,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             </div>
                         </div>
                     `;
+                    loadDashboardStats();
                     setTimeout(initAnalyticsChart, 100);
+
                     break;
                     
                 case 'settings':
