@@ -33,16 +33,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Verify password
-        if (!password_verify($password, $user['password'])) {
-            echo json_encode(['status' => 'error', 'message' => 'Incorrect password']);
-            exit();
-        }
-        
-        // Success - Set session
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['user_name'] = $user['name'];
-        $_SESSION['user_email'] = $user['email'];
-        $_SESSION['user_role'] = $user['role'];
+if (!password_verify($password, $user['password'])) {
+    echo json_encode(['status' => 'error', 'message' => 'Incorrect password']);
+    exit();
+}
+
+// NEW: require admin approval
+if ($user['status'] !== 'approved') {
+    echo json_encode([
+        'status'  => 'error',
+        'message' => 'Your account is pending approval by the administrator.'
+    ]);
+    exit();
+}
+
+// Success - Set session
+$_SESSION['user_id']   = $user['id'];
+$_SESSION['user_name'] = $user['name'];
+$_SESSION['user_email']= $user['email'];
+$_SESSION['user_role'] = $user['role'];
+
         
         // Redirect based on role
         $redirect = ($user['role'] === 'admin') ? 'admin_dashboard.php' : 'dashboard.php';

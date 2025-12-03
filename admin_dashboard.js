@@ -191,7 +191,7 @@ async function loadUsersSection() {
     mainContent.innerHTML = `
         <div class="admin-header">
             <h1>User Management</h1>
-            <p>View and manage all registered users</p>
+            <p>Approve or reject registered users and manage existing accounts</p>
         </div>
         <div class="admin-section">
             <div class="section-header-flex">
@@ -206,17 +206,18 @@ async function loadUsersSection() {
             </div>
         </div>
     `;
-    
+
     loadAllUsers();
 }
+
 
 async function loadAllUsers() {
     try {
         const res = await fetch('admin_api.php?action=get_users');
         const data = await res.json();
-        
+
         const container = document.getElementById('usersTableContainer');
-        
+
         if (data.status === 'success' && data.users.length > 0) {
             let html = `
                 <div class="data-table">
@@ -226,6 +227,8 @@ async function loadAllUsers() {
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
+                                <th>Address</th>
+                                <th>Status</th>
                                 <th>Registered</th>
                                 <th>Pets</th>
                                 <th>Actions</th>
@@ -233,7 +236,7 @@ async function loadAllUsers() {
                         </thead>
                         <tbody>
             `;
-            
+
             data.users.forEach(user => {
                 html += `
                     <tr>
@@ -245,26 +248,40 @@ async function loadAllUsers() {
                             </div>
                         </td>
                         <td>${user.email}</td>
+                        <td>${user.address || ''}</td>
+                        <td>
+                            <span class="badge ${user.status === 'approved' ? 'green' : user.status === 'pending' ? 'orange' : 'red'}">
+                                ${user.status}
+                            </span>
+                        </td>
                         <td>${new Date(user.created_at).toLocaleDateString()}</td>
                         <td><span class="badge blue">${user.pet_count || 0} pets</span></td>
                         <td>
-                            <button class="btn-icon btn-view" onclick="viewUserDetails(${user.id})">
+                            ${user.status === 'pending' ? `
+                                <button class="btn-icon btn-approve" onclick="updateUserStatus(${user.id}, 'approved')" title="Approve">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn-icon btn-reject" onclick="updateUserStatus(${user.id}, 'rejected')" title="Reject">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                            <button class="btn-icon btn-view" onclick="viewUserDetails(${user.id})" title="View">
                                 <i class="fas fa-eye"></i>
                             </button>
-                            <button class="btn-icon btn-delete" onclick="deleteUser(${user.id}, '${user.name}')">
+                            <button class="btn-icon btn-delete" onclick="deleteUser(${user.id}, '${user.name}')" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </td>
                     </tr>
                 `;
             });
-            
+
             html += `
                         </tbody>
                     </table>
                 </div>
             `;
-            
+
             container.innerHTML = html;
         } else {
             container.innerHTML = '<p style="text-align: center; padding: 40px; color: #6b7280;">No users found</p>';
@@ -273,6 +290,7 @@ async function loadAllUsers() {
         console.error('Error loading users:', err);
     }
 }
+
 
 function viewUserDetails(userId) {
     showNotification('User details view coming soon!', 'info');
@@ -302,6 +320,36 @@ async function deleteUser(userId, userName) {
         showNotification('Failed to delete user', 'error');
     }
 }
+
+async function updateUserStatus(userId, newStatus) {
+    const actionText = newStatus === 'approved' ? 'approve' : 'reject';
+
+    if (!confirm(`Are you sure you want to ${actionText} this user?`)) {
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('action', 'update_user_status');
+        formData.append('user_id', userId);
+        formData.append('status', newStatus);
+
+        const res = await fetch('admin_api.php', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            showNotification(`User ${actionText}d successfully`, 'success');
+            loadAllUsers();
+            loadAdminStats();
+        } else {
+            showNotification('Error: ' + (data.message || 'Failed to update user'), 'error');
+        }
+    } catch (err) {
+        console.error(err);
+        showNotification('Failed to update user status', 'error');
+    }
+}
+
 
 // ========================================
 // LOAD ALL PETS SECTION

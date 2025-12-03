@@ -127,6 +127,12 @@
             <div class="input-group">
               <input type="email" id="registerEmail" name="email" placeholder="✉️ Enter your email" required>
             </div>
+            <div class="form-group">
+  <label for="address">Complete Address / Location *</label>
+  <input type="text" id="address" name="address"
+         placeholder="e.g., Purok 3, Sitio Riverside, Barangay San Roque" required>
+</div>
+
           </div>
           <div class="form-group">
             <label for="registerPassword">Password</label>

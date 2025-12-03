@@ -446,7 +446,7 @@ async function loadPetsWithVaccinations() {
                             <i class="fas fa-syringe"></i> Add Vaccination Record
                         </button>
                         <button class="btn-vaccination-secondary" onclick="viewVaccinationHistory('${pet.id}')">
-                            <i class="fas fa-history"></i> View History
+                            <i class="fas fa-history"></i> History
                         </button>
                     </div>
                     
@@ -536,14 +536,24 @@ async function loadIncidents() {
 async function openIncidentModal() {
     const modal = document.getElementById('incidentModal');
     const form = document.getElementById('incidentForm');
-    
+    if (!modal || !form) return;
+
+    // Reset form
     form.reset();
+
+    // Set current local datetime
     const now = new Date();
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-    document.getElementById('incidentDate').value = now.toISOString().slice(0, 16);
+    const dateInput = document.getElementById('incidentDateOld');
+    if (dateInput) {
+        dateInput.value = now.toISOString().slice(0, 16);
+    }
 
+    // Show modal
     modal.classList.add('active');
 }
+
+
 
 function loadAnalyticsTrendsChart() {
     const canvas = document.getElementById('analyticsTrendsChart');
@@ -783,21 +793,24 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="section-header-enhanced">
                 <div class="header-left">
                     <div class="icon-badge red">
-                        <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i>
+                        <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600"></i>
                     </div>
                     <div>
                         <h2>Incident Reports</h2>
                         <p class="section-subtitle">View and manage all incident reports</p>
                     </div>
                 </div>
-                <button class="btn-enhanced btn-danger" onclick="openIncidentModal()">
-                    <i class="fas fa-plus"></i> Report Incident
-                </button>
+                <div>
+                    <!-- FIX: use id instead of inline onclick -->
+                    <button class="btn-enhanced btn-danger" id="reportIncidentBtn">
+                        <i class="fas fa-plus"></i> Report Incident
+                    </button>
+                </div>
             </div>
-            
+
             <div class="stats-mini-row">
                 <div class="stat-mini red">
-                    <i class="fa-solid fa-triangle-exclamation" style="color: #ffffffff;"></i>
+                    <i class="fa-solid fa-triangle-exclamation" style="color: #ffffff;"></i>
                     <div>
                         <div class="stat-mini-value">0</div>
                         <div class="stat-mini-label">Active</div>
@@ -818,12 +831,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </div>
             </div>
-            
+
             <div id="incidentsContainer" class="incidents-grid-enhanced"></div>
         </div>
     `;
+
+    // NEW: wire the button to open the modal
+    const reportBtn = document.getElementById('reportIncidentBtn');
+    if (reportBtn) {
+        reportBtn.addEventListener('click', openIncidentModal);
+    }
+
+    // load incidents list into #incidentsContainer
     loadIncidents();
     break;
+
 
                     
                 case 'analytics':

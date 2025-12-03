@@ -56,20 +56,21 @@ try {
             echo json_encode(['status' => 'success', 'activities' => $activities]);
             break;
 
-        case 'get_users':
-            // Get all users with pet count
+                case 'get_users':
+            // Get all resident users with pet count, pending first
             $stmt = $pdo->query("
                 SELECT u.*, COUNT(p.id) as pet_count 
                 FROM users u 
                 LEFT JOIN pets p ON u.id = p.user_id 
                 WHERE u.role = 'resident'
                 GROUP BY u.id 
-                ORDER BY u.created_at DESC
+                ORDER BY u.status = 'pending' DESC, u.created_at DESC
             ");
             $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             echo json_encode(['status' => 'success', 'users' => $users]);
             break;
+
 
         case 'delete_user':
             $userId = $_POST['user_id'] ?? '';
@@ -102,6 +103,31 @@ try {
 
             echo json_encode(['status' => 'success', 'message' => 'User deleted successfully']);
             break;
+
+                    case 'update_user_status':
+            $userId = $_POST['user_id'] ?? '';
+            $status = $_POST['status'] ?? '';
+
+            if (empty($userId) || !in_array($status, ['pending', 'approved', 'rejected'], true)) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid parameters']);
+                exit;
+            }
+
+            // Optional safety: prevent demoting/deleting yourself or other admins
+            // $check = $pdo->prepare("SELECT role FROM users WHERE id = ?");
+            // $check->execute([$userId]);
+            // $u = $check->fetch(PDO::FETCH_ASSOC);
+            // if ($u && $u['role'] === 'admin') {
+            //     echo json_encode(['status' => 'error', 'message' => 'Cannot change admin status']);
+            //     exit;
+            // }
+
+            $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ?");
+            $stmt->execute([$status, $userId]);
+
+            echo json_encode(['status' => 'success', 'message' => 'User status updated']);
+            break;
+
 
         case 'get_all_pets':
             // Get all pets with owner info

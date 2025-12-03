@@ -8,7 +8,7 @@ require_once 'check_session.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WATCHDOG - Dashboard</title>
     <link rel="stylesheet" href="dashboard.css?v=<?php echo time(); ?>" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
@@ -20,225 +20,435 @@ require_once 'check_session.php';
             <span class="bar"></span>
         </button>
 
-        <!-- MODERN SIDEBAR -->
+        <!-- SIDEBAR -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <i class="fas fa-paw"></i>
+                    <i class="fas fa-shield-dog"></i>
                 </div>
+                <span class="sidebar-brand">WATCHDOG</span>
             </div>
             
-            <ul class="sidebar-menu">
-                <li>
-                    <a href="#" class="active" data-section="dashboard">
-                        <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="pets">
-                        <i class="fas fa-dog"></i>
-                        <span>My Pets</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="vaccinations">
-                        <i class="fas fa-syringe"></i>
-                        <span>Vaccinations</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="incidents">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span>Incidents</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="analytics">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Analytics</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-section="settings">
-                        <i class="fas fa-cog"></i>
-                        <span>Settings</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="logout.php" id="logoutBtn">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
-                    </a>
-                </li>
-            </ul>
+            <nav class="sidebar-nav">
+                <ul class="sidebar-menu">
+                    <li class="menu-item">
+                        <a href="#" class="active" data-section="dashboard">
+                            <i class="fas fa-grid-2"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" data-section="pets">
+                            <i class="fas fa-paw"></i>
+                            <span>My Pets</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" data-section="vaccinations">
+                            <i class="fas fa-syringe"></i>
+                            <span>Vaccinations</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" data-section="incidents">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span>Incidents</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" data-section="analytics">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" data-section="settings">
+                            <i class="fas fa-gear"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="logout.php" class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
         </aside>
 
         <!-- MAIN CONTENT -->
         <main class="main-content" id="mainContent">
-            <!-- HERO WELCOME BANNER -->
-            <div class="hero-banner">
-                <div class="hero-content">
-                    <div class="hero-text">
-                        <div class="date-badge">
-                            <i class="fas fa-calendar"></i>
-                            <?php echo date('M d, Y • g:i a'); ?>
-                        </div>
-                        <h1>Good Day, <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?>!</h1>
-                        <p>Have a Nice Managing Day!</p>
+            <!-- TOP HEADER BAR -->
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle"><?php echo date('l, F d, Y'); ?></p>
+                </div>
+                <div class="header-right">
+                    <div class="header-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search...">
                     </div>
-                    <div class="hero-illustration">
-                        <i class="fas fa-dog"></i>
-                        <i class="fas fa-bone"></i>
-                        <i class="fas fa-paw"></i>
+                    <button class="header-notification">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="header-profile">
+                        <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name'] ?? 'User'); ?>&background=6366f1&color=fff&size=100" alt="Profile" id="userAvatar">
+                        <div class="profile-info">
+                            <span class="profile-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?></span>
+                            <span class="profile-role">Pet Owner</span>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <!-- STATS CARDS ROW -->
-            <div class="stats-row">
-                <div class="stat-card-modern blue">
-                    <div class="stat-header-modern">
-                        <div class="stat-info">
-                            <span class="stat-label">Total Pets</span>
-                            <h2 class="stat-value">0</h2>
-                            <span class="stat-change">-6% than average</span>
-                        </div>
-                        <div class="stat-icon-modern">
-                            <i class="fas fa-paw"></i>
+            <!-- WELCOME HERO SECTION -->
+            <section class="hero-banner">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <span class="hero-greeting">Welcome back,</span>
+                        <h1><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?>! 👋</h1>
+                        <p>Here's what's happening with your pets today.</p>
+                    </div>
+                    <div class="hero-illustration">
+                        <div class="hero-icon-group">
+                            <i class="fas fa-dog"></i>
+                            <i class="fas fa-cat"></i>
+                            <i class="fas fa-heart"></i>
                         </div>
                     </div>
-                    <div class="stat-mini-chart">
-                        <svg viewBox="0 0 100 30" class="mini-wave">
-                            <path d="M0,15 Q15,5 30,15 T60,15 T90,15 L100,15 L100,30 L0,30 Z" fill="rgba(239,68,68,0.2)" stroke="rgba(239,68,68,0.5)" stroke-width="2"/>
-                        </svg>
+                </div>
+                <div class="hero-pattern"></div>
+            </section>
+
+            <!-- STATS CARDS -->
+            <section class="stats-row">
+                <div class="stat-card-modern blue">
+                    <div class="stat-icon-modern">
+                        <i class="fas fa-paw"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h2 class="stat-value">0</h2>
+                        <span class="stat-label">Total Pets</span>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+12%</span>
                     </div>
                 </div>
 
                 <div class="stat-card-modern green">
-                    <div class="stat-header-modern">
-                        <div class="stat-info">
-                            <span class="stat-label">Vaccinations Due</span>
-                            <h2 class="stat-value">0</h2>
-                            <span class="stat-change positive">+12% than average</span>
-                        </div>
-                        <div class="stat-icon-modern">
-                            <i class="fas fa-syringe"></i>
-                        </div>
+                    <div class="stat-icon-modern">
+                        <i class="fas fa-syringe"></i>
                     </div>
-                    <div class="stat-mini-chart">
-                        <svg viewBox="0 0 100 30" class="mini-wave">
-                            <path d="M0,20 Q15,10 30,20 T60,20 T90,20 L100,20 L100,30 L0,30 Z" fill="rgba(34,197,94,0.2)" stroke="rgba(34,197,94,0.5)" stroke-width="2"/>
-                        </svg>
+                    <div class="stat-info">
+                        <h2 class="stat-value">0</h2>
+                        <span class="stat-label">Vaccinations Due</span>
+                    </div>
+                    <div class="stat-trend down">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>-5%</span>
                     </div>
                 </div>
 
                 <div class="stat-card-modern purple">
-                    <div class="stat-header-modern">
-                        <div class="stat-info">
-                            <span class="stat-label">Active Incidents</span>
-                            <h2 class="stat-value">0</h2>
-                            <span class="stat-change">No change</span>
-                        </div>
-                        <div class="stat-icon-modern">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
+                    <div class="stat-icon-modern">
+                        <i class="fas fa-exclamation-triangle"></i>
                     </div>
-                    <div class="stat-mini-chart">
-                        <svg viewBox="0 0 100 30" class="mini-wave">
-                            <path d="M0,10 Q15,20 30,10 T60,10 T90,10 L100,10 L100,30 L0,30 Z" fill="rgba(147,51,234,0.2)" stroke="rgba(147,51,234,0.5)" stroke-width="2"/>
-                        </svg>
+                    <div class="stat-info">
+                        <h2 class="stat-value">0</h2>
+                        <span class="stat-label">Active Incidents</span>
+                    </div>
+                    <div class="stat-trend neutral">
+                        <i class="fas fa-minus"></i>
+                        <span>0%</span>
                     </div>
                 </div>
-            </div>
+
+                <div class="stat-card-modern orange">
+                    <div class="stat-icon-modern">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h2 class="stat-value">0</h2>
+                        <span class="stat-label">Appointments</span>
+                    </div>
+                    <div class="stat-trend up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+8%</span>
+                    </div>
+                </div>
+            </section>
 
             <!-- MAIN DASHBOARD GRID -->
             <div class="dashboard-main-grid">
                 <!-- LEFT COLUMN -->
                 <div class="dashboard-left-col">
-                    <!-- PETS SECTION -->
+                    <!-- MY PETS SECTION -->
                     <div class="dashboard-section">
                         <div class="section-header-modern">
-                            <h2><i class="fas fa-paw"></i> My Pets</h2>
+                            <div class="section-title">
+                                <i class="fas fa-paw"></i>
+                                <h2>My Pets</h2>
+                            </div>
                             <button class="btn-modern btn-primary" id="registerPetBtn">
-                                <i class="fas fa-plus"></i> Add Pet
+                                <i class="fas fa-plus"></i>
+                                <span>Add Pet</span>
                             </button>
                         </div>
                         <div class="pets-grid" id="petsGrid">
-                            <p style="text-align: center; padding: 40px; color: #999;">Loading pets...</p>
+                            <div class="loading-state">
+                                <div class="spinner"></div>
+                                <p>Loading pets...</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- RECENT ALERTS -->
+                    <!-- INCIDENT REPORTING SECTION (Hidden by default) -->
+                    <div class="dashboard-section" id="incidents-section" style="display: none;">
+                        <div class="section-header">
+                            <div class="section-title">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h2>Report Incident</h2>
+                            </div>
+                            <p class="section-desc">Report any pet-related incidents in your area</p>
+                        </div>
+
+                        <div class="incident-form-container">
+                            <form id="incidentReportForm" enctype="multipart/form-data">
+                                <input type="hidden" name="action" value="add">
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="incidentType">
+                                            <i class="fas fa-list"></i> Incident Type *
+                                        </label>
+                                        <select id="incidentType" name="incident_type" required>
+                                            <option value="">Select incident type</option>
+                                            <option value="Stray Dog">Stray Dog</option>
+                                            <option value="Dog Bite">Dog Bite</option>
+                                            <option value="Lost Pet">Lost Pet</option>
+                                            <option value="Found Pet">Found Pet</option>
+                                            <option value="Animal Abuse">Animal Abuse</option>
+                                            <option value="Aggressive Behavior">Aggressive Behavior</option>
+                                            <option value="Health Concern">Health Concern</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="incidentSeverity">
+                                            <i class="fas fa-exclamation-circle"></i> Severity *
+                                        </label>
+                                        <select id="incidentSeverity" name="severity" required>
+                                            <option value="Low">Low - Minor concern</option>
+                                            <option value="Medium" selected>Medium - Needs attention</option>
+                                            <option value="High">High - Urgent</option>
+                                            <option value="Critical">Critical - Emergency</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="incidentPet">
+                                            <i class="fas fa-paw"></i> Related Pet (Optional)
+                                        </label>
+                                        <select id="incidentPet" name="pet_id">
+                                            <option value="">Not related to my pet</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="incidentDateNew">
+                                            <i class="fas fa-calendar"></i> Date & Time *
+                                        </label>
+                                        <input type="datetime-local" id="incidentDateNew" name="incident_date" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="incidentLocationNew">
+                                        <i class="fas fa-map-marker-alt"></i> Location *
+                                    </label>
+                                    <input type="text" id="incidentLocationNew" name="location" 
+                                           placeholder="e.g., Near Barangay Hall, Corner of Main St." required>
+                                    <small class="form-hint">Location will be recorded in: <strong id="userBarangay">Your Area</strong></small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="incidentDescriptionNew">
+                                        <i class="fas fa-align-left"></i> Description *
+                                    </label>
+                                    <textarea id="incidentDescriptionNew" name="description" rows="4" 
+                                              placeholder="Provide detailed description of the incident..." required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="incidentImageUpload">
+                                        <i class="fas fa-camera"></i> Upload Image (Optional)
+                                    </label>
+                                    <div class="image-upload-wrapper">
+                                        <input type="file" id="incidentImageUpload" name="incident_image" 
+                                               accept="image/jpeg,image/jpg,image/png,image/gif" class="image-input">
+                                        <label for="incidentImageUpload" class="image-upload-label">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <span>Click to upload or drag & drop</span>
+                                            <small>JPG, PNG, GIF (Max 5MB)</small>
+                                        </label>
+                                        <div id="imagePreviewNew" class="image-preview-box hidden">
+                                            <img id="previewImgNew" src="" alt="Preview">
+                                            <button type="button" id="removeImageNew" class="remove-image-btn">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i> Submit Report
+                                    </button>
+                                    <button type="reset" class="btn btn-secondary">
+                                        <i class="fas fa-redo"></i> Reset
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="incidents-list-container">
+                            <h3><i class="fas fa-history"></i> Your Reported Incidents</h3>
+                            <div id="incidentsList" class="incidents-list"></div>
+                        </div>
+                    </div>
+
+                    <!-- RECENT ACTIVITY SECTION -->
                     <div class="dashboard-section">
                         <div class="section-header-modern">
-                            <h2><i class="fas fa-bell"></i> Recent Activity</h2>
+                            <div class="section-title">
+                                <i class="fas fa-clock"></i>
+                                <h2>Recent Activity</h2>
+                            </div>
+                            <a href="#" class="view-all-link">View All</a>
                         </div>
-                        <div class="alerts-section"></div>
+                        <div class="alerts-section">
+                            <div class="activity-placeholder">
+                                <i class="fas fa-history"></i>
+                                <p>Loading recent activities...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN - PROFILE & QUICK ACTIONS -->
+                <!-- RIGHT COLUMN -->
                 <div class="dashboard-right-col">
                     <!-- PROFILE CARD -->
                     <div class="profile-card-modern">
-                        <div class="profile-header">
-                            <button class="btn-edit"><i class="fas fa-pen"></i></button>
-                        </div>
-                        <div class="profile-avatar">
-                            <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name'] ?? 'User'); ?>&background=5B7FDB&color=fff&size=200" alt="Profile" id="userAvatar">
-                        </div>
-                        <h3><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?></h3>
-                        <p class="profile-role">Pet Owner</p>
-                        
-                        <div class="profile-stats-grid">
-                            <div class="profile-stat-item">
-                                <span class="profile-stat-label">Date Joined</span>
-                                <span class="profile-stat-value"><?php echo date('M d, Y'); ?></span>
+                        <div class="profile-cover"></div>
+                        <div class="profile-body">
+                            <div class="profile-avatar-wrapper">
+                                <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name'] ?? 'User'); ?>&background=6366f1&color=fff&size=200" alt="Profile">
+                                <span class="status-dot online"></span>
                             </div>
-                            <div class="profile-stat-item">
-                                <span class="profile-stat-label">Status</span>
-                                <span class="profile-stat-value"><span class="status-badge active">Active</span></span>
+                            <h3 class="profile-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?></h3>
+                            <p class="profile-role">Pet Owner</p>
+                            
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <span class="stat-number">0</span>
+                                    <span class="stat-text">Pets</span>
+                                </div>
+                                <div class="profile-stat">
+                                    <span class="stat-number">0</span>
+                                    <span class="stat-text">Records</span>
+                                </div>
+                                <div class="profile-stat">
+                                    <span class="stat-number">0</span>
+                                    <span class="stat-text">Reports</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <span>Joined <?php echo date('M Y'); ?></span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="fas fa-circle-check"></i>
+                                    <span class="status-active">Active</span>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- QUICK ACTIONS CARD -->
+                    <!-- QUICK ACTIONS -->
                     <div class="quick-actions-card">
                         <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
                         <div class="quick-actions-grid">
-                            <button class="quick-action-btn blue" id="quickAddPetBtn">
-                            <i class="fas fa-plus-circle"></i>
+                            <button class="quick-action-btn" id="quickAddPetBtn">
+                                <div class="action-icon blue">
+                                    <i class="fas fa-plus"></i>
+                                </div>
                                 <span>Add Pet</span>
                             </button>
-
-                            <button class="quick-action-btn green" onclick="document.querySelector('[data-section=vaccinations]').click()">
-                                <i class="fas fa-syringe"></i>
-                                <span>Vaccinations</span>
+                            <button class="quick-action-btn" onclick="document.querySelector('[data-section=vaccinations]').click()">
+                                <div class="action-icon green">
+                                    <i class="fas fa-syringe"></i>
+                                </div>
+                                <span>Vaccination</span>
                             </button>
-                            <button class="quick-action-btn orange" onclick="document.querySelector('[data-section=incidents]').click()">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Report Issue</span>
+                            <button class="quick-action-btn" onclick="document.querySelector('[data-section=incidents]').click()">
+                                <div class="action-icon orange">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <span>Report</span>
                             </button>
-                            <button class="quick-action-btn purple" onclick="document.querySelector('[data-section=analytics]').click()">
-                                <i class="fas fa-chart-line"></i>
+                            <button class="quick-action-btn" onclick="document.querySelector('[data-section=analytics]').click()">
+                                <div class="action-icon purple">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
                                 <span>Analytics</span>
                             </button>
+                        </div>
+                    </div>
+
+                    <!-- UPCOMING EVENTS -->
+                    <div class="upcoming-card">
+                        <h3><i class="fas fa-calendar"></i> Upcoming</h3>
+                        <div class="upcoming-list">
+                            <div class="upcoming-item">
+                                <div class="upcoming-date">
+                                    <span class="day"><?php echo date('d'); ?></span>
+                                    <span class="month"><?php echo date('M'); ?></span>
+                                </div>
+                                <div class="upcoming-info">
+                                    <h4>No upcoming events</h4>
+                                    <p>Add vaccinations to see schedules</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </main>
 
-        <!-- SIDEBAR OVERLAY for mobile -->
+        <!-- SIDEBAR OVERLAY -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
     </div>
+
+    <!-- ========== MODALS ========== -->
 
     <!-- PET REGISTRATION MODAL -->
     <div class="modal" id="petRegistrationModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-paw"></i> Register New Pet</h2>
+                <div class="modal-title">
+                    <i class="fas fa-paw"></i>
+                    <h2>Register New Pet</h2>
+                </div>
                 <button class="modal-close"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
@@ -246,55 +456,44 @@ require_once 'check_session.php';
                     <div class="image-upload-container">
                         <div class="image-preview" id="imagePreview">
                             <i class="fas fa-camera"></i>
-                            <span>Click to upload pet image</span>
+                            <span>Upload Photo</span>
                         </div>
                         <input type="file" name="pet_image" id="petImage" accept="image/*" class="image-input">
                     </div>
 
                     <div class="form-group">
                         <label for="petName">Pet Name *</label>
-                        <div class="input-group">
-                            <input type="text" id="petName" name="name" required placeholder="Enter pet name">
-                        </div>
+                        <input type="text" id="petName" name="name" required placeholder="Enter pet name">
                     </div>
 
                     <div class="form-group">
                         <label for="species">Species *</label>
-                        <div class="input-group">
-                            <select id="species" name="species" required>
-                                <option value="">Select species</option>
-                                <option value="Dog">Dog</option>
-                                <option value="Cat">Cat</option>
-                                <option value="Bird">Bird</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
+                        <select id="species" name="species" required>
+                            <option value="">Select species</option>
+                            <option value="Dog">Dog</option>
+                            <option value="Cat">Cat</option>
+                            <option value="Bird">Bird</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
 
                     <div class="form-group">
                         <label for="breed">Breed</label>
-                        <div class="input-group">
-                            <input type="text" id="breed" name="breed" placeholder="Enter breed">
-                        </div>
+                        <input type="text" id="breed" name="breed" placeholder="Enter breed">
                     </div>
 
                     <div class="form-row-2">
                         <div class="form-group">
                             <label for="age">Age (years)</label>
-                            <div class="input-group">
-                                <input type="number" id="age" name="age" min="0" placeholder="Age">
-                            </div>
+                            <input type="number" id="age" name="age" min="0" placeholder="Age">
                         </div>
-
                         <div class="form-group">
                             <label for="gender">Gender</label>
-                            <div class="input-group">
-                                <select id="gender" name="gender">
-                                    <option value="">Select gender</option>
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
-                            </div>
+                            <select id="gender" name="gender">
+                                <option value="">Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
                         </div>
                     </div>
 
@@ -310,7 +509,10 @@ require_once 'check_session.php';
     <div class="modal" id="vaccinationModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-syringe"></i> Add Vaccination Record</h2>
+                <div class="modal-title">
+                    <i class="fas fa-syringe"></i>
+                    <h2>Add Vaccination Record</h2>
+                </div>
                 <button class="modal-close"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
@@ -332,7 +534,6 @@ require_once 'check_session.php';
                             <label for="dateGiven">Date Given *</label>
                             <input type="date" id="dateGiven" name="date_given" required>
                         </div>
-
                         <div class="form-group">
                             <label for="nextDueDate">Next Due Date</label>
                             <input type="date" id="nextDueDate" name="next_due_date">
@@ -361,32 +562,41 @@ require_once 'check_session.php';
     <div class="modal" id="incidentModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-exclamation-triangle"></i> Report Incident</h2>
+                <div class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h2>Report Incident</h2>
+                </div>
                 <button class="modal-close"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
                 <form id="incidentForm">
                     <div class="form-group">
-                        <label for="incidentPetId">Related Pet</label>
-                        <select id="incidentPetId" name="pet_id">
-                            <option value="">No specific pet</option>
-                        </select>
-                    </div>
+    <label for="incidentSpecies">
+        <i class="fas fa-paw"></i> Animal Type *
+    </label>
+    <select id="incidentSpecies" name="animal_species" required>
+        <option value="">Select animal type</option>
+        <option value="Dog">Dog</option>
+        <option value="Cat">Cat</option>
+        <option value="Bird">Bird</option>
+        <option value="Other">Other</option>
+    </select>
+</div>
+
 
                     <div class="form-group">
-                        <label for="incidentType">Incident Type *</label>
-                        <input type="text" id="incidentType" name="incident_type" required placeholder="E.g., Lost Pet, Injury, Bite">
+                        <label for="incidentTypeOld">Incident Type *</label>
+                        <input type="text" id="incidentTypeOld" name="incident_type" required placeholder="E.g., Lost Pet, Injury, Bite">
                     </div>
 
                     <div class="form-row-2">
                         <div class="form-group">
-                            <label for="incidentDate">Date & Time *</label>
-                            <input type="datetime-local" id="incidentDate" name="incident_date" required>
+                            <label for="incidentDateOld">Date & Time *</label>
+                            <input type="datetime-local" id="incidentDateOld" name="incident_date" required>
                         </div>
-
                         <div class="form-group">
-                            <label for="incidentSeverity">Severity *</label>
-                            <select id="incidentSeverity" name="severity" required>
+                            <label for="incidentSeverityOld">Severity *</label>
+                            <select id="incidentSeverityOld" name="severity" required>
                                 <option value="Low">Low</option>
                                 <option value="Medium">Medium</option>
                                 <option value="High">High</option>
@@ -396,13 +606,13 @@ require_once 'check_session.php';
                     </div>
 
                     <div class="form-group">
-                        <label for="incidentLocation">Location</label>
-                        <input type="text" id="incidentLocation" name="location" placeholder="Where did it happen?">
+                        <label for="incidentLocationOld">Location</label>
+                        <input type="text" id="incidentLocationOld" name="location" placeholder="Where did it happen?">
                     </div>
 
                     <div class="form-group">
-                        <label for="incidentDescription">Description *</label>
-                        <textarea id="incidentDescription" name="description" rows="4" required placeholder="Describe what happened..."></textarea>
+                        <label for="incidentDescriptionOld">Description *</label>
+                        <textarea id="incidentDescriptionOld" name="description" rows="4" required placeholder="Describe what happened..."></textarea>
                     </div>
 
                     <button type="submit" class="dashboard-btn btn-primary btn-block">
@@ -417,7 +627,10 @@ require_once 'check_session.php';
     <div class="modal" id="updateIncidentModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2><i class="fas fa-edit"></i> Update Incident Status</h2>
+                <div class="modal-title">
+                    <i class="fas fa-edit"></i>
+                    <h2>Update Incident Status</h2>
+                </div>
                 <button class="modal-close" id="closeUpdateIncidentModal"><i class="fas fa-times"></i></button>
             </div>
             <div class="modal-body">
@@ -447,6 +660,7 @@ require_once 'check_session.php';
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="dashboard.js?v=<?php echo time(); ?>"></script>
 </body>
