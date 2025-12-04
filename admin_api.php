@@ -1,14 +1,15 @@
 <?php
-session_start();
+require_once 'check_session.php';
 require_once 'config/database.php';
 
 header('Content-Type: application/json');
 
-// Check if user is admin
-if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
+// After this, $_SESSION['user_id'] is guaranteed.
+if (($_SESSION['user_role'] ?? '') !== 'admin') {
     echo json_encode(['status' => 'error', 'message' => 'Unauthorized']);
     exit;
 }
+
 
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 

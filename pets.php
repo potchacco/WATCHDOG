@@ -1,9 +1,4 @@
 <?php
-// Set header FIRST before any output
-error_reporting(0);
-ini_set('display_errors', 0);
-header('Content-Type: application/json');
-
 require_once 'check_session.php';
 require_once 'config/database.php';
 

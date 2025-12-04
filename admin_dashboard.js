@@ -321,7 +321,9 @@ async function loadAllUsers() {
                         <td>#${user.id}</td>
                         <td>
                             <div class="user-cell">
-                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=667eea&color=fff&size=40" alt="${user.name}">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                    user.name
+                                )}&background=667eea&color=fff&size=40" alt="${user.name}">
                                 <span>${user.name}</span>
                             </div>
                         </td>
@@ -333,7 +335,7 @@ async function loadAllUsers() {
                                     ? 'green'
                                     : user.status === 'pending'
                                     ? 'orange'
-                                    : 'red'
+                                    : 'danger'
                             }">
                                 ${user.status}
                             </span>
@@ -487,10 +489,12 @@ async function fetchAllPets() {
             const grid = container.querySelector('.pets-grid-admin');
 
             data.pets.forEach(pet => {
-                const imgSrc = pet.photo && pet.photo.trim()
-  ? pet.photo
-  : 'https://via.placeholder.com/300x200?text=No+Image';
-
+                const imgSrc =
+                    pet.photo && pet.photo.trim()
+                        ? pet.photo
+                        : pet.image_url && pet.image_url.trim()
+                        ? pet.image_url
+                        : 'https://via.placeholder.com/300x200?text=No+Image';
 
                 const card = document.createElement('div');
                 card.className = 'pet-card-admin';
@@ -1020,7 +1024,7 @@ async function viewReport(type) {
                         type.charAt(0).toUpperCase() + type.slice(1)
                     } Report</h2>
                     <div class="chart-container-report">
-                        <canvas id="reportChart"></canvas>
+                        anvas id="reportChart"></canvas>
                     </div>
                 </div>
             `;

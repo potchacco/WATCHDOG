@@ -1856,12 +1856,12 @@ body.modal-open {
 
 /* Primary small pill */
 .btn-vaccination-primary {
-    background: var(--primary);
+    background: var(--green);
     color: var(--white);
 }
 
 .btn-vaccination-primary:hover {
-    background: var(--primary-dark);
+    background: var(--green-light);
 }
 
 /* Secondary outline pill */
