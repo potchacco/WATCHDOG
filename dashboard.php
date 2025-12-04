@@ -12,6 +12,34 @@ require_once 'check_session.php';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
+    <!-- AI Assistant Widget -->
+<div id="aiAssistant" class="ai-assistant">
+  <div class="ai-header">
+    <span>Watchdog Assistant</span>
+    <button id="aiToggleBtn">&times;</button>
+  </div>
+  <div id="aiMessages" class="ai-messages">
+    <div class="ai-message ai-message-bot">
+      Hi! I can answer questions about using this system, like how to register pets,
+      add vaccinations, or report incidents.
+    </div>
+  </div>
+  <form id="aiForm" class="ai-form">
+    <input
+      type="text"
+      id="aiInput"
+      placeholder="Ask about the system..."
+      autocomplete="off"
+      required
+    />
+    <button type="submit">Send</button>
+  </form>
+</div>
+
+<button id="aiAssistantToggle" class="ai-fab">
+  ?
+</button>
+
     <div class="dashboard">
         <!-- Hamburger Menu -->
         <button class="hamburger" id="hamburger" aria-label="Toggle menu">

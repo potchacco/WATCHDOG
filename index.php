@@ -17,7 +17,7 @@
 <body>
   <body>
   <!-- Enhanced Navbar -->
-<nav class="navbar">
+<nav class="navbar animate-from-left delay-1">
   <div class="container nav-container">
     <div class="nav-logo">
       <!-- <img src="project-logo.png" width="110px" alt="" class="project-logo"> -->
@@ -186,7 +186,7 @@
 
     <div class="container hero-container">
       <!-- Left Side Content -->
-      <div class="hero-left">
+      <div class="hero-left reveal-left">
         <div class="hero-badge">
           <i class="fas fa-shield-alt"></i>
           <span>Government Certified Platform</span>
@@ -221,7 +221,7 @@
       </div>
 
       <!-- Center - Large Dog Image -->
-      <div class="hero-center">
+      <div class="hero-center reveal">
         <div class="dog-container">
           <div class="dog-image-wrapper">
             <!-- Replace with your high-quality dog image -->
@@ -247,7 +247,7 @@
       </div>
 
       <!-- Right Side Content -->
-      <div class="hero-right">
+      <div class="hero-right reveal-right">
         <div class="quick-actions">
           <h3>Quick Actions</h3>
           
@@ -308,7 +308,7 @@
   </section>
 
     <!-- ENHANCED SERVICES SECTION -->
-  <section class="services-premium" id="services">
+  <section class="services-premium reveal" id="services">
     <div class="container">
       <div class="section-header-premium">
         <span class="badge-premium">Our Services</span>
@@ -350,7 +350,7 @@
   </section>
 
   <!-- ENHANCED BENEFITS SECTION (Dog with glasses style) -->
-  <section class="benefits-premium" id="benefits">
+  <section class="benefits-premium reveal" id="benefits">
     <div class="container">
       <div class="section-header-premium">
         <h2 class="section-title-premium">Benefits Of Using Digital Pet Registration and Tracking Platform</h2>
@@ -418,7 +418,7 @@
   </section>
 
   <!-- ENHANCED HOW TO USE SECTION (Cat style) -->
-  <section class="howto-premium" id="howto">
+  <section class="howto-premium reveal" id="howto">
     <div class="container">
       <div class="howto-layout">
         <div class="howto-left">
@@ -477,7 +477,7 @@
   </section>
 
     <!-- PREMIUM CONTACT SECTION -->
-  <section class="contact-premium" id="contact">
+  <section class="contact-premium reveal" id="contact">
     <div class="container">
       <div class="section-header-premium">
         <span class="badge-premium">Get In Touch</span>
@@ -563,7 +563,7 @@
   </section>
 
   <!-- ENHANCED FOOTER -->
-  <footer class="footer-premium">
+  <footer class="footer-premium reveal">
     <div class="container">
       <div class="footer-content">
         <div class="footer-brand-premium">
@@ -634,6 +634,25 @@
         console.log('Found modal:', modal.id);
       });
     });
+
+     // Scroll reveal using IntersectionObserver
+  document.addEventListener('DOMContentLoaded', () => {
+    const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          // Optional: stop observing once revealed
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.15  // reveal when ~15% of element is visible
+    });
+
+    revealEls.forEach(el => observer.observe(el));
+  });
   </script>
 </body>
 </html>

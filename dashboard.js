@@ -45,7 +45,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     
     // (The rest of your dashboard initialization code follows below...)
-    
+    loadDashboardStats();
+
 });
 
 function showAppModal(title, message) {
@@ -2516,4 +2517,65 @@ async function openVaccinationModalForPet(petId, petName) {
     await openVaccinationModal(petId);
 }
 
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const fab = document.getElementById('aiAssistantToggle');
+  const panel = document.getElementById('aiAssistant');
+  const closeBtn = document.getElementById('aiToggleBtn');
+  const form = document.getElementById('aiForm');
+  const input = document.getElementById('aiInput');
+  const messages = document.getElementById('aiMessages');
+
+  if (!fab || !panel || !form || !input || !messages) return;
+
+  const togglePanel = () => {
+    panel.style.display = panel.style.display === 'flex' ? 'none' : 'flex';
+  };
+
+  fab.addEventListener('click', togglePanel);
+  closeBtn.addEventListener('click', togglePanel);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const question = input.value.trim();
+    if (!question) return;
+
+    appendMessage(question, 'user');
+    input.value = '';
+    appendMessage('Thinking...', 'bot', true);
+
+    try {
+      const res = await fetch('assistant.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+
+      const data = await res.json();
+      removeLastThinking();
+      if (data.status === 'success') {
+        appendMessage(data.answer, 'bot');
+      } else {
+        appendMessage(data.message || 'Sorry, something went wrong.', 'bot');
+      }
+    } catch (err) {
+      removeLastThinking();
+      appendMessage('Connection error. Please try again.', 'bot');
+    }
+  });
+
+  function appendMessage(text, who, isThinking = false) {
+    const div = document.createElement('div');
+    div.className = 'ai-message ' + (who === 'user' ? 'ai-message-user' : 'ai-message-bot');
+    if (isThinking) div.dataset.thinking = '1';
+    div.textContent = text;
+    messages.appendChild(div);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  function removeLastThinking() {
+    const thinking = messages.querySelector('.ai-message-bot[data-thinking="1"]');
+    if (thinking) thinking.remove();
+  }
 });

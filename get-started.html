@@ -1,372 +1,475 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>Digital Pet Registration and Tracking Platform</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WATCHDOG - Pet Monitoring System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg: #020617;
+            --panel: #0f172a;
+            --panel-soft: #020617;
+            --accent: #6366f1;
+            --accent-soft: #4f46e5;
+            --green: #10b981;
+            --orange: #f97316;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --border-subtle: #1f2937;
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
             min-height: 100vh;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
+            color: var(--text);
             display: flex;
-            align-items: center;
+            align-items: stretch;
             justify-content: center;
-            overflow: hidden;
-            position: relative;
+            overflow-x: hidden;
         }
 
-        /* Animated Background */
-        .background-animation {
-            position: absolute;
+        .page {
             width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        .paw-print {
-            position: absolute;
-            font-size: 40px;
-            color: rgba(255, 255, 255, 0.1);
-            animation: float 15s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-50px) rotate(180deg); }
-        }
-
-        .paw-print:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
-        .paw-print:nth-child(2) { top: 20%; right: 15%; animation-delay: 2s; }
-        .paw-print:nth-child(3) { bottom: 15%; left: 20%; animation-delay: 4s; }
-        .paw-print:nth-child(4) { bottom: 25%; right: 10%; animation-delay: 6s; }
-
-        /* Main Container */
-        .landing-container {
-            position: relative;
-            z-index: 1;
             max-width: 1200px;
-            width: 90%;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 30px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            min-height: 600px;
-            animation: slideUp 0.8s ease;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Left Section - Content */
-        .content-section {
-            padding: 60px 50px;
+            padding: 24px 16px 40px;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            background: #f0f0f0;
+            gap: 32px;
         }
 
-        .logo {
+        .nav {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 30px;
+            justify-content: space-between;
+            gap: 16px;
         }
 
-        .logo-icon {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
+        .brand {
             display: flex;
             align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-        }
-
-        .logo-text {
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        h1 {
-            font-size: 48px;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            color: #6b7280;
-            margin-bottom: 40px;
-            line-height: 1.6;
-        }
-
-        .features {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-bottom: 40px;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            color: #374151;
-            font-size: 16px;
-        }
-
-        .feature-item i {
-            color: #667eea;
-            font-size: 20px;
-        }
-
-        /* Get Started Button */
-        .btn-get-started {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 18px 40px;
-            font-size: 18px;
+            gap: 10px;
             font-weight: 600;
-            border-radius: 50px;
+        }
+
+        .brand-mark {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: conic-gradient(from 180deg, #22c55e, #0ea5e9, #6366f1, #f97316, #22c55e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #020617;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .brand-sub {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .nav-links span {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 700px) {
+            .nav-links {
+                display: none;
+            }
+        }
+
+        .btn {
+            border-radius: 999px;
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-            position: relative;
-            overflow: hidden;
+            background: transparent;
+            color: var(--text);
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--green));
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--accent-soft), var(--green));
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.9fr);
+            gap: 28px;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .hero {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--border-subtle);
+            font-size: 12px;
+            color: var(--muted);
             width: fit-content;
         }
 
-        .btn-get-started:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        .eyebrow-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--green);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
         }
 
-        .btn-get-started:active {
-            transform: translateY(-1px);
+        h1 {
+            font-size: clamp(30px, 4vw + 6px, 44px);
+            line-height: 1.05;
+            margin: 0;
         }
 
-        .btn-get-started.loading {
+        .highlight {
+            background: linear-gradient(135deg, #a5b4fc, #22c55e);
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .hero-sub {
+            max-width: 550px;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .hero-ctas {
+            margin-top: 4px;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 999px;
+            background: #4b5563;
+        }
+
+        .hero-right {
+            position: relative;
+            min-height: 260px;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+        }
+
+        .panel {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            border-radius: 20px;
+            padding: 18px 18px 16px;
+            background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.35), transparent 60%),
+                        radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.35), transparent 55%),
+                        var(--panel);
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 22px 45px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(75, 85, 99, 0.9);
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--green);
+            box-shadow: 0 0 8px rgba(16, 185, 129, 0.8);
+        }
+
+        .mini-stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            font-size: 11px;
+        }
+
+        @media (max-width: 500px) {
+            .mini-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        .mini-card {
+            padding: 8px;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(31, 41, 55, 0.9);
+        }
+
+        .mini-label {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .mini-value {
+            margin-top: 4px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .mini-tag {
+            margin-top: 2px;
+            font-size: 10px;
+            color: var(--muted);
+        }
+
+        .activity {
+            margin-top: 6px;
+            padding: 8px;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .activity-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, 0.15);
+            color: #6ee7b7;
+        }
+
+        .badge-orange {
+            background: rgba(249, 115, 22, 0.18);
+            color: #fed7aa;
+        }
+
+        .pill-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .pill {
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(31, 41, 55, 0.9);
+            color: var(--muted);
+        }
+
+        .panel-footer {
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .glow-orbit {
+            position: absolute;
+            inset: -40%;
+            background: radial-gradient(circle at 20% 0%, rgba(99, 102, 241, 0.3), transparent 50%),
+                        radial-gradient(circle at 90% 100%, rgba(249, 115, 22, 0.25), transparent 60%);
+            opacity: 0.6;
+            filter: blur(4px);
+            z-index: 0;
             pointer-events: none;
         }
 
-        .btn-text {
-            transition: opacity 0.3s ease;
-        }
-
-        .btn-get-started.loading .btn-text {
-            opacity: 0;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            position: absolute;
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .btn-get-started.loading .spinner {
-            opacity: 1;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Right Section - Image */
-        .image-section {
-            position: relative;
-            overflow: hidden;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .dog-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.9;
-        }
-
-        .image-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 30px;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
-            color: white;
-        }
-
-        .image-overlay h3 {
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-
-        .image-overlay p {
+        #learn-more {
+            max-width: 720px;
             font-size: 14px;
-            opacity: 0.9;
-        }
-
-        /* Responsive */
-        @media (max-width: 968px) {
-            .landing-container {
-                grid-template-columns: 1fr;
-                width: 95%;
-            }
-
-            .image-section {
-                min-height: 300px;
-                order: -1;
-            }
-
-            .content-section {
-                padding: 40px 30px;
-            }
-
-            h1 {
-                font-size: 36px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 28px;
-            }
-
-            .subtitle {
-                font-size: 16px;
-            }
-
-            .btn-get-started {
-                width: 100%;
-                padding: 16px 30px;
-                font-size: 16px;
-            }
-
-            .content-section {
-                padding: 30px 20px;
-            }
+            color: var(--muted);
+            margin-top: 4px;
         }
     </style>
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="background-animation">
-        <div class="paw-print"><i class="fas fa-paw"></i></div>
-        <div class="paw-print"><i class="fas fa-paw"></i></div>
-        <div class="paw-print"><i class="fas fa-paw"></i></div>
-        <div class="paw-print"><i class="fas fa-paw"></i></div>
-    </div>
+<div class="page">
+    <header class="nav">
+        <div class="brand">
+            <div class="brand-mark">W</div>
+            <div>
+                <div>Watchdog</div>
+                <div class="brand-sub">Digital Pet Registration &amp; Tracking</div>
+            </div>
+        </div>
+        <div class="nav-links">
+            <span>Features</span>
+            <span>How it works</span>
+            <span>For barangays</span>
+        </div>
+    </header>
 
-    <!-- Main Container -->
-    <div class="landing-container">
-        <!-- Left Section - Content -->
-        <div class="content-section">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-paw"></i>
-                </div>
-                <span class="logo-text">WATCHDOG</span>
+    <main class="hero">
+        <section class="hero-left">
+            <div class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                <span>Barangay-ready pet management platform</span>
             </div>
 
-            <h1>Keep Your Pets Safe & Healthy</h1>
-            <p class="subtitle">
-                Your complete pet monitoring solution. Track vaccinations, manage records, 
-                and ensure the well-being of your furry friends all in one place.
+            <h1>
+                Bring every pet, vaccine, and
+                <span class="highlight">incident</span> into one dashboard.
+            </h1>
+
+            <p class="hero-sub">
+                Watchdog helps barangays and residents register pets, track vaccinations,
+                and report animal-related incidents in a single, secure web platform.
+                Designed for local government workflows and residents with any skill level.
             </p>
 
-            <div class="features">
-                <div class="feature-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Easy Pet Registration</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Vaccination Tracking</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Incident Management</span>
-                </div>
-                <div class="feature-item">
-                    <i class="fas fa-check-circle"></i>
-                    <span>Real-time Analytics</span>
-                </div>
+            <div class="hero-ctas">
+                <a href="index.php" class="btn btn-primary">
+                    Get started
+                </a>
             </div>
 
-            <button class="btn-get-started" id="getStartedBtn">
-                <span class="btn-text">
-                    Get Started
-                    <i class="fas fa-arrow-right"></i>
-                </span>
-                <div class="spinner"></div>
-            </button>
-        </div>
-
-        <!-- Right Section - Image -->
-        <div class="image-section">
-            <img src="https://images.unsplash.com/photo-1587300003388-59208cc962cb?q=80&w=1000&auto=format&fit=crop" 
-                 alt="Happy Dog" 
-                 class="dog-image">
-            <div class="image-overlay">
-                <h3>Trusted by Pet Owners</h3>
-                <p>Join thousands of pet parents keeping their companions safe</p>
+            <div class="hero-meta">
+                <span>✔ Resident &amp; admin dashboards</span>
+                <span class="dot"></span>
+                <span>✔ Vaccination &amp; incident tracking</span>
+                <span class="dot"></span>
+                <span>✔ Activity logs for accountability</span>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <script>
-        const getStartedBtn = document.getElementById('getStartedBtn');
+        <section class="hero-right">
+            <div class="glow-orbit"></div>
+            <div class="panel">
+                <div class="panel-header">
+                    <span style="font-size:13px;color:#e5e7eb;">Barangay overview</span>
+                    <div class="status-pill">
+                        <span class="status-dot"></span>
+                        <span>Live demo data</span>
+                    </div>
+                </div>
 
-        getStartedBtn.addEventListener('click', function() {
-            // Add loading state
-            this.classList.add('loading');
-            
-            // Simulate loading for 2 seconds then redirect
-            setTimeout(() => {
-                window.location.href = 'index.php';
-            }, 2000);
-        });
-    </script>
+                <div class="mini-stats">
+                    <div class="mini-card">
+                        <div class="mini-label">Registered pets</div>
+                        <div class="mini-value">128</div>
+                        <div class="mini-tag">across all puroks</div>
+                    </div>
+                    <div class="mini-card">
+                        <div class="mini-label">Vaccines up to date</div>
+                        <div class="mini-value" style="color:#a5b4fc;">92%</div>
+                        <div class="mini-tag">barangay coverage</div>
+                    </div>
+                    <div class="mini-card">
+                        <div class="mini-label">Open incidents</div>
+                        <div class="mini-value" style="color:#fed7aa;">3</div>
+                        <div class="mini-tag">awaiting action</div>
+                    </div>
+                </div>
+
+                <div class="activity">
+                    <div class="activity-title">
+                        <span style="color:#e5e7eb;">Recent system activity</span>
+                        <span class="badge badge-green">Auto-logged</span>
+                    </div>
+                    <div style="font-size:12px;color:var(--muted);">
+                        • New resident “Juan Dela Cruz” registered a pet “Buddy”<br>
+                        • Rabies vaccination recorded for “Kuromi”<br>
+                        • Bite incident reported in Barangay 5
+                    </div>
+                    <div class="pill-row">
+                        <span class="pill">Pet registration</span>
+                        <span class="pill">Vaccination update</span>
+                        <span class="pill">Incident reporting</span>
+                    </div>
+                </div>
+
+                <div class="panel-footer">
+                    <span>Role-based access for residents &amp; admins</span>
+                    <span class="badge badge-orange">Barangay-level focus</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <section id="learn-more">
+        <p>
+            The Digital Pet Registration and Tracking Platform centralizes pet data, vaccination records,
+            and incident reports at the barangay level. Residents can register their pets and submit reports
+            online or with assistance at the barangay office, while officials review, approve, and analyze
+            data through an admin dashboard.
+        </p>
+    </section>
+</div>
 </body>
 </html>
