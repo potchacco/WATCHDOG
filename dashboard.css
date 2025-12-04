@@ -3232,3 +3232,49 @@ body.modal-open {
         margin-left: 0 !important;
     }
 }
+
+.incident-image {
+  margin-bottom: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.incident-image img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Greyed out read-only inputs */
+.form-group input[readonly] {
+  background-color: var(--gray-100);
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+/* User incident image */
+.incident-image {
+    margin-bottom: 12px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.incident-image img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    display: block;
+}
+
+/* Admin incident image */
+.incident-image-admin {
+    margin-bottom: 10px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+.incident-image-admin img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    display: block;
+}

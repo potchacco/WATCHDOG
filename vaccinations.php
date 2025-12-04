@@ -46,10 +46,11 @@ if ($method === 'POST' && $action === 'add') {
         }
 
         $stmt = $pdo->prepare("
-            INSERT INTO vaccinations (pet_id, vaccine_name, date_given, next_due_date, veterinarian, notes)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([$petId, $vaccine, $dateGiven, $nextDue ?: null, $vet, $notes]);
+    INSERT INTO vaccinations (user_id, pet_id, vaccine_name, date_given, next_due_date, veterinarian, notes)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+");
+$stmt->execute([$userId, $petId, $vaccine, $dateGiven, $nextDue ?: null, $vet, $notes]);
+
 
         // Log activity
         $log = $pdo->prepare("

@@ -609,6 +609,7 @@ async function openVaccinationModalForPet(petId, petName) {
 }
 
 // ================= INCIDENTS: LOAD LIST =================
+// USER DASHBOARD - LOAD INCIDENTS WITH IMAGE
 async function loadIncidents() {
     const container = document.getElementById('incidentsContainer');
     if (!container) return;
@@ -632,57 +633,46 @@ async function loadIncidents() {
             const incidentsGrid = container.querySelector('div');
 
             data.incidents.forEach(incident => {
-  const incidentCard = document.createElement('div');
-  incidentCard.style.cssText = 'background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1)';
-  incidentCard.innerHTML = `
-    <h3>${incident.incident_type}</h3>
-    <p>${incident.description}</p>
-    <p><small>Status: ${incident.status} • ${new Date(incident.incident_date).toLocaleString()}</small></p>
-  `;
-  incidentsGrid.appendChild(incidentCard);
-});
-// Update incident status mini stats
-let active = 0, pending = 0, resolved = 0;
+                const incidentCard = document.createElement('div');
+                incidentCard.style.cssText = `
+                    background: white;
+                    border-radius: 12px;
+                    padding: 20px;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                `;
 
-data.incidents.forEach(incident => {
-  const status = (incident.status || '').toLowerCase();
+                // If backend provided an image_path, show it
+                const imgHtml = incident.image_path
+                    ? `
+                        <div class="incident-image">
+                            <img src="${incident.image_path}" alt="Incident image">
+                        </div>
+                      `
+                    : '';
 
-  if (status === 'open' || status === 'active') {
-    active++;
-  } else if (status === 'pending') {
-    pending++;
-  } else if (status === 'resolved' || status === 'closed') {
-    resolved++;
-  }
-});
+                incidentCard.innerHTML = `
+                    ${imgHtml}
+                    <h3>${incident.incident_type}</h3>
+                    <p>${incident.description}</p>
+                    <p>
+                        <small>
+                            Status: ${incident.status} |
+                            ${new Date(incident.incident_date).toLocaleString()}
+                        </small>
+                    </p>
+                `;
 
-const activeEl   = document.getElementById('incActiveCount');
-const pendingEl  = document.getElementById('incPendingCount');
-const resolvedEl = document.getElementById('incResolvedCount');
-
-if (activeEl)   activeEl.textContent   = active;
-if (pendingEl)  pendingEl.textContent  = pending;
-if (resolvedEl) resolvedEl.textContent = resolved;
-
-
+                incidentsGrid.appendChild(incidentCard);
+            });
         } else {
-            container.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <i class="fas fa-triangle-exclamation" style="font-size: 48px; color: #f97316;"></i>
-                    <p>Failed to load incidents.</p>
-                </div>
-            `;
+            container.innerHTML = `<p style="text-align:center; padding:40px;">${data.message || 'Failed to load incidents.'}</p>`;
         }
     } catch (err) {
-        console.error('Error loading incidents', err);
-        container.innerHTML = `
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-triangle-exclamation" style="font-size: 48px; color: #ef4444;"></i>
-                <p>Error loading incidents. Please try again.</p>
-            </div>
-        `;
+        console.error('Error', err);
+        container.innerHTML = `<p style="text-align:center; padding:40px;">Error loading incidents.</p>`;
     }
 }
+
 
 // ================= INCIDENTS: OPEN MODAL =================
 async function openIncidentModal() {
@@ -736,68 +726,78 @@ if (incidentImagePreview && incidentImageInput) {
 }
 
 
-// ================= INCIDENT FORM SUBMIT =================
-const incidentForm = document.getElementById('incidentForm');
-if (incidentForm) {
-    incidentForm.addEventListener('submit', async e => {
+document.addEventListener('DOMContentLoaded', () => {
+    const vaccinationForm = document.getElementById('vaccinationForm');
+    console.log('Vaccination form found:', !!vaccinationForm);
+
+    if (!vaccinationForm) {
+        return;
+    }
+
+    vaccinationForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const formData = new FormData(incidentForm);
-        formData.append('action', 'add'); // matches your existing incidents.php handler
+        const formData = new FormData(vaccinationForm);
+        const mode = vaccinationForm.dataset.mode === 'update' ? 'update' : 'add';
+
+        formData.append('action', mode);
+        if (mode === 'update') {
+            formData.append('vaccid', vaccinationForm.dataset.vaccId);
+        }
 
         try {
-            const res = await fetch('incidents.php', {
+            const res = await fetch('vaccinations.php', {
                 method: 'POST',
                 body: formData
             });
             const data = await res.json();
 
-            if (data.status === 'success') {
-                // Close modal and reset
-                document.getElementById('incidentModal').classList.remove('active');
-                incidentForm.reset();
-
-                // Reset preview UI
-                if (incidentImagePreview) {
-                    incidentImagePreview.style.backgroundImage = '';
-                    incidentImagePreview.innerHTML = `
-                        <i class="fas fa-camera"></i>
-                        <span>Click to upload incident photo</span>
-                    `;
-                }
-
-                // Refresh UI parts
-                loadIncidents();
-                if (typeof loadRecentAlerts === 'function') {
-                    loadRecentAlerts();
-                }
-                if (typeof loadDashboardStats === 'function') {
-                    loadDashboardStats();
-                }
-
-                // Use your app-wide modal/notification
-                if (typeof showAppModal === 'function') {
-                    showAppModal('Success', 'Incident reported successfully!');
-                } else if (typeof showNotification === 'function') {
-                    showNotification('Incident reported successfully!', 'success');
-                }
-            } else {
-                if (typeof showAppModal === 'function') {
-                    showAppModal('Error', data.message || 'Failed to report incident.');
-                } else if (typeof showNotification === 'function') {
-                    showNotification(data.message || 'Failed to report incident.', 'error');
-                }
+            if (data.status !== 'success') {
+                showNotification(data.message || 'Failed to save vaccination record.', 'error');
+                return;
             }
+
+            // Close modal and reset form
+            document.getElementById('vaccinationModal').classList.remove('active');
+            vaccinationForm.reset();
+            delete vaccinationForm.dataset.mode;
+            delete vaccinationForm.dataset.vaccId;
+
+            // Reset button text
+            const submitBtn = vaccinationForm.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '<i class="fas fa-syringe"></i> Save Vaccination Record';
+            }
+
+            // Safely refresh UI pieces (only if functions exist)
+            if (typeof loadVaccinationHistory === 'function') {
+                loadVaccinationHistory();
+            }
+            if (typeof loadPetsWithVaccinations === 'function') {
+                loadPetsWithVaccinations();
+            }
+            if (typeof loadDashboardStats === 'function') {
+                loadDashboardStats();
+            }
+            if (typeof loadRecentAlerts === 'function') {
+                loadRecentAlerts();
+            }
+
+            showNotification(
+                mode === 'update'
+                    ? 'Vaccination updated successfully!'
+                    : 'Vaccination added successfully!',
+                'success'
+            );
         } catch (err) {
-            console.error(err);
-            if (typeof showAppModal === 'function') {
-                showAppModal('Error', 'Connection error. Please try again.');
-            } else if (typeof showNotification === 'function') {
-                showNotification('Connection error. Please try again.', 'error');
-            }
+            console.error('Error saving vaccination:', err);
+            showNotification('Connection error. Please try again.', 'error');
         }
     });
-}
+});
+
+
+
 
 // ================= WIRE "REPORT INCIDENT" BUTTON =================
 // This should run after you render the Incidents section HTML (inside your switch-case)
@@ -1731,62 +1731,6 @@ try {
 }
 
 
-
-    const vaccinationForm = document.getElementById('vaccinationForm');
-
-if (vaccinationForm) {
-    vaccinationForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const formData = new FormData(vaccinationForm);
-        const mode = vaccinationForm.dataset.mode || 'create';
-
-        if (mode === 'update') {
-            formData.append('action', 'update');
-            formData.append('vacc_id', vaccinationForm.dataset.vaccId);
-        } else {
-            formData.append('action', 'add');
-        }
-
-        try {
-            const res = await fetch('vaccinations.php', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-
-            if (data.status === 'success') {
-                // Close modal and reset form
-                document.getElementById('vaccinationModal').classList.remove('active');
-                vaccinationForm.reset();
-                delete vaccinationForm.dataset.mode;
-                delete vaccinationForm.dataset.vaccId;
-
-                // Refresh UI (no page reload)
-                loadVaccinationHistory();   // table & vaccination mini stats (via updateVaccinationStats)
-                loadPetsWithVaccinations?.(); // if defined, refresh pet cards with vacc info
-                loadDashboardStats();       // dashboard & sidebar stats
-                loadRecentAlerts();         // recent activity feed
-
-                showAppModal(
-                    'Success',
-                    mode === 'update'
-                        ? 'Vaccination updated successfully!'
-                        : 'Vaccination recorded successfully!'
-                );
-            } else {
-                showAppModal('Error', data.message || 'Failed to save vaccination.');
-            }
-        } catch (err) {
-            console.error('Error saving vaccination:', err);
-            showAppModal('Error', 'Connection error. Please try again.');
-        }
-    });
-}
-
-
-
-
     const incidentForm = document.getElementById('incidentForm');
 if (incidentForm) {
   incidentForm.addEventListener('submit', async (e) => {
@@ -1837,47 +1781,22 @@ if (incidentForm) {
 
     // ===== VACCINATION FUNCTIONS =====
 
-// Function to open vaccination modal
-async function openVaccinationModal() {
-    const modal = document.getElementById('vaccinationModal');
-    const petSelect = document.getElementById('vaccPetId');
-    
-    try {
-        const res = await fetch('pets.php');
-        const data = await res.json();
-        
-        if (data.status === 'success' && data.pets.length > 0) {
-            petSelect.innerHTML = '<option value="">Select a pet</option>';
-            data.pets.forEach(pet => {
-                petSelect.innerHTML += `<option value="${pet.id}">${pet.name}</option>`;
-            });
-        } else {
-            petSelect.innerHTML = '<option value="">No pets registered</option>';
-            showNotification('Please register a pet first', 'warning');
-            return;
-        }
-    } catch (err) {
-        console.error('Error loading pets:', err);
-    }
-    
-    modal.classList.add('active');
-}
-
 // ===== VACCINATION FUNCTIONS =====
 
-// Function to open vaccination modal
-async function openVaccinationModal() {
+// Open vaccination modal (optionally pre-select a pet)
+async function openVaccinationModal(petId = null) {
     const modal = document.getElementById('vaccinationModal');
     const petSelect = document.getElementById('vaccPetId');
-    
+
     try {
         const res = await fetch('pets.php');
         const data = await res.json();
-        
+
         if (data.status === 'success' && data.pets.length > 0) {
             petSelect.innerHTML = '<option value="">Select a pet</option>';
             data.pets.forEach(pet => {
-                petSelect.innerHTML += `<option value="${pet.id}">${pet.name}</option>`;
+                const selected = (pet.id == petId) ? 'selected' : '';
+                petSelect.innerHTML += `<option value="${pet.id}" ${selected}>${pet.name}</option>`;
             });
         } else {
             petSelect.innerHTML = '<option value="">No pets registered</option>';
@@ -1887,9 +1806,309 @@ async function openVaccinationModal() {
     } catch (err) {
         console.error('Error loading pets:', err);
     }
-    
+
     modal.classList.add('active');
 }
+
+// Open modal from pet cards
+async function openVaccinationModalForPet(petId, petName) {
+    await openVaccinationModal(petId);
+}
+
+// Pets grid with vaccination actions
+async function loadPetsWithVaccinations() {
+    const container = document.getElementById('vaccinationPetsContainer');
+    if (!container) return;
+
+    try {
+        const petsRes = await fetch('pets.php');
+        const petsData = await petsRes.json();
+
+        if (petsData.status === 'success') {
+            if (petsData.pets.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-paw"></i>
+                        <h3>No Pets Registered</h3>
+                        <p>Register your first pet to start tracking vaccinations</p>
+                        <button class="btn-enhanced btn-primary" onclick="document.getElementById('petRegistrationModal').classList.add('active')">
+                            <i class="fas fa-plus"></i> Register Pet
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '<div class="vaccination-pets-grid"></div>';
+            const petsContainer = container.querySelector('.vaccination-pets-grid');
+
+            petsData.pets.forEach(pet => {
+                const imgSrc = pet.image_url && pet.image_url.trim() !== ''
+                    ? pet.image_url
+                    : 'https://via.placeholder.com/300x200?text=No+Image';
+
+                const petCard = document.createElement('div');
+                petCard.className = 'vaccination-pet-card';
+                petCard.innerHTML = `
+                    <div class="pet-card-header">
+                        <div class="pet-image-small" style="background-image: url('${imgSrc}');"></div>
+                        <div class="pet-info">
+                            <h3>${pet.name}</h3>
+                            <p class="pet-breed"><i class="fas fa-dog"></i> ${pet.species} - ${pet.breed || 'Mixed Breed'}</p>
+                            <div class="pet-details-tags">
+                                <span class="tag blue"><i class="fas fa-calendar"></i> Age: ${pet.age || 'N/A'}</span>
+                                <span class="tag purple"><i class="fas fa-venus-mars"></i> ${pet.gender || 'N/A'}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vaccination-actions">
+                        <button class="btn-vaccination-primary" onclick="openVaccinationModalForPet('${pet.id}', '${pet.name}')">
+                            <i class="fas fa-syringe"></i> Add Vaccination Record
+                        </button>
+                        <button class="btn-vaccination-secondary" onclick="viewVaccinationHistory('${pet.id}')">
+                            <i class="fas fa-history"></i> History
+                        </button>
+                    </div>
+
+                    <div class="vaccination-status">
+                        <div class="status-indicator up-to-date">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Vaccination Status: Up to Date</span>
+                        </div>
+                    </div>
+                `;
+                petsContainer.appendChild(petCard);
+            });
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        container.innerHTML = `
+            <div class="empty-state error">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600;"></i>
+                <h3>Error Loading Pets</h3>
+                <p>Unable to load pet data. Please try again.</p>
+            </div>
+        `;
+    }
+}
+
+// Placeholder until you build per-pet history
+function viewVaccinationHistory(petId) {
+    alert('Vaccination history for pet ID: ' + petId + ' (Feature coming soon!)');
+}
+
+// Status and date helpers
+function getVaccinationStatus(nextDueDate) {
+    if (!nextDueDate) return 'No Due Date';
+
+    const today = new Date();
+    const dueDate = new Date(nextDueDate);
+    const diffTime = dueDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'Overdue';
+    if (diffDays <= 30) return 'Due Soon';
+    return 'Up to Date';
+}
+
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+// Mini stats updater
+function updateVaccinationStats(vaccinations) {
+    const totalCount = vaccinations.length;
+
+    const today = new Date();
+    const dueSoonCount = vaccinations.filter(v => {
+        if (!v.next_due_date) return false;
+        const dueDate = new Date(v.next_due_date);
+        const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+        return diffDays > 0 && diffDays <= 30;
+    }).length;
+
+    const thisMonthCount = vaccinations.filter(v => {
+        const vaccDate = new Date(v.date_given);
+        return (
+            vaccDate.getMonth() === today.getMonth() &&
+            vaccDate.getFullYear() === today.getFullYear()
+        );
+    }).length;
+
+    const totalEl = document.getElementById('totalVaccinesCount');
+    const dueSoonEl = document.getElementById('dueSoonCount');
+    const thisMonthEl = document.getElementById('thisMonthCount');
+
+    if (totalEl) totalEl.textContent = totalCount;
+    if (dueSoonEl) dueSoonEl.textContent = dueSoonCount;
+    if (thisMonthEl) thisMonthEl.textContent = thisMonthCount;
+}
+
+// History table loader
+async function loadVaccinationHistory() {
+    const container = document.getElementById('vaccinationHistoryContainer');
+    if (!container) return;
+
+    try {
+        const res = await fetch('vaccinations.php');
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            if (data.vaccinations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state-small">
+                        <i class="fas fa-syringe" style="font-size: 48px; color: #ddd;"></i>
+                        <p>No vaccination records yet</p>
+                    </div>
+                `;
+                updateVaccinationStats([]);
+                return;
+            }
+
+            updateVaccinationStats(data.vaccinations);
+
+            let tableHTML = `
+                <div class="table-responsive">
+                    <table class="vaccination-table">
+                        <thead>
+                            <tr>
+                                <th>Pet Name</th>
+                                <th>Vaccine Name</th>
+                                <th>Date Given</th>
+                                <th>Next Due Date</th>
+                                <th>Veterinarian</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.vaccinations.forEach(vacc => {
+                const status = getVaccinationStatus(vacc.next_due_date);
+                const statusClass =
+                    status === 'Overdue' ? 'overdue' :
+                    status === 'Due Soon' ? 'due-soon' :
+                    'up-to-date';
+
+                tableHTML += `
+                    <tr>
+                        <td data-label="Pet Name"><strong>${vacc.pet_name}</strong></td>
+                        <td data-label="Vaccine">${vacc.vaccine_name}</td>
+                        <td data-label="Date Given">${formatDate(vacc.date_given)}</td>
+                        <td data-label="Next Due">${vacc.next_due_date ? formatDate(vacc.next_due_date) : 'N/A'}</td>
+                        <td data-label="Veterinarian">${vacc.veterinarian || 'N/A'}</td>
+                        <td data-label="Status"><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td data-label="Actions">
+                            <div class="action-buttons">
+                                <button class="action-btn edit" onclick="editVaccination(${vacc.id})" title="Edit">
+                                    <i class="fas fa-edit"></i> <span style="margin-left: 6px;">Edit</span>
+                                </button>
+                                <button class="action-btn delete"
+                                    onclick="deleteVaccination(${vacc.id}, '${vacc.vaccine_name.replace(/'/g, "\\'")}', '${vacc.pet_name.replace(/'/g, "\\'")}' )"
+                                    title="Delete">
+                                    <i class="fas fa-trash"></i> <span style="margin-left: 6px;">Delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = tableHTML;
+        } else {
+            container.innerHTML = `<p style="color: #999; text-align: center; padding: 40px;">Error loading vaccination records</p>`;
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        container.innerHTML = `<p style="color: #999; text-align: center; padding: 40px;">Error loading vaccination records</p>`;
+    }
+}
+
+// Global edit/delete used by inline onclick
+window.editVaccination = async function (vaccId) {
+    try {
+        const res = await fetch('vaccinations.php');
+        const data = await res.json();
+
+        if (data.status !== 'success') {
+            showNotification(data.message || 'Error loading vaccination record', 'error');
+            return;
+        }
+
+        const vacc = data.vaccinations.find(v => v.id == vaccId);
+        if (!vacc) {
+            showNotification('Vaccination record not found', 'error');
+            return;
+        }
+
+        await openVaccinationModal(vacc.pet_id);
+
+        document.getElementById('vaccineName').value  = vacc.vaccine_name;
+        document.getElementById('dateGiven').value    = vacc.date_given;
+        document.getElementById('nextDueDate').value  = vacc.next_due_date || '';
+        document.getElementById('veterinarian').value = vacc.veterinarian || '';
+        document.getElementById('vaccNotes').value    = vacc.notes || '';
+
+        const form = document.getElementById('vaccinationForm');
+        form.dataset.mode   = 'update';
+        form.dataset.vaccId = vaccId;
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Vaccination';
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        showNotification('Error loading vaccination record', 'error');
+    }
+};
+
+window.deleteVaccination = async function (vaccId, vaccineName, petName) {
+    if (!confirm(`Are you sure you want to delete the "${vaccineName}" vaccination record for ${petName}?`)) {
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('action', 'delete');
+    formData.append('vaccid', vaccId);
+
+    try {
+        const res = await fetch('vaccinations.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            showNotification('Vaccination record deleted successfully!', 'success');
+            loadVaccinationHistory();
+            loadPetsWithVaccinations();
+            loadDashboardStats();
+            loadRecentAlerts();
+        } else {
+            showNotification(data.message || 'Failed to delete vaccination record', 'error');
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        showNotification('Failed to delete vaccination record', 'error');
+    }
+};
+
 
 
 // Helper function to get vaccination status

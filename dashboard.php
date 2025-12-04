@@ -33,7 +33,7 @@ require_once 'check_session.php';
                 <ul class="sidebar-menu">
                     <li class="menu-item">
                         <a href="#" class="active" data-section="dashboard">
-                            <i class="fas fa-grid-2"></i>
+                            <i class="fa-solid fa-house fa-lg" style="color: #d6d6d6;"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>

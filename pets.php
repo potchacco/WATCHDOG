@@ -46,7 +46,7 @@ if ($method === 'POST' && $action === 'register') {
         $fileExt  = strtolower(pathinfo($_FILES['pet_image']['name'], PATHINFO_EXTENSION));
         $allowed  = ['jpg', 'jpeg', 'png', 'gif'];
 
-        if (!in_array($fileExt, $allowed)) {
+        if (!in_array($fileExt, $allowed, true)) {
             echo json_encode(['status' => 'error', 'message' => 'Invalid file type.']);
             exit;
         }
@@ -55,6 +55,7 @@ if ($method === 'POST' && $action === 'register') {
         $targetPath  = $uploadDir . $newFilename;
 
         if (move_uploaded_file($_FILES['pet_image']['tmp_name'], $targetPath)) {
+            // store web path (relative to project root)
             $image_url = 'uploads/pets/' . $newFilename;
         }
     }
@@ -141,7 +142,7 @@ if ($method === 'POST' && $action === 'delete') {
         $stmt->execute([$pet_id, $userId]);
         $pet = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($pet && $pet['image_url']) {
+        if ($pet && !empty($pet['image_url'])) {
             $imagePath = __DIR__ . '/' . $pet['image_url'];
             if (file_exists($imagePath)) {
                 unlink($imagePath);
@@ -173,7 +174,23 @@ if ($method === 'POST' && $action === 'delete') {
  * ==============
  */
 try {
-    $stmt = $pdo->prepare("SELECT * FROM pets WHERE user_id = ? ORDER BY created_at DESC");
+    // IMPORTANT: alias image_url AS imageurl so JS can use pet.imageurl
+    $stmt = $pdo->prepare("
+        SELECT 
+            id,
+            user_id,
+            name,
+            species,
+            breed,
+            age,
+            gender,
+            image_url,
+            image_url AS imageurl,
+            created_at
+        FROM pets
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+    ");
     $stmt->execute([$userId]);
     $pets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

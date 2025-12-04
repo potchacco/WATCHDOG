@@ -132,9 +132,21 @@ try {
         case 'get_all_pets':
             // Get all pets with owner info
             $stmt = $pdo->query("
-                SELECT p.*, u.name as owner_name, u.email as owner_email 
-                FROM pets p 
-                INNER JOIN users u ON p.user_id = u.id 
+                SELECT 
+                    p.id,
+                    p.user_id,
+                    p.name,
+                    p.species,
+                    p.breed,
+                    p.age,
+                    p.gender,
+                    p.image_url,
+                    p.image_url AS imageurl,
+                    p.created_at,
+                    u.name  AS ownername,
+                    u.email AS owneremail
+                FROM pets p
+                INNER JOIN users u ON p.user_id = u.id
                 ORDER BY p.created_at DESC
             ");
             $pets = $stmt->fetchAll(PDO::FETCH_ASSOC);

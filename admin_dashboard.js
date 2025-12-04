@@ -487,10 +487,10 @@ async function fetchAllPets() {
             const grid = container.querySelector('.pets-grid-admin');
 
             data.pets.forEach(pet => {
-                const imgSrc =
-                    pet.imageurl && pet.imageurl.trim()
-                        ? pet.imageurl
-                        : 'https://via.placeholder.com/300x200?text=No+Image';
+                const imgSrc = pet.photo && pet.photo.trim()
+  ? pet.photo
+  : 'https://via.placeholder.com/300x200?text=No+Image';
+
 
                 const card = document.createElement('div');
                 card.className = 'pet-card-admin';
