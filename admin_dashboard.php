@@ -89,6 +89,7 @@ if ($_SESSION['user_role'] !== 'admin') {
                         <div class="stat-info">
                             <h3 id="totalUsers">0</h3>
                             <p>Total Users</p>
+                            <span class="stat-subtext" id="pendingUsersStat">0 pending approval</span>
                         </div>
                     </div>
 
@@ -109,6 +110,7 @@ if ($_SESSION['user_role'] !== 'admin') {
                         <div class="stat-info">
                             <h3 id="totalIncidents">0</h3>
                             <p>Total Incidents</p>
+                            <span class="stat-subtext" id="activeIncidentsStat">0 active</span>
                         </div>
                     </div>
 

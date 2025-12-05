@@ -16,27 +16,40 @@ $action = $_GET['action'] ?? $_POST['action'] ?? '';
 try {
     switch($action) {
         case 'stats':
-            // Get system-wide statistics
-            $stats = [];
+    // Get system-wide statistics
+    $stats = [];
 
-            // Total users
-            $stmt = $pdo->query("SELECT COUNT(*) as count FROM users WHERE role = 'resident'");
-            $stats['total_users'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+    // Total resident users
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM users WHERE role = 'resident'");
+    $stats['total_users'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-            // Total pets
-            $stmt = $pdo->query("SELECT COUNT(*) as count FROM pets");
-            $stats['total_pets'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+    // Pending resident users
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM users WHERE role = 'resident' AND status = 'pending'");
+    $stats['pending_users'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-            // Total incidents
-            $stmt = $pdo->query("SELECT COUNT(*) as count FROM incidents");
-            $stats['total_incidents'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+    // Total pets
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM pets");
+    $stats['total_pets'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-            // Total vaccinations
-            $stmt = $pdo->query("SELECT COUNT(*) as count FROM vaccinations");
-            $stats['total_vaccinations'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+    // Total incidents
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM incidents");
+    $stats['total_incidents'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
 
-            echo json_encode(['status' => 'success', 'stats' => $stats]);
-            break;
+    // Active incidents (Open / Pending / In Progress)
+    $stmt = $pdo->query("
+        SELECT COUNT(*) as count 
+        FROM incidents 
+        WHERE status IN ('Open','Pending','In Progress')
+    ");
+    $stats['active_incidents'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+    // Total vaccinations
+    $stmt = $pdo->query("SELECT COUNT(*) as count FROM vaccinations");
+    $stats['total_vaccinations'] = $stmt->fetch(PDO::FETCH_ASSOC)['count'];
+
+    echo json_encode(['status' => 'success', 'stats' => $stats]);
+    break;
+
 
         case 'recent_activity':
             // Get recent system activity

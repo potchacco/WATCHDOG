@@ -1493,3 +1493,20 @@ body {
     border:  1px solid red;
 }
 
+.stat-info .stat-subtext {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.section-header-flex .badge.orange {
+    margin-right: 8px;
+}
+
+tr.user-row-pending {
+    background: #fffbeb;
+}
+tr.user-row-pending:hover {
+    background: #fef3c7;
+}

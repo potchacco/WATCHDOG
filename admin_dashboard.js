@@ -98,20 +98,28 @@ async function loadAdminStats() {
         const totalPets         = s.total_pets         ?? s.totalPets         ?? 0;
         const totalIncidents    = s.total_incidents    ?? s.totalIncidents    ?? 0;
         const totalVaccinations = s.total_vaccinations ?? s.totalVaccinations ?? 0;
+        const pendingUsers      = s.pending_users      ?? 0;
+        const activeIncidents   = s.active_incidents   ?? 0;
 
         const uEl  = document.getElementById('totalUsers');
         const pEl  = document.getElementById('totalPets');
         const iEl  = document.getElementById('totalIncidents');
         const vEl  = document.getElementById('totalVaccinations');
+        const pendingEl  = document.getElementById('pendingUsersStat');
+        const activeIncEl = document.getElementById('activeIncidentsStat');
 
         if (uEl) uEl.textContent = totalUsers;
         if (pEl) pEl.textContent = totalPets;
         if (iEl) iEl.textContent = totalIncidents;
         if (vEl) vEl.textContent = totalVaccinations;
+
+        if (pendingEl)  pendingEl.textContent  = `${pendingUsers} pending approval`;
+        if (activeIncEl) activeIncEl.textContent = `${activeIncidents} active`;
     } catch (err) {
         console.error('Error loading stats', err);
     }
 }
+
 
 // ========================================
 // LOAD RECENT ACTIVITY
@@ -171,60 +179,33 @@ function loadAdminSection(section) {
         case 'overview':
             // Rebuild overview in-place (no page reload)
             mainContent.innerHTML = `
-                <div class="admin-header">
-                    <h1>System Overview</h1>
-                    <p>Monitor and manage your entire pet monitoring system</p>
+    <div class="admin-header">
+        <h1>User Management</h1>
+        <p>Approve or reject registered users and manage existing accounts</p>
+    </div>
+    <div class="admin-section">
+        <div class="section-header-flex">
+            <h2><i class="fas fa-users"></i> All Users</h2>
+            <div class="section-header-flex" style="gap: 10px;">
+                <span id="pendingUsersBadge" class="badge orange">0 pending</span>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="userSearch" placeholder="Search users...">
                 </div>
+                <select id="userStatusFilter" class="filter-select">
+                    <option value="">All status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+        </div>
+        <div id="usersTableContainer">
+            <p style="text-align:center;padding:40px;">Loading users...</p>
+        </div>
+    </div>
+`;
 
-                <div class="admin-stats-grid">
-                    <div class="admin-stat-card blue">
-                        <div class="stat-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="totalUsers">0</h3>
-                            <p>Total Users</p>
-                        </div>
-                    </div>
-
-                    <div class="admin-stat-card green">
-                        <div class="stat-icon">
-                            <i class="fas fa-paw"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="totalPets">0</h3>
-                            <p>Total Pets</p>
-                        </div>
-                    </div>
-
-                    <div class="admin-stat-card orange">
-                        <div class="stat-icon" id="transparent">
-                            <i class="fa-solid fa-triangle-exclamation fa-lg" style="color:#ff1900;"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="totalIncidents">0</h3>
-                            <p>Total Incidents</p>
-                        </div>
-                    </div>
-
-                    <div class="admin-stat-card purple">
-                        <div class="stat-icon">
-                            <i class="fas fa-syringe"></i>
-                        </div>
-                        <div class="stat-info">
-                            <h3 id="totalVaccinations">0</h3>
-                            <p>Vaccinations</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="admin-section">
-                    <h2>Recent System Activity</h2>
-                    <div id="recentActivity" class="activity-feed">
-                        <p>Loading...</p>
-                    </div>
-                </div>
-            `;
             loadAdminStats();
             loadRecentActivity();
             break;
@@ -274,9 +255,18 @@ async function loadUsersSection() {
         <div class="admin-section">
             <div class="section-header-flex">
                 <h2><i class="fas fa-users"></i> All Users</h2>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="userSearch" placeholder="Search users...">
+                <div class="section-header-flex" style="gap: 10px;">
+                    <span id="pendingUsersBadge" class="badge orange">0 pending</span>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="userSearch" placeholder="Search users...">
+                    </div>
+                    <select id="userStatusFilter" class="filter-select">
+                        <option value="">All status</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
                 </div>
             </div>
             <div id="usersTableContainer">
@@ -296,91 +286,158 @@ async function loadAllUsers() {
         const container = document.getElementById('usersTableContainer');
         if (!container) return;
 
-        if (data.status === 'success' && data.users && data.users.length > 0) {
-            let html = `
-                <div class="data-table">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Address</th>
-                                <th>Status</th>
-                                <th>Registered</th>
-                                <th>Pets</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            data.users.forEach(user => {
-                html += `
-                    <tr>
-                        <td>#${user.id}</td>
-                        <td>
-                            <div class="user-cell">
-                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(
-                                    user.name
-                                )}&background=667eea&color=fff&size=40" alt="${user.name}">
-                                <span>${user.name}</span>
-                            </div>
-                        </td>
-                        <td>${user.email}</td>
-                        <td>${user.address || ''}</td>
-                        <td>
-                            <span class="badge ${
-                                user.status === 'approved'
-                                    ? 'green'
-                                    : user.status === 'pending'
-                                    ? 'orange'
-                                    : 'danger'
-                            }">
-                                ${user.status}
-                            </span>
-                        </td>
-                        <td>${new Date(user.created_at).toLocaleDateString()}</td>
-                        <td><span class="badge blue">${user.pet_count || 0} pets</span></td>
-                        <td>
-                            ${
-                                user.status === 'pending'
-                                    ? `
-                                <button class="btn-icon btn-approve" onclick="updateUserStatus(${user.id}, 'approved')" title="Approve">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                                <button class="btn-icon btn-reject" onclick="updateUserStatus(${user.id}, 'rejected')" title="Reject">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            `
-                                    : ''
-                            }
-                            <button class="btn-icon btn-view" onclick="viewUserDetails(${user.id})" title="View">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn-icon btn-delete" onclick="deleteUser(${user.id}, '${user.name}')" title="Delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            container.innerHTML = html;
-        } else {
+        if (!(data.status === 'success' && Array.isArray(data.users) && data.users.length > 0)) {
             container.innerHTML =
                 '<p style="text-align:center;padding:40px;color:#6b7280;">No users found</p>';
+            const pendingBadge = document.getElementById('pendingUsersBadge');
+            if (pendingBadge) pendingBadge.textContent = '0 pending';
+            return;
         }
+
+        // Count pending users
+        let pendingCount = 0;
+        data.users.forEach(u => {
+            if (u.status === 'pending') pendingCount++;
+        });
+
+        let html = `
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Registered</th>
+                            <th>Pets</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        data.users.forEach(user => {
+            const rowClass = user.status === 'pending' ? 'user-row-pending' : '';
+            const searchText = [
+                user.name || '',
+                user.email || '',
+                user.address || '',
+                user.status || ''
+            ]
+                .join(' ')
+                .toLowerCase()
+                .replace(/'/g, '&#39;'); // escape single quotes for attribute
+
+            html += `
+                <tr class="${rowClass}"
+                    data-status="${user.status || ''}"
+                    data-search='${searchText}'>
+                    <td>#${user.id}</td>
+                    <td>
+                        <div class="user-cell">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(
+                                user.name
+                            )}&background=667eea&color=fff&size=40" alt="${user.name}">
+                            <span>${user.name}</span>
+                        </div>
+                    </td>
+                    <td>${user.email}</td>
+                    <td>${user.address || ''}</td>
+                    <td>
+                        <span class="badge ${
+                            user.status === 'approved'
+                                ? 'green'
+                                : user.status === 'pending'
+                                ? 'orange'
+                                : 'danger'
+                        }">
+                            ${user.status}
+                        </span>
+                    </td>
+                    <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                    <td><span class="badge blue">${user.pet_count || 0} pets</span></td>
+                    <td>
+                        ${
+                            user.status === 'pending'
+                                ? `
+                            <button class="btn-icon btn-approve"
+                                    onclick="updateUserStatus(${user.id}, 'approved')"
+                                    title="Approve">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn-icon btn-reject"
+                                    onclick="updateUserStatus(${user.id}, 'rejected')"
+                                    title="Reject">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `
+                                : ''
+                        }
+                        <button class="btn-icon btn-view"
+                                onclick="viewUserDetails(${user.id})"
+                                title="View">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-icon btn-delete"
+                                onclick="deleteUser(${user.id}, '${user.name.replace(/'/g, "\\'")}')"
+                                title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        container.innerHTML = html;
+
+        // Update pending badge
+        const pendingBadge = document.getElementById('pendingUsersBadge');
+        if (pendingBadge) {
+            pendingBadge.textContent = `${pendingCount} pending`;
+        }
+
+        // Wire search + filter
+        const searchInput  = document.getElementById('userSearch');
+        const statusFilter = document.getElementById('userStatusFilter');
+
+        function applyUserFilters() {
+            const q = (searchInput?.value || '').toLowerCase();
+            const status = (statusFilter?.value || '').toLowerCase();
+            const rows = container.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const rowStatus = (row.getAttribute('data-status') || '').toLowerCase();
+                const text      = row.getAttribute('data-search') || '';
+
+                const matchesStatus = !status || rowStatus === status;
+                const matchesSearch = !q || text.includes(q);
+
+                row.style.display = matchesStatus && matchesSearch ? '' : 'none';
+            });
+        }
+
+        if (searchInput)  searchInput.addEventListener('input', applyUserFilters);
+        if (statusFilter) statusFilter.addEventListener('change', applyUserFilters);
+
+        applyUserFilters();
     } catch (err) {
         console.error('Error loading users:', err);
+        const container = document.getElementById('usersTableContainer');
+        if (container) {
+            container.innerHTML =
+                '<p style="text-align:center;padding:40px;color:#ef4444;">Error loading users</p>';
+        }
     }
 }
+
 
 function viewUserDetails(userId) {
     showNotification('User details view coming soon!', 'info');
@@ -498,6 +555,11 @@ async function fetchAllPets() {
 
                 const card = document.createElement('div');
                 card.className = 'pet-card-admin';
+                card.setAttribute(
+    'data-search',
+    `${pet.name || ''} ${pet.owner_name || ''} ${pet.species || ''} ${pet.breed || ''}`
+        .toLowerCase()
+);
                 card.innerHTML = `
                     <div class="pet-image-admin" style="background-image:url('${imgSrc}')">
                         <button class="btn-delete-overlay"
@@ -518,6 +580,19 @@ async function fetchAllPets() {
                 `;
                 grid.appendChild(card);
             });
+            const searchInput = document.getElementById('petSearch');
+if (searchInput) {
+    searchInput.addEventListener('input', () => {
+        const q = searchInput.value.toLowerCase();
+        document
+            .querySelectorAll('.pets-grid-admin .pet-card-admin')
+            .forEach(card => {
+                const text = card.getAttribute('data-search') || '';
+                card.style.display = !q || text.includes(q) ? '' : 'none';
+            });
+    });
+}
+
         } else {
             container.innerHTML =
                 '<p style="text-align:center;padding:40px;color:#6b7280;">No pets found</p>';
@@ -754,6 +829,9 @@ function filterIncidents() {
 // ========================================
 // VACCINATIONS SECTION
 // ========================================
+// ========================================
+// VACCINATIONS SECTION
+// ========================================
 function loadAllVaccinations() {
     const mainContent = document.getElementById('adminMainContent');
     if (!mainContent) return;
@@ -805,6 +883,7 @@ function loadAllVaccinations() {
     fetchAllVaccinations();
 }
 
+
 async function fetchAllVaccinations() {
     try {
         const res = await fetch('admin_api.php?action=get_all_vaccinations');
@@ -819,6 +898,7 @@ async function fetchAllVaccinations() {
             return;
         }
 
+        // Update mini stats
         const stats = data.stats || {};
         const vEl = document.getElementById('vaccinatedPets');
         const dEl = document.getElementById('dueSoon');
@@ -871,8 +951,17 @@ async function fetchAllVaccinations() {
             const warningClass =
                 vacc.warning_status === 'Warning Sent' ? 'orange' : 'gray';
 
+            const searchText = [
+                vacc.pet_name || '',
+                vacc.owner_name || '',
+                vacc.vaccine_name || ''
+            ]
+                .join(' ')
+                .toLowerCase()
+                .replace(/'/g, '&#39;');
+
             html += `
-                <tr>
+                <tr data-search='${searchText}'>
                     <td>
                         <div class="user-cell">
                             <i class="fas fa-paw" style="color:#667eea;font-size:20px;"></i>
@@ -911,12 +1000,28 @@ async function fetchAllVaccinations() {
         `;
 
         container.innerHTML = html;
+
+        // Search filter
+        const searchInput = document.getElementById('vaccSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                const q = searchInput.value.toLowerCase();
+                container.querySelectorAll('tbody tr').forEach(row => {
+                    const text = row.getAttribute('data-search') || '';
+                    row.style.display = !q || text.includes(q) ? '' : 'none';
+                });
+            });
+        }
     } catch (err) {
         console.error('Error loading vaccinations:', err);
-        document.getElementById('vaccinationsContainer').innerHTML =
-            '<p style="text-align:center;padding:40px;color:#6b7280;">Error loading vaccinations</p>';
+        const container = document.getElementById('vaccinationsContainer');
+        if (container) {
+            container.innerHTML =
+                '<p style="text-align:center;padding:40px;color:#ef4444;">Error loading vaccinations</p>';
+        }
     }
 }
+
 
 async function sendVaccinationWarning(vaccId) {
     const note = prompt('Enter warning note (optional):');
@@ -1019,15 +1124,16 @@ async function viewReport(type) {
 
         if (data.status === 'success') {
             container.innerHTML = `
-                <div class="admin-section" style="margin-top:30px;">
-                    <h2><i class="fas fa-chart-bar"></i> ${
-                        type.charAt(0).toUpperCase() + type.slice(1)
-                    } Report</h2>
-                    <div class="chart-container-report">
-                        anvas id="reportChart"></canvas>
-                    </div>
-                </div>
-            `;
+    <div class="admin-section" style="margin-top:30px;">
+        <h2><i class="fas fa-chart-bar"></i> ${
+            type.charAt(0).toUpperCase() + type.slice(1)
+        } Report</h2>
+        <div class="chart-container-report">
+            <canvas id="reportChart"></canvas>
+        </div>
+    </div>
+`;
+
 
             renderReportChart(type, data.chart_data);
         }
