@@ -454,13 +454,20 @@ async function loadPetsInSidebar() {
         if (data.status === 'success') {
             if (data.pets.length === 0) {
                 sidebarPetsGrid.innerHTML = '<p style="text-align: center; padding: 40px;">No pets registered yet.</p>';
+
+                const petsTotalMini      = document.getElementById('petsTotalMini');
+                const petsVaccinatedMini = document.getElementById('petsVaccinatedMini');
+                const petsUpcomingMini   = document.getElementById('petsUpcomingMini');
+
+                if (petsTotalMini)      petsTotalMini.textContent = 0;
+                if (petsVaccinatedMini) petsVaccinatedMini.textContent = 0;
+                if (petsUpcomingMini)   petsUpcomingMini.textContent = 0;
                 return;
             }
 
             sidebarPetsGrid.innerHTML = '';
             data.pets.forEach(pet => {
                 const imgSrc = pet.image_url || 'https://via.placeholder.com/300x200?text=No+Image';
-                
                 const petCard = document.createElement('div');
                 petCard.className = 'pet-card';
                 petCard.innerHTML = `
@@ -476,24 +483,66 @@ async function loadPetsInSidebar() {
                 `;
                 sidebarPetsGrid.appendChild(petCard);
             });
-                // Update My Pets mini total from actual list
-    const petsTotalMini = document.getElementById('petsTotalMini');
-    if (petsTotalMini) {
-        petsTotalMini.textContent = data.pets.length;
-    }
 
-             document.querySelectorAll('#sidebarPetsGrid .edit-btn').forEach(btn => {
+            // Total pets
+            const petsTotalMini = document.getElementById('petsTotalMini');
+            if (petsTotalMini) {
+                petsTotalMini.textContent = data.pets.length;
+            }
+
+            // Wire edit buttons
+            document.querySelectorAll('#sidebarPetsGrid .edit-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const petId = this.getAttribute('data-pet-id');
                     editPet(petId, data.pets);
                 });
             });
+
+            // NEW: compute Vaccinated and Upcoming from vaccinations.php
+            try {
+                const vaccRes  = await fetch('vaccinations.php');
+                const vaccData = await vaccRes.json();
+
+                const petsVaccinatedMini = document.getElementById('petsVaccinatedMini');
+                const petsUpcomingMini   = document.getElementById('petsUpcomingMini');
+
+                if (vaccData.status === 'success' && Array.isArray(vaccData.vaccinations)) {
+                    const today = new Date();
+                    const vaccinatedPetIds = new Set();
+                    const upcomingPetIds   = new Set();
+
+                    vaccData.vaccinations.forEach(v => {
+                        if (v.pet_id) {
+                            vaccinatedPetIds.add(v.pet_id);
+                        }
+                        if (v.next_due_date) {
+                            const due = new Date(v.next_due_date);
+                            if (due >= today) {
+                                upcomingPetIds.add(v.pet_id);
+                            }
+                        }
+                    });
+
+                    if (petsVaccinatedMini) {
+                        petsVaccinatedMini.textContent = vaccinatedPetIds.size;
+                    }
+                    if (petsUpcomingMini) {
+                        petsUpcomingMini.textContent = upcomingPetIds.size;
+                    }
+                } else {
+                    if (petsVaccinatedMini) petsVaccinatedMini.textContent = 0;
+                    if (petsUpcomingMini)   petsUpcomingMini.textContent = 0;
+                }
+            } catch (err) {
+                console.error('Error loading vaccinations for pets mini stats:', err);
+            }
         }
     } catch (err) {
         console.error('Error:', err);
         sidebarPetsGrid.innerHTML = '<p>Error loading pets.</p>';
     }
 }
+
 
 
 
@@ -642,32 +691,70 @@ async function loadIncidents() {
         if (resolvedEl)resolvedEl.textContent= resolved;
 
         // Render the list/cards
-        if (incidents.length === 0) {
-            grid.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">No incidents reported yet.</p>';
-            return;
-        }
+        // If no incidents
+if (incidents.length === 0) {
+    grid.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">No incidents reported yet.</p>';
+    return;
+}
 
-        grid.innerHTML = '';
-        incidents.forEach(inc => {
-            const card = document.createElement('div');
-            card.className = 'incident-card';
-            card.innerHTML = `
-                <div class="incident-header">
-                    <span class="incident-type">${inc.incident_type}</span>
-                    <span class="incident-status status-${inc.status.toLowerCase().replace(/\s+/g, '-')}">
-                        ${inc.status}
-                    </span>
-                </div>
-                <p class="incident-desc">${inc.description}</p>
-                <small>${new Date(inc.incident_date).toLocaleString()}</small>
-            `;
-            grid.appendChild(card);
-        });
+// Clear and render cards
+grid.innerHTML = '';
+incidents.forEach(inc => {
+    const card = document.createElement('div');
+    card.className = 'incident-card';
+
+    // Image (thumbnail) – if image_path exists, use it; otherwise show placeholder
+    const imgHtml = inc.image_path
+        ? `<div class="incident-card-image" style="background-image:url('${inc.image_path}')"></div>`
+        : `<div class="incident-card-image placeholder">
+               <i class="fas fa-camera"></i>
+           </div>`;
+
+    // Status pill class
+    const statusClass =
+        inc.status === 'Resolved' || inc.status === 'Closed'
+            ? 'status-resolved'
+            : (inc.status === 'Pending'
+                ? 'status-pending'
+                : 'status-active');
+
+    // Severity pill class
+    const severityClass =
+        inc.severity === 'Critical' || inc.severity === 'High'
+            ? 'severity-high'
+            : (inc.severity === 'Medium'
+                ? 'severity-medium'
+                : 'severity-low');
+
+    card.innerHTML = `
+        ${imgHtml}
+        <div class="incident-card-body">
+            <div class="incident-card-header">
+                <span class="incident-type">${inc.incident_type}</span>
+                <span class="incident-status ${statusClass}">${inc.status}</span>
+            </div>
+            <div class="incident-meta">
+                <span class="incident-species">${inc.animal_species || ''}</span>
+                <span class="incident-location">
+                    <i class="fas fa-map-marker-alt"></i> ${inc.location || ''}
+                </span>
+                <span class="incident-severity ${severityClass}">${inc.severity}</span>
+            </div>
+            <p class="incident-desc">${inc.description || ''}</p>
+            <small class="incident-date">
+                ${new Date(inc.incident_date).toLocaleString()}
+            </small>
+        </div>
+    `;
+    grid.appendChild(card);
+});
+
     } catch (err) {
         console.error('Error loading incidents', err);
         grid.innerHTML = '<p>Error loading incidents.</p>';
     }
 }
+
 
 
 // ================= INCIDENTS: OPEN MODAL =================
@@ -974,21 +1061,21 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="stat-mini blue">
           <i class="fas fa-dog"></i>
           <div>
-            <div class="stat-mini-value" id="incActiveCount">0</div>
+            <div class="stat-mini-value" id="petsTotalMini">0</div>
             <div class="stat-mini-label">Total Pets</div>
           </div>
         </div>
         <div class="stat-mini green">
           <i class="fas fa-check-circle"></i>
           <div>
-            <div class="stat-mini-value" id="incPendingCount">0</div>
+            <div class="stat-mini-value" id="petsVaccinatedMini">0</div>
             <div class="stat-mini-label">Vaccinated</div>
           </div>
         </div>
         <div class="stat-mini orange">
           <i class="fas fa-calendar-check"></i>
           <div>
-            <div class="stat-mini-value" id="incResolvedCount">0</div>
+            <div class="stat-mini-value" id="petsUpcomingMini">0</div>
             <div class="stat-mini-label">Upcoming</div>
           </div>
         </div>
@@ -1001,8 +1088,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('petRegistrationModal').classList.add('active');
   });
   loadPetsInSidebar();
-  loadDashboardStats(); // ⬅️ add this line
+  loadDashboardStats();
   break;
+
 
 
                     
@@ -1084,64 +1172,61 @@ document.addEventListener('DOMContentLoaded', function() {
     break;
           
                 case 'incidents':
-    mainContent.innerHTML = `
-        <div class="enhanced-section-wrapper">
-            <div class="section-header-enhanced">
-                <div class="header-left">
-                    <div class="icon-badge red">
-                        <i class="fa-solid fa-triangle-exclamation" style="color: #ff2600"></i>
-                    </div>
-                    <div>
-                        <h2>Incident Reports</h2>
-                        <p class="section-subtitle">View and manage all incident reports</p>
-                    </div>
-                </div>
-                <div>
-                    <!-- FIX: use id instead of inline onclick -->
-                    <button class="btn-enhanced btn-danger" id="reportIncidentBtn">
-                        <i class="fas fa-plus"></i> Report Incident
-                    </button>
-                </div>
-            </div>
+                mainContent.innerHTML = `
+                    <div class="enhanced-section-wrapper">
+                        <div class="section-header-enhanced">
+                            <div class="header-left">
+                                <div class="icon-badge red">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <h2>Incident Reports</h2>
+                                    <p class="section-subtitle">View and manage all incident reports</p>
+                                </div>
+                            </div>
+                            <button class="btn-enhanced btn-danger" id="reportIncidentBtn">
+                                <i class="fas fa-plus"></i> Report Incident
+                            </button>
+                        </div>
 
-            <div class="stats-mini-row">
-                <div class="stat-mini red">
-                    <i class="fa-solid fa-triangle-exclamation" style="color: #ffffff;"></i>
-                    <div>
-                        <div class="stat-mini-value" id="incActiveCount">0</div>
-                        <div class="stat-mini-label">Active</div>
-                    </div>
-                </div>
-                <div class="stat-mini yellow">
-                    <i class="fas fa-hourglass-half"></i>
-                    <div>
-                        <div class="stat-mini-value" id="incPendingCount">0</div>
-                        <div class="stat-mini-label">Pending</div>
-                    </div>
-                </div>
-                <div class="stat-mini green">
-                    <i class="fas fa-check-double"></i>
-                    <div>
-                        <div class="stat-mini-value" id="incResolvedCount">0</div>
-                        <div class="stat-mini-label">Resolved</div>
-                    </div>
-                </div>
-            </div>
+                        <div class="stats-mini-row">
+                            <div class="stat-mini red">
+                                <i class="fas fa-bell"></i>
+                                <div>
+                                    <div class="stat-mini-value" id="incActiveCount">0</div>
+                                    <div class="stat-mini-label">Active</div>
+                                </div>
+                            </div>
+                            <div class="stat-mini orange">
+                                <i class="fas fa-hourglass-half"></i>
+                                <div>
+                                    <div class="stat-mini-value" id="incPendingCount">0</div>
+                                    <div class="stat-mini-label">Pending</div>
+                                </div>
+                            </div>
+                            <div class="stat-mini green">
+                                <i class="fas fa-check-circle"></i>
+                                <div>
+                                    <div class="stat-mini-value" id="incResolvedCount">0</div>
+                                    <div class="stat-mini-label">Resolved</div>
+                                </div>
+                            </div>
+                        </div>
 
-            <div id="incidentsContainer" class="incidents-grid-enhanced"></div>
-        </div>
-    `;
+                        <div id="incidentsGrid" class="incidents-grid"></div>
+                    </div>
+                `;
 
-    // NEW: wire the button to open the modal
-    const reportBtn = document.getElementById('reportIncidentBtn');
-    if (reportBtn) {
-        reportBtn.addEventListener('click', openIncidentModal);
-    }
+                // Now that the HTML exists, load data
+                loadIncidents();
 
-    // load incidents list into #incidentsContainer
-    loadIncidents();
-    loadDashboardStats();
-    break;
+                // Wire the "Report Incident" button on the fresh HTML
+                const reportBtn = document.getElementById('reportIncidentBtn');
+                if (reportBtn) {
+                    reportBtn.addEventListener('click', openIncidentModal);
+                }
+
+                break;
 
 
                     

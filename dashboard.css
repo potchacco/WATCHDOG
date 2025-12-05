@@ -1219,9 +1219,9 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
-.alert-item.success { border-left-color: var(--green); }
+/* .alert-item.success { border-left-color: var(--green); }
 .alert-item.warning { border-left-color: var(--orange); }
-.alert-item.error { border-left-color: var(--red); }
+.alert-item.error { border-left-color: var(--red); } */
 
 .alert-item i {
     font-size: 18px;
@@ -3380,4 +3380,126 @@ body.modal-open {
   background: #6366f1;
   color: #fff;
   cursor: pointer;
+}
+
+/* Incidents list container */
+.incidents-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Incident card */
+.incident-card {
+    display: flex;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+    align-items: flex-start;
+}
+
+/* Thumbnail image */
+.incident-card-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+}
+
+.incident-card-image.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3f4f6;
+    color: #9ca3af;
+    font-size: 20px;
+}
+
+/* Body */
+.incident-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.incident-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.incident-type {
+    font-weight: 600;
+    color: #111827;
+}
+
+.incident-status {
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Status colors */
+.status-active {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+.status-pending {
+    background: #ffedd5;
+    color: #c2410c;
+}
+.status-resolved {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+/* Meta row */
+.incident-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.incident-meta i {
+    margin-right: 3px;
+}
+
+/* Severity pill */
+.incident-severity {
+    padding: 1px 6px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.severity-high {
+    background: #fef2f2;
+    color: #b91c1c;
+}
+.severity-medium {
+    background: #fffbeb;
+    color: #92400e;
+}
+.severity-low {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.incident-desc {
+    margin: 2px 0;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.incident-date {
+    font-size: 11px;
+    color: #9ca3af;
 }

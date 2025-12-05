@@ -237,7 +237,7 @@ try {
          FROM incidents i
          LEFT JOIN pets p ON i.pet_id = p.id 
          WHERE i.user_id = ? 
-         ORDER BY i.incident_date DESC"
+         ORDER BY i.created_at DESC" 
     );
     $stmt->execute([$_SESSION['user_id']]);
     $incidents = $stmt->fetchAll(PDO::FETCH_ASSOC);
