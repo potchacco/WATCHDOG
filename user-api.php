@@ -1,6 +1,6 @@
 <?php
 require_once 'config/database.php';
-
+require_once 'check_session.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {

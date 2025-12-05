@@ -49,6 +49,67 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+// ===== DASHBOARD STATS LOADER (TOP + PROFILE) =====
+async function loadDashboardStats() {
+    try {
+        const res = await fetch('user-api.php?action=stats'); // ⬅️ use user_api.php
+        const data = await res.json();
+        console.log('Dashboard stats response:', data);       // ⬅️ add this log once
+
+        if (data.status !== 'success') return;
+
+        const s = data.stats || {};
+
+        // Normalize keys from backend (supports snake_case and old names)
+        const totalPets         = s.total_pets              ?? 0;
+        const vaccinationsDue   = s.vaccinations_due        ?? 0;
+        const totalIncidents    = s.total_incidents         ?? 0;
+        const appointments      = s.appointments            ?? 0;
+        const totalVaccinations = s.total_vaccinations      ?? 0;
+        const vaccThisMonth     = s.vaccinations_this_month ?? 0;
+
+        // Top stat cards
+        const totalPetsEl = document.querySelector('.stat-card-modern.blue .stat-value');
+        const vaccDueEl   = document.querySelector('.stat-card-modern.green .stat-value');
+        const incidentsEl = document.querySelector('.stat-card-modern.purple .stat-value');
+        const apptEl      = document.querySelector('.stat-card-modern.orange .stat-value');
+
+        if (totalPetsEl) totalPetsEl.textContent = totalPets;
+        if (vaccDueEl)   vaccDueEl.textContent   = vaccinationsDue;
+        if (incidentsEl) incidentsEl.textContent = totalIncidents;
+        if (apptEl)      apptEl.textContent      = appointments;
+
+        // Profile mini stats
+        const profilePets = document.querySelector('.profile-stat:nth-child(1) .stat-number');
+        const profileRecs = document.querySelector('.profile-stat:nth-child(2) .stat-number');
+        const profileRep  = document.querySelector('.profile-stat:nth-child(3) .stat-number');
+        if (profilePets) profilePets.textContent = totalPets;
+        if (profileRecs) profileRecs.textContent = totalVaccinations;
+        if (profileRep)  profileRep.textContent  = totalIncidents;
+
+        // Vaccinations mini stats (in Vaccinations section)
+        const vaccTotal = document.getElementById('totalVaccinesCount');
+        const vaccDue   = document.getElementById('dueSoonCount');
+        const vaccMonth = document.getElementById('thisMonthCount');
+        if (vaccTotal) vaccTotal.textContent = totalVaccinations;
+        if (vaccDue)   vaccDue.textContent   = vaccinationsDue;
+        if (vaccMonth) vaccMonth.textContent = vaccThisMonth;
+
+        // Analytics cards (if you have them)
+        const analyticsTotalPetsEl = document.getElementById('analyticsTotalPets');
+        const analyticsTotalVaccEl = document.getElementById('analyticsTotalVaccinations');
+        const chartIncEl           = document.getElementById('analyticsChartTotalIncidents');
+        if (analyticsTotalPetsEl) analyticsTotalPetsEl.textContent = totalPets;
+        if (analyticsTotalVaccEl) analyticsTotalVaccEl.textContent = totalVaccinations;
+        if (chartIncEl)           chartIncEl.textContent           = totalIncidents;
+
+    } catch (err) {
+        console.error('Error loading dashboard stats', err);
+    }
+}
+
+
+
 function showAppModal(title, message) {
   const modal = document.getElementById('appMessageModal');
   if (!modal) return;
@@ -434,74 +495,6 @@ async function loadPetsInSidebar() {
     }
 }
 
-async function loadDashboardStats() {
-    try {
-        const res = await fetch('user-api.php?action=stats');
-        const data = await res.json();
-        if (data.status !== 'success') return;
-
-        const s = data.stats || {};
-
-        // Normalize keys from backend (supports snake_case and old names)
-        const totalPets         = s.total_pets         ?? s.totalpets         ?? 0;
-        const vaccinationsDue   = s.vaccinations_due   ?? s.vaccinationsdue   ?? 0;
-        const totalIncidents    = s.total_incidents    ?? s.totalincidents    ?? s.active_incidents ?? 0;
-        const appointments      = s.appointments       ?? s.total_appointments ?? 0;
-        const totalVaccinations = s.total_vaccinations ?? s.totalvaccinations ?? 0;
-        const vaccThisMonth     = s.vaccinations_this_month ?? s.vaccinationsthismonth ?? 0;
-
-        // Top stat cards
-        const totalPetsEl = document.querySelector('.stat-card-modern.blue .stat-value');
-        const vaccDueEl   = document.querySelector('.stat-card-modern.green .stat-value');
-        const incidentsEl = document.querySelector('.stat-card-modern.purple .stat-value');
-        const apptEl      = document.querySelector('.stat-card-modern.orange .stat-value');
-
-        if (totalPetsEl) totalPetsEl.textContent = totalPets;
-        if (vaccDueEl)   vaccDueEl.textContent   = vaccinationsDue;
-        if (incidentsEl) incidentsEl.textContent = totalIncidents;
-        if (apptEl)      apptEl.textContent      = appointments;
-
-        // Profile mini stats
-        const profilePets = document.querySelector('.profile-stat:nth-child(1) .stat-number');
-        const profileRecs = document.querySelector('.profile-stat:nth-child(2) .stat-number');
-        const profileRep  = document.querySelector('.profile-stat:nth-child(3) .stat-number');
-        if (profilePets) profilePets.textContent = totalPets;
-        if (profileRecs) profileRecs.textContent = vaccinationsDue;
-        if (profileRep)  profileRep.textContent  = totalIncidents;
-
-        // Vaccinations mini stats
-        const vaccTotal = document.getElementById('totalVaccinesCount');
-        const vaccDue   = document.getElementById('dueSoonCount');
-        const vaccMonth = document.getElementById('thisMonthCount');
-        if (vaccTotal) vaccTotal.textContent = totalVaccinations;
-        if (vaccDue)   vaccDue.textContent   = vaccinationsDue;
-        if (vaccMonth) vaccMonth.textContent = vaccThisMonth;
-
-        // Analytics cards (left + chart row)
-        const analyticsTotalPetsEl  = document.getElementById('analyticsTotalPets');
-        const analyticsTotalVaccEl  = document.getElementById('analyticsTotalVaccinations');
-        const chartPetsEl           = document.getElementById('analyticsChartTotalPets');
-        const chartVaccEl           = document.getElementById('analyticsChartTotalVaccinations');
-        const chartIncEl            = document.getElementById('analyticsChartTotalIncidents');
-        const coverageEl            = document.getElementById('analyticsVaccinationCoverage');
-
-        if (analyticsTotalPetsEl) analyticsTotalPetsEl.textContent = totalPets;
-        if (analyticsTotalVaccEl) analyticsTotalVaccEl.textContent = totalVaccinations;
-        if (chartPetsEl)          chartPetsEl.textContent          = totalPets;
-        if (chartVaccEl)          chartVaccEl.textContent          = totalVaccinations;
-        if (chartIncEl)           chartIncEl.textContent           = totalIncidents;
-
-        if (coverageEl) {
-            const coverage = totalPets > 0
-                ? Math.min(100, Math.round((totalVaccinations / totalPets) * 100))
-                : 0;
-            coverageEl.textContent = coverage + '%';
-        }
-    } catch (err) {
-        console.error('Error loading dashboard stats', err);
-    }
-}
-
 
 
 async function loadPetsWithVaccinations() {
@@ -610,67 +603,69 @@ async function openVaccinationModalForPet(petId, petName) {
 }
 
 // ================= INCIDENTS: LOAD LIST =================
-// USER DASHBOARD - LOAD INCIDENTS WITH IMAGE
 async function loadIncidents() {
-    const container = document.getElementById('incidentsContainer');
-    if (!container) return;
+    const grid      = document.getElementById('incidentsGrid');
+    const activeEl  = document.getElementById('incActiveCount');
+    const pendingEl = document.getElementById('incPendingCount');
+    const resolvedEl= document.getElementById('incResolvedCount');
+
+    if (!grid) return;
+
+    grid.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">Loading incidents...</p>';
 
     try {
-        const res = await fetch('incidents.php');
+        const res  = await fetch('incidents.php');
         const data = await res.json();
 
-        if (data.status === 'success') {
-            if (!data.incidents || data.incidents.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 40px;">
-                        <i class="fas fa-clipboard-check" style="font-size: 64px; color: #ccc;"></i>
-                        <p>No incidents reported.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = `<div style="display: grid; gap: 20px;"></div>`;
-            const incidentsGrid = container.querySelector('div');
-
-            data.incidents.forEach(incident => {
-                const incidentCard = document.createElement('div');
-                incidentCard.style.cssText = `
-                    background: white;
-                    border-radius: 12px;
-                    padding: 20px;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                `;
-
-                // If backend provided an image_path, show it
-                const imgHtml = incident.image_path
-                    ? `
-                        <div class="incident-image">
-                            <img src="${incident.image_path}" alt="Incident image">
-                        </div>
-                      `
-                    : '';
-
-                incidentCard.innerHTML = `
-                    ${imgHtml}
-                    <h3>${incident.incident_type}</h3>
-                    <p>${incident.description}</p>
-                    <p>
-                        <small>
-                            Status: ${incident.status} |
-                            ${new Date(incident.incident_date).toLocaleString()}
-                        </small>
-                    </p>
-                `;
-
-                incidentsGrid.appendChild(incidentCard);
-            });
-        } else {
-            container.innerHTML = `<p style="text-align:center; padding:40px;">${data.message || 'Failed to load incidents.'}</p>`;
+        if (data.status !== 'success' || !Array.isArray(data.incidents)) {
+            grid.innerHTML = '<p>Failed to load incidents.</p>';
+            return;
         }
+
+        const incidents = data.incidents;
+
+        // Count by status
+        let active = 0, pending = 0, resolved = 0;
+        incidents.forEach(inc => {
+            const st = inc.status;
+            if (st === 'Open' || st === 'In Progress') {
+                active++;
+            } else if (st === 'Pending') {
+                pending++;
+            } else if (st === 'Resolved' || st === 'Closed') {
+                resolved++;
+            }
+        });
+
+        if (activeEl)  activeEl.textContent  = active;
+        if (pendingEl) pendingEl.textContent = pending;
+        if (resolvedEl)resolvedEl.textContent= resolved;
+
+        // Render the list/cards
+        if (incidents.length === 0) {
+            grid.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">No incidents reported yet.</p>';
+            return;
+        }
+
+        grid.innerHTML = '';
+        incidents.forEach(inc => {
+            const card = document.createElement('div');
+            card.className = 'incident-card';
+            card.innerHTML = `
+                <div class="incident-header">
+                    <span class="incident-type">${inc.incident_type}</span>
+                    <span class="incident-status status-${inc.status.toLowerCase().replace(/\s+/g, '-')}">
+                        ${inc.status}
+                    </span>
+                </div>
+                <p class="incident-desc">${inc.description}</p>
+                <small>${new Date(inc.incident_date).toLocaleString()}</small>
+            `;
+            grid.appendChild(card);
+        });
     } catch (err) {
-        console.error('Error', err);
-        container.innerHTML = `<p style="text-align:center; padding:40px;">Error loading incidents.</p>`;
+        console.error('Error loading incidents', err);
+        grid.innerHTML = '<p>Error loading incidents.</p>';
     }
 }
 
@@ -979,21 +974,21 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="stat-mini blue">
           <i class="fas fa-dog"></i>
           <div>
-            <div class="stat-mini-value" id="petsTotalMini">0</div>
+            <div class="stat-mini-value" id="incActiveCount">0</div>
             <div class="stat-mini-label">Total Pets</div>
           </div>
         </div>
         <div class="stat-mini green">
           <i class="fas fa-check-circle"></i>
           <div>
-            <div class="stat-mini-value" id="petsVaccinatedMini">0</div>
+            <div class="stat-mini-value" id="incPendingCount">0</div>
             <div class="stat-mini-label">Vaccinated</div>
           </div>
         </div>
         <div class="stat-mini orange">
           <i class="fas fa-calendar-check"></i>
           <div>
-            <div class="stat-mini-value" id="petsUpcomingMini">0</div>
+            <div class="stat-mini-value" id="incResolvedCount">0</div>
             <div class="stat-mini-label">Upcoming</div>
           </div>
         </div>
