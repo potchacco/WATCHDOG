@@ -147,21 +147,22 @@ try {
             // Get all pets with owner info
             $stmt = $pdo->query("
                 SELECT 
-                    p.id,
-                    p.user_id,
-                    p.name,
-                    p.species,
-                    p.breed,
-                    p.age,
-                    p.gender,
-                    p.image_url,
-                    p.image_url AS imageurl,
-                    p.created_at,
-                    u.name  AS ownername,
-                    u.email AS owneremail
-                FROM pets p
-                INNER JOIN users u ON p.user_id = u.id
-                ORDER BY p.created_at DESC
+                p.id,
+                p.user_id,
+                p.name,
+                p.species,
+                p.breed,
+                p.age,
+                p.gender,
+                p.image_url,
+                p.image_url AS imageurl,
+                p.created_at,
+                u.name  AS owner_name,
+                u.email AS owner_email
+            FROM pets p
+            INNER JOIN users u ON p.user_id = u.id
+            ORDER BY p.created_at DESC
+
             ");
             $pets = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -302,39 +303,80 @@ try {
             break;
 
         case 'send_warning':
-            $vaccId = $_POST['vacc_id'] ?? '';
-            $note   = $_POST['note'] ?? '';
+    $vaccId = intval($_POST['vacc_id'] ?? 0);
+    $note   = trim($_POST['note'] ?? '');
 
-            if (empty($vaccId)) {
-                echo json_encode(['status' => 'error', 'message' => 'Vaccination ID required']);
-                exit;
-            }
+    if ($vaccId <= 0) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid vaccination id']);
+        exit;
+    }
 
-            try {
-                $stmt = $pdo->prepare("
-                    UPDATE vaccinations 
-                    SET warning_status = 'Warning Sent',
-                        warning_note   = ?,
-                        warning_date   = NOW()
-                    WHERE id = ?
-                ");
-                $stmt->execute([$note, $vaccId]);
+    // Get vaccination + pet + owner
+    $stmt = $pdo->prepare("
+        SELECT v.id, v.vaccine_name, v.next_due_date,
+               p.name AS pet_name,
+               u.id   AS owner_id,
+               u.name AS owner_name,
+               u.email AS owner_email
+        FROM vaccinations v
+        INNER JOIN pets p ON v.pet_id = p.id
+        INNER JOIN users u ON v.user_id = u.id
+        WHERE v.id = ?
+    ");
+    $stmt->execute([$vaccId]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                // Log warning
-                $logStmt = $pdo->prepare("
-                    INSERT INTO activity_log (user_id, activity_type, description, created_at)
-                    VALUES (?, 'vaccination_warning_sent', ?, NOW())
-                ");
-                $logStmt->execute([
-                    $_SESSION['user_id'],
-                    "Warning sent for vaccination id $vaccId" . ($note ? " (Note: $note)" : "")
-                ]);
+    if (!$row) {
+        echo json_encode(['status' => 'error', 'message' => 'Vaccination not found']);
+        exit;
+    }
 
-                echo json_encode(['status' => 'success', 'message' => 'Warning sent successfully']);
-            } catch (PDOException $e) {
-                echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
-            }
-            break;
+    $ownerEmail = $row['owner_email'];
+    $ownerName  = $row['owner_name'];
+    $petName    = $row['pet_name'];
+    $vaccine    = $row['vaccine_name'];
+    $dueDate    = $row['next_due_date'];
+
+    // Build email body
+    $subject = "Vaccination Warning for {$petName}";
+    $body    = "Hello {$ownerName},\n\n"
+             . "This is a reminder that the vaccination '{$vaccine}' for your pet '{$petName}' "
+             . "is overdue or due very soon (due date: {$dueDate}).\n\n"
+             . ($note !== '' ? "Note from admin: {$note}\n\n" : '')
+             . "Please contact your veterinarian as soon as possible and update the vaccination record in the system.\n\n"
+             . "Thank you,\nWatchdog Admin";
+
+    // Send email (simple PHP mail, you can replace with SMTP later)
+    $mailSent = @mail($ownerEmail, $subject, $body);
+
+    // Update vaccination record regardless of mail result
+    $stmt = $pdo->prepare("
+        UPDATE vaccinations
+        SET warning_status = 'Warning Sent',
+            warning_note   = ?,
+            warning_date   = NOW()
+        WHERE id = ?
+    ");
+    $stmt->execute([$note, $vaccId]);
+
+    // Log to activity_log for the overview timeline
+    $adminId = $_SESSION['user_id'] ?? null;
+    if ($adminId) {
+        $desc = "Warning sent for vaccination id {$vaccId} (Note: " . ($note ?: 'none') . ")";
+        $stmt = $pdo->prepare("
+            INSERT INTO activity_log (user_id, activity_type, description)
+            VALUES (?, 'vaccination_updated', ?)
+        ");
+        $stmt->execute([$adminId, $desc]);
+    }
+
+    echo json_encode([
+        'status'      => 'success',
+        'mail_sent'   => $mailSent ? 1 : 0,
+        'message'     => $mailSent ? 'Warning sent via email' : 'Warning recorded (email failed)'
+    ]);
+    break;
+
 
         case 'get_report':
             $type = $_GET['type'] ?? '';

@@ -11,6 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 $userId = $_SESSION['user_id'];
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 
+
 /**
  * STATS FOR DASHBOARD
  */
@@ -92,6 +93,7 @@ if ($action === 'stats') {
     }
     exit;
 }
+
 
 /**
  * RECENT ACTIVITY FEED
@@ -176,6 +178,50 @@ if ($action === 'recent_activity') {
     }
     exit;
 }
+
+
+/**
+ * VACCINATION ALERTS FOR THIS USER
+ */
+if ($action === 'vaccination_alerts') {
+    try {
+        $stmt = $pdo->prepare("
+            SELECT v.id,
+                   v.vaccine_name,
+                   v.date_given,
+                   v.next_due_date,
+                   v.warning_status,
+                   v.warning_note,
+                   v.warning_date,
+                   p.name AS pet_name
+            FROM vaccinations v
+            INNER JOIN pets p ON v.pet_id = p.id
+            WHERE p.user_id = ?
+              AND (
+                  v.warning_status = 'Warning Sent'
+                  OR v.warning_status = 'Ignored Warning'
+                  OR (
+                      v.next_due_date IS NOT NULL
+                      AND v.next_due_date <= DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+                  )
+              )
+            ORDER BY v.next_due_date IS NULL,
+                     v.next_due_date ASC,
+                     v.date_given DESC
+        ");
+        $stmt->execute([$userId]);
+        $alerts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        echo json_encode([
+            'status' => 'success',
+            'alerts' => $alerts,
+        ]);
+    } catch (PDOException $e) {
+        echo json_encode(['status' => 'error', 'message' => 'Database error']);
+    }
+    exit;
+}
+
 
 // Fallback for unknown actions
 echo json_encode(['status' => 'error', 'message' => 'Invalid action']);

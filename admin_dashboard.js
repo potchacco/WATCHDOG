@@ -179,33 +179,62 @@ function loadAdminSection(section) {
         case 'overview':
             // Rebuild overview in-place (no page reload)
             mainContent.innerHTML = `
-    <div class="admin-header">
-        <h1>User Management</h1>
-        <p>Approve or reject registered users and manage existing accounts</p>
-    </div>
-    <div class="admin-section">
-        <div class="section-header-flex">
-            <h2><i class="fas fa-users"></i> All Users</h2>
-            <div class="section-header-flex" style="gap: 10px;">
-                <span id="pendingUsersBadge" class="badge orange">0 pending</span>
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="userSearch" placeholder="Search users...">
+                <div class="admin-header">
+                    <h1>System Overview</h1>
+                    <p>Monitor and manage your entire pet monitoring system</p>
                 </div>
-                <select id="userStatusFilter" class="filter-select">
-                    <option value="">All status</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                </select>
-            </div>
-        </div>
-        <div id="usersTableContainer">
-            <p style="text-align:center;padding:40px;">Loading users...</p>
-        </div>
-    </div>
-`;
 
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card blue">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                            <span class="stat-subtext" id="pendingUsersStat">0 pending approval</span>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card green">
+                        <div class="stat-icon">
+                            <i class="fas fa-paw"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalPets">0</h3>
+                            <p>Total Pets</p>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card orange">
+                        <div class="stat-icon" id="transparent">
+                            <i class="fa-solid fa-triangle-exclamation fa-lg" style="color:#ff1900;"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalIncidents">0</h3>
+                            <p>Total Incidents</p>
+                            <span class="stat-subtext" id="activeIncidentsStat">0 active</span>
+                        </div>
+                    </div>
+
+                    <div class="admin-stat-card purple">
+                        <div class="stat-icon">
+                            <i class="fas fa-syringe"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalVaccinations">0</h3>
+                            <p>Vaccinations</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-section">
+                    <h2>Recent System Activity</h2>
+                    <div id="recentActivity" class="activity-feed">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            `;
             loadAdminStats();
             loadRecentActivity();
             break;
@@ -239,6 +268,7 @@ function loadAdminSection(section) {
             break;
     }
 }
+
 
 // ========================================
 // USERS SECTION
@@ -561,23 +591,24 @@ async function fetchAllPets() {
         .toLowerCase()
 );
                 card.innerHTML = `
-                    <div class="pet-image-admin" style="background-image:url('${imgSrc}')">
-                        <button class="btn-delete-overlay"
-                                onclick="deletePet(${pet.id}, '${pet.name}')"
-                                title="Delete Pet">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                    <div class="pet-details-admin">
-                        <h3>${pet.name}</h3>
-                        <p class="pet-owner"><i class="fas fa-user"></i> ${pet.owner_name}</p>
-                        <p class="pet-info">${pet.species} • ${pet.breed || 'Mixed'}</p>
-                        <div class="pet-meta">
-                            <span class="badge green">${pet.age || 'N/A'} years</span>
-                            <span class="badge blue">${pet.gender || 'N/A'}</span>
-                        </div>
-                    </div>
-                `;
+    <div class="pet-image-admin" style="background-image:url('${imgSrc}')">
+        <button class="btn-delete-overlay"
+                onclick="deletePet(${pet.id}, '${pet.name}')"
+                title="Delete Pet">
+            <i class="fas fa-trash"></i>
+        </button>
+    </div>
+    <div class="pet-details-admin">
+        <h3>${pet.name}</h3>
+        <p class="pet-owner"><i class="fas fa-user"></i> ${pet.owner_name}</p>
+        <p class="pet-info">${pet.species} • ${pet.breed || 'Mixed'}</p>
+        <div class="pet-meta">
+            <span class="badge green">${pet.age || 'N/A'} years</span>
+            <span class="badge blue">${pet.gender || 'N/A'}</span>
+        </div>
+    </div>
+`;
+
                 grid.appendChild(card);
             });
             const searchInput = document.getElementById('petSearch');
@@ -933,65 +964,80 @@ async function fetchAllVaccinations() {
         `;
 
         data.vaccinations.forEach(vacc => {
-            const status = vacc.is_overdue
-                ? 'Overdue'
-                : vacc.is_due_soon
-                ? 'Due Soon'
-                : 'Up to Date';
+    const status = vacc.is_overdue
+        ? 'Overdue'
+        : vacc.is_due_soon
+        ? 'Due Soon'
+        : 'Up to Date';
 
-            const statusClass = vacc.is_overdue
-                ? 'danger'
-                : vacc.is_due_soon
-                ? 'warning'
-                : 'success';
+    const statusClass = vacc.is_overdue
+        ? 'danger'
+        : vacc.is_due_soon
+        ? 'warning'
+        : 'success';
 
-            const warningLabel =
-                vacc.warning_status === 'Warning Sent' ? 'Warning Sent' : 'None';
+    const warningLabel =
+        vacc.warning_status === 'Warning Sent'
+            ? 'Warning Sent'
+            : vacc.warning_status === 'Ignored Warning'
+            ? 'Ignored Warning'
+            : 'None';
 
-            const warningClass =
-                vacc.warning_status === 'Warning Sent' ? 'orange' : 'gray';
+    const warningClass =
+        warningLabel === 'Warning Sent'
+            ? 'orange'
+            : warningLabel === 'Ignored Warning'
+            ? 'danger'
+            : 'gray';
 
-            const searchText = [
-                vacc.pet_name || '',
-                vacc.owner_name || '',
-                vacc.vaccine_name || ''
-            ]
-                .join(' ')
-                .toLowerCase()
-                .replace(/'/g, '&#39;');
+    // ADD THIS: text used for the search filter
+    const searchText = [
+        vacc.pet_name || '',
+        vacc.owner_name || '',
+        vacc.vaccine_name || ''
+    ]
+        .join(' ')
+        .toLowerCase()
+        .replace(/'/g, '&#39;');
 
-            html += `
-                <tr data-search='${searchText}'>
-                    <td>
-                        <div class="user-cell">
-                            <i class="fas fa-paw" style="color:#667eea;font-size:20px;"></i>
-                            <span>${vacc.pet_name}</span>
-                        </div>
-                    </td>
-                    <td>${vacc.owner_name}</td>
-                    <td><strong>${vacc.vaccine_name}</strong></td>
-                    <td>${new Date(vacc.date_given).toLocaleDateString()}</td>
-                    <td>${
-                        vacc.next_due_date
-                            ? new Date(vacc.next_due_date).toLocaleDateString()
-                            : 'N/A'
-                    }</td>
-                    <td><span class="badge ${statusClass}">${status}</span></td>
-                    <td><span class="badge ${warningClass}">${warningLabel}</span></td>
-                    <td>
-                        <button class="btn-warning"
-                                onclick="sendVaccinationWarning(${vacc.id})"
-                                ${
-                                    vacc.warning_status === 'Warning Sent'
-                                        ? 'disabled'
-                                        : ''
-                                }>
-                            Send Warning
-                        </button>
-                    </td>
-                </tr>
-            `;
-        });
+    html += `
+        <tr data-search='${searchText}'>
+            <td>
+                <div class="user-cell">
+                    <i class="fas fa-paw" style="color:#667eea;font-size:20px;"></i>
+                    <span>${vacc.pet_name}</span>
+                </div>
+            </td>
+            <td>${vacc.owner_name}</td>
+            <td><strong>${vacc.vaccine_name}</strong></td>
+            <td>${new Date(vacc.date_given).toLocaleDateString()}</td>
+            <td>${
+                vacc.next_due_date
+                    ? new Date(vacc.next_due_date).toLocaleDateString()
+                    : 'N/A'
+            }</td>
+            <td><span class="badge ${statusClass}">${status}</span></td>
+            <td><span class="badge ${warningClass}">${warningLabel}</span></td>
+            <td>
+                <button class="btn-warning"
+                        title="${
+                            vacc.warning_status === 'Warning Sent'
+                                ? 'Warning already sent'
+                                : 'Send warning to pet owner'
+                        }"
+                        onclick="sendVaccinationWarning(${vacc.id})"
+                        ${
+                            vacc.warning_status === 'Warning Sent'
+                                ? 'disabled'
+                                : ''
+                        }>
+                    Send Warning
+                </button>
+            </td>
+        </tr>
+    `;
+});
+
 
         html += `
                     </tbody>

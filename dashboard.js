@@ -44,8 +44,11 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
     
-    // (The rest of your dashboard initialization code follows below...)
-    loadDashboardStats();
+            // (The rest of your dashboard initialization code follows below...)
+            // (The rest of your dashboard initialization code follows below...)
+        loadDashboardStats();
+        loadRecentAlerts();        // already used for "Recent Activity"
+        loadVaccinationAlerts();   // <-- add this
 
 });
 
@@ -623,6 +626,172 @@ async function loadPetsWithVaccinations() {
     }
 }
 
+// Decide vaccination status based on next_due_date
+function getVaccinationStatus(nextDueDate) {
+    if (!nextDueDate) {
+        return 'Up to Date';
+    }
+
+    const today = new Date();
+    const due   = new Date(nextDueDate);
+
+    // Clear time part for fair comparison
+    today.setHours(0, 0, 0, 0);
+    due.setHours(0, 0, 0, 0);
+
+    const diffMs   = due - today;
+    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+    if (diffDays < 0) {
+        return 'Overdue';
+    } else if (diffDays <= 7) {
+        return 'Due Soon';
+    } else {
+        return 'Up to Date';
+    }
+}
+
+
+// Update mini vaccination stats from history data
+function updateVaccinationStats(vaccinations) {
+    const total = vaccinations.length;
+    let dueSoon = 0;
+    let thisMonth = 0;
+
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear  = today.getFullYear();
+
+    vaccinations.forEach(vacc => {
+        // Uses your existing helper
+        const status = getVaccinationStatus(vacc.next_due_date);
+
+        // Count overdue + due soon
+        if (status === 'Overdue' || status === 'Due Soon') {
+            dueSoon++;
+        }
+
+        // Count vaccinations given this month
+        if (vacc.date_given) {
+            const d = new Date(vacc.date_given);
+            if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
+                thisMonth++;
+            }
+        }
+    });
+
+    const vaccTotal = document.getElementById('totalVaccinesCount');
+    const vaccDue   = document.getElementById('dueSoonCount');
+    const vaccMonth = document.getElementById('thisMonthCount');
+
+    if (vaccTotal) vaccTotal.textContent = total;
+    if (vaccDue)   vaccDue.textContent   = dueSoon;
+    if (vaccMonth) vaccMonth.textContent = thisMonth;
+}
+
+// Helper: format dates for the vaccination table
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return 'N/A';
+
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    });
+}
+
+
+// History table loader
+async function loadVaccinationHistory() {
+    const container = document.getElementById('vaccinationHistoryContainer');
+    if (!container) return;
+
+    try {
+        const res = await fetch('vaccinations.php');
+        const data = await res.json();
+
+        if (data.status === 'success') {
+            if (data.vaccinations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state-small">
+                        <i class="fas fa-syringe" style="font-size: 48px; color: #ddd;"></i>
+                        <p>No vaccination records yet</p>
+                    </div>
+                `;
+                updateVaccinationStats([]);
+                return;
+            }
+
+            updateVaccinationStats(data.vaccinations);
+
+            let tableHTML = `
+                <div class="table-responsive">
+                    <table class="vaccination-table">
+                        <thead>
+                            <tr>
+                                <th>Pet Name</th>
+                                <th>Vaccine Name</th>
+                                <th>Date Given</th>
+                                <th>Next Due Date</th>
+                                <th>Veterinarian</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.vaccinations.forEach(vacc => {
+                const status = getVaccinationStatus(vacc.next_due_date);
+                const statusClass =
+                    status === 'Overdue' ? 'overdue' :
+                    status === 'Due Soon' ? 'due-soon' :
+                    'up-to-date';
+
+                tableHTML += `
+                    <tr>
+                        <td data-label="Pet Name"><strong>${vacc.pet_name}</strong></td>
+                        <td data-label="Vaccine">${vacc.vaccine_name}</td>
+                        <td data-label="Date Given">${formatDate(vacc.date_given)}</td>
+                        <td data-label="Next Due">${vacc.next_due_date ? formatDate(vacc.next_due_date) : 'N/A'}</td>
+                        <td data-label="Veterinarian">${vacc.veterinarian || 'N/A'}</td>
+                        <td data-label="Status"><span class="status-badge ${statusClass}">${status}</span></td>
+                        <td data-label="Actions">
+                            <div class="action-buttons">
+                                <button class="action-btn edit" onclick="editVaccination(${vacc.id})" title="Edit">
+                                    <i class="fas fa-edit"></i> <span style="margin-left: 6px;">Edit</span>
+                                </button>
+                                <button class="action-btn delete"
+                                    onclick="deleteVaccination(${vacc.id}, '${vacc.vaccine_name.replace(/'/g, "\\'")}', '${vacc.pet_name.replace(/'/g, "\\'")}' )"
+                                    title="Delete">
+                                    <i class="fas fa-trash"></i> <span style="margin-left: 6px;">Delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = tableHTML;
+        } else {
+            container.innerHTML = `<p style="color: #999; text-align: center; padding: 40px;">Error loading vaccination records</p>`;
+        }
+    } catch (err) {
+        console.error('Error:', err);
+        container.innerHTML = `<p style="color: #999; text-align: center; padding: 40px;">Error loading vaccination records</p>`;
+    }
+}
+
+
 // Add this new function for viewing vaccination history
 function viewVaccinationHistory(petId) {
     alert('Vaccination history for pet ID: ' + petId + ' (Feature coming soon!)');
@@ -864,7 +1033,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (typeof loadRecentAlerts === 'function') {
                 loadRecentAlerts();
-            }
+            }if (typeof loadVaccinationAlerts === 'function') {
+            loadVaccinationAlerts();
+        }
+
 
             showNotification(
                 mode === 'update'
@@ -879,18 +1051,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
-
-
 // ================= WIRE "REPORT INCIDENT" BUTTON =================
 // This should run after you render the Incidents section HTML (inside your switch-case)
 const reportBtn = document.getElementById('reportIncidentBtn');
 if (reportBtn) {
     reportBtn.addEventListener('click', openIncidentModal);
 }
-
-
-
 
 async function openIncidentModal() {
     const modal = document.getElementById('incidentModal');
@@ -1000,6 +1166,100 @@ async function loadRecentAlerts() {
     }
 }
 
+// VACCINATION ALERTS PANEL
+async function loadVaccinationAlerts() {
+    const alertsContainer = document.getElementById('vaccinationAlerts');
+    if (!alertsContainer) return;
+
+    // Simple loading state
+    alertsContainer.innerHTML = `
+        <div class="alert-item info">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <strong>Loading vaccination alerts...</strong>
+                <span>Please wait a moment.</span>
+            </div>
+        </div>
+    `;
+
+    try {
+        const res = await fetch('user-api.php?action=vaccination_alerts');
+        const data = await res.json();
+
+        if (data.status !== 'success' || !Array.isArray(data.alerts) || data.alerts.length === 0) {
+            alertsContainer.innerHTML = `
+                <div class="alert-item success">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <strong>No vaccination alerts</strong>
+                        <span>All vaccinations are up to date.</span>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        alertsContainer.innerHTML = '';
+
+        data.alerts.forEach(alert => {
+            let cls  = 'info';
+            let icon = 'fa-info-circle';
+
+            const status = (alert.warning_status || '').toLowerCase();
+
+            if (status === 'warning sent') {
+                cls  = 'warning';
+                icon = 'fa-exclamation-triangle';
+            } else if (status === 'ignored warning') {
+                cls  = 'error';
+                icon = 'fa-exclamation-circle';
+            } else if (alert.next_due_date) {
+                // Due soon without explicit warning
+                cls  = 'warning';
+                icon = 'fa-clock';
+            }
+
+            const petName = alert.pet_name || 'Unknown pet';
+            const vaccine = alert.vaccine_name || 'Unknown vaccine';
+            const nextDue = alert.next_due_date
+                ? new Date(alert.next_due_date).toLocaleDateString()
+                : 'No due date';
+            const note    = alert.warning_note || '';
+
+            const div = document.createElement('div');
+            div.className = 'alert-item ' + cls;
+            div.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <div>
+                    <strong>${petName} – ${vaccine}</strong>
+                    <span>Next due: ${nextDue}${note ? ' · ' + note : ''}</span>
+                </div>
+            `;
+            alertsContainer.appendChild(div);
+        });
+
+        // Optional toast notification
+        if (typeof showNotification === 'function' && data.alerts.length > 0) {
+            showNotification(
+                'You have ' + data.alerts.length + ' vaccination alert(s).',
+                'warning'
+            );
+        }
+    } catch (err) {
+        console.error('Error loading vaccination alerts', err);
+        alertsContainer.innerHTML = `
+            <div class="alert-item error">
+                <i class="fas fa-exclamation-circle"></i>
+                <div>
+                    <strong>Could not load vaccination alerts</strong>
+                    <span>Please try again later.</span>
+                </div>
+            </div>
+        `;
+    }
+}
+
+
 
 
 // ===== MAIN INITIALIZATION =====
@@ -1089,6 +1349,8 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   loadPetsInSidebar();
   loadDashboardStats();
+  loadVaccinationAlerts();
+  loadDashboardStats();
   break;
 
 
@@ -1165,10 +1427,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load pets with vaccination status
     loadPetsWithVaccinations();
-    
-    // Load vaccination history
     loadVaccinationHistory();
     loadDashboardStats();
+
     break;
           
                 case 'incidents':
@@ -2032,93 +2293,6 @@ function updateVaccinationStats(vaccinations) {
     if (thisMonthEl) thisMonthEl.textContent = thisMonthCount;
 }
 
-// History table loader
-async function loadVaccinationHistory() {
-    const container = document.getElementById('vaccinationHistoryContainer');
-    if (!container) return;
-
-    try {
-        const res = await fetch('vaccinations.php');
-        const data = await res.json();
-
-        if (data.status === 'success') {
-            if (data.vaccinations.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state-small">
-                        <i class="fas fa-syringe" style="font-size: 48px; color: #ddd;"></i>
-                        <p>No vaccination records yet</p>
-                    </div>
-                `;
-                updateVaccinationStats([]);
-                return;
-            }
-
-            updateVaccinationStats(data.vaccinations);
-
-            let tableHTML = `
-                <div class="table-responsive">
-                    <table class="vaccination-table">
-                        <thead>
-                            <tr>
-                                <th>Pet Name</th>
-                                <th>Vaccine Name</th>
-                                <th>Date Given</th>
-                                <th>Next Due Date</th>
-                                <th>Veterinarian</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-
-            data.vaccinations.forEach(vacc => {
-                const status = getVaccinationStatus(vacc.next_due_date);
-                const statusClass =
-                    status === 'Overdue' ? 'overdue' :
-                    status === 'Due Soon' ? 'due-soon' :
-                    'up-to-date';
-
-                tableHTML += `
-                    <tr>
-                        <td data-label="Pet Name"><strong>${vacc.pet_name}</strong></td>
-                        <td data-label="Vaccine">${vacc.vaccine_name}</td>
-                        <td data-label="Date Given">${formatDate(vacc.date_given)}</td>
-                        <td data-label="Next Due">${vacc.next_due_date ? formatDate(vacc.next_due_date) : 'N/A'}</td>
-                        <td data-label="Veterinarian">${vacc.veterinarian || 'N/A'}</td>
-                        <td data-label="Status"><span class="status-badge ${statusClass}">${status}</span></td>
-                        <td data-label="Actions">
-                            <div class="action-buttons">
-                                <button class="action-btn edit" onclick="editVaccination(${vacc.id})" title="Edit">
-                                    <i class="fas fa-edit"></i> <span style="margin-left: 6px;">Edit</span>
-                                </button>
-                                <button class="action-btn delete"
-                                    onclick="deleteVaccination(${vacc.id}, '${vacc.vaccine_name.replace(/'/g, "\\'")}', '${vacc.pet_name.replace(/'/g, "\\'")}' )"
-                                    title="Delete">
-                                    <i class="fas fa-trash"></i> <span style="margin-left: 6px;">Delete</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            tableHTML += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-
-            container.innerHTML = tableHTML;
-        } else {
-            container.innerHTML = `<p style="color: #999; text-align: center; padding: 40px;">Error loading vaccination records</p>`;
-        }
-    } catch (err) {
-        console.error('Error:', err);
-        container.innerHTML = `<p style="color: #999; text-align: center; padding: 40px;">Error loading vaccination records</p>`;
-    }
-}
-
 // Global edit/delete used by inline onclick
 window.editVaccination = async function (vaccId) {
     try {
@@ -2317,13 +2491,15 @@ window.deleteVaccination = async function (vaccId, vaccineName, petName) {
         const data = await res.json();
         
         if (data.status === 'success') {
-            notifySuccess('Vaccination record deleted successfully!');
-            loadVaccinationHistory();
-            loadDashboardStats();
-            loadRecentAlerts();
-        } else {
-            notifyError(data.message || 'Failed to delete vaccination record');
-        }
+    notifySuccess('Vaccination record deleted successfully!');
+    loadVaccinationHistory();
+    loadDashboardStats();
+    loadRecentAlerts();
+    loadVaccinationAlerts();   // <-- add this
+} else {
+    notifyError(data.message || 'Failed to delete vaccination record');
+}
+
     } catch (err) {
         console.error('Error:', err);
         notifyError('Failed to delete vaccination record');
@@ -2363,87 +2539,8 @@ async function deleteVaccination(vaccId, vaccineName) {
 
 // ===== VACCINATION HISTORY FUNCTIONS =====
 
-async function loadVaccinationHistory() {
-    const container = document.getElementById('vaccinationHistoryContainer');
-    
-    if (!container) return;
-    
-    try {
-        const res = await fetch('vaccinations.php');
-        const data = await res.json();
-        
-        if (data.status === 'success') {
-            if (data.vaccinations.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state-small">
-                        <i class="fas fa-syringe" style="font-size: 48px; color: #ddd;"></i>
-                        <p>No vaccination records yet</p>
-                    </div>
-                `;
-                updateVaccinationStats([]);
-                return;
-            }
-            
-            updateVaccinationStats(data.vaccinations);
-            
-            let tableHTML = `
-                <div class="table-responsive">
-                    <table class="vaccination-table">
-                        <thead>
-                            <tr>
-                                <th>Pet Name</th>
-                                <th>Vaccine Name</th>
-                                <th>Date Given</th>
-                                <th>Next Due Date</th>
-                                <th>Veterinarian</th>
-                                <th>Status</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            data.vaccinations.forEach(vacc => {
-                const status = getVaccinationStatus(vacc.next_due_date);
-                const statusClass = status === 'Overdue' ? 'overdue' : status === 'Due Soon' ? 'due-soon' : 'up-to-date';
-                
-                tableHTML += `
-                    <tr>
-                        <td data-label="Pet Name"><strong>${vacc.pet_name}</strong></td>
-                        <td data-label="Vaccine">${vacc.vaccine_name}</td>
-                        <td data-label="Date Given">${formatDate(vacc.date_given)}</td>
-                        <td data-label="Next Due">${vacc.next_due_date ? formatDate(vacc.next_due_date) : 'N/A'}</td>
-                        <td data-label="Veterinarian">${vacc.veterinarian || 'N/A'}</td>
-                        <td data-label="Status"><span class="status-badge ${statusClass}">${status}</span></td>
-                        <td data-label="Actions">
-                            <div class="action-buttons">
-                                <button class="action-btn edit" onclick="editVaccination(${vacc.id})" title="Edit">
-                                    <i class="fas fa-edit"></i> <span style="margin-left: 6px;">Edit</span>
-                                </button>
-                                <button class="action-btn delete" onclick="deleteVaccination(${vacc.id}, '${vacc.vaccine_name.replace(/'/g, "\\'")}', '${vacc.pet_name.replace(/'/g, "\\'")}' )" title="Delete">
-                                    <i class="fas fa-trash"></i> <span style="margin-left: 6px;">Delete</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            tableHTML += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            container.innerHTML = tableHTML;
-        } else {
-            container.innerHTML = `<p style="color: #999; text-align: center; padding: 40px;">Error loading vaccination records</p>`;
-        }
-    } catch (err) {
-        console.error('Error:', err);
-        container.innerHTML = `<p style="color: #999; text-align: center; padding: 40px;">Error loading vaccination records</p>`;
-    }
-}
+
+
 
 
 // Helper function to get vaccination status

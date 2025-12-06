@@ -3503,3 +3503,53 @@ body.modal-open {
     font-size: 11px;
     color: #9ca3af;
 }
+
+.alert-card {
+    background: #fef3c7;
+    border: 1px solid #fbbf24;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+}
+
+.alert-card h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: #92400e;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alert-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    color: #78350f;
+}
+
+.alert-list li + li {
+    margin-top: 6px;
+}
+
+.alert-status {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    background: #f97316;
+    color: #fff7ed;
+}
+
+.alert-date {
+    display: block;
+    font-size: 11px;
+    color: #9a3412;
+}
+
+.alert-note {
+    font-size: 11px;
+    color: #7c2d12;
+}

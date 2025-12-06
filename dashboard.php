@@ -368,6 +368,19 @@ require_once 'check_session.php';
                                 <p>Loading recent activities...</p>
                             </div>
                         </div>
+                        <div class="dashboard-section">
+                        <div class="section-header-modern">
+                            <div class="section-title">
+                            <i class="fas fa-syringe"></i>
+                            <h2>Vaccination Alerts</h2>
+                            </div>
+                        </div>
+
+  <div id="vaccinationAlerts" class="alerts-section">
+    <!-- JS will inject alerts here -->
+  </div>
+</div>
+
                     </div>
                 </div>
 
