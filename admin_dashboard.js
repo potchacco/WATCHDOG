@@ -676,7 +676,7 @@ async function loadAllIncidents() {
         </div>
         <div class="admin-section">
             <div class="section-header-flex">
-                <h2><i class="fas fa-exclamation-triangle"></i> Incident Reports</h2>
+                <h2><i class="fa-solid fa-triangle-exclamation fa-lg" style="color: #ff0000;"></i> Incident Reports</h2>
                 <select id="statusFilter" onchange="filterIncidents()" class="filter-select">
                     <option value="">All Status</option>
                     <option value="Open">Open</option>

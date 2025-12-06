@@ -15,7 +15,7 @@ require_once 'check_session.php';
     <!-- AI Assistant Widget -->
 <div id="aiAssistant" class="ai-assistant">
   <div class="ai-header">
-    <span>Watchdog Assistant</span>
+    <span>A.I Assistant</span>
     <button id="aiToggleBtn">&times;</button>
   </div>
   <div id="aiMessages" class="ai-messages">
@@ -52,7 +52,7 @@ require_once 'check_session.php';
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
-                    <i class="fas fa-shield-dog"></i>
+                    <i class="fa-solid fa-paw fa-rotate-by fa-2xl" style="color: #2f72e4; --fa-rotate-angle: 35deg;"></i>
                 </div>
                 <span class="sidebar-brand"></span>
             </div>
@@ -123,13 +123,13 @@ require_once 'check_session.php';
                         <i class="fas fa-bell"></i>
                         <span class="notification-badge">3</span>
                     </button>
-                    <div class="header-profile">
+                    <!-- <div class="header-profile">
                         <img src="https://ui-avatars.com/api/?name=<?php echo urlencode($_SESSION['user_name'] ?? 'User'); ?>&background=6366f1&color=fff&size=100" alt="Profile" id="userAvatar">
                         <div class="profile-info">
                             <span class="profile-name"><?php echo htmlspecialchars($_SESSION['user_name'] ?? 'User'); ?></span>
                             <span class="profile-role">Pet Owner</span>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </header>
 
@@ -184,7 +184,7 @@ require_once 'check_session.php';
 
                 <div class="stat-card-modern purple">
                     <div class="stat-icon-modern">
-                        <i class="fas fa-exclamation-triangle"></i>
+                        <i class="fa-solid fa-triangle-exclamation fa-lg" style="color: #ff0000;"></i>
                     </div>
                     <div class="stat-info">
                         <h2 class="stat-value">0</h2>

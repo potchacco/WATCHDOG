@@ -159,13 +159,13 @@
             <i class="fas fa-user-plus"></i> Create Account
           </button>
         </form><hr>
-        <p id="login-via">or login via</p>
-        <div class="login-options">
-          <div class="options-holder">
+        <!-- <p id="login-via">or login via</p>
+        <div class="login-options"> -->
+          <!-- <div class="options-holder">
             <a href=""><button type="button" class="option-btn"><i class="fa-brands fa-facebook fa-xl"></i> Log in with facebook</button></a>
             <a href=""><button type="button" class="option-btn"><i class="fa-brands fa-google fa-xl"></i> Log in with Google</button></a>
-          </div>
-        </div>
+          </div> -->
+        <!-- </div> -->
         <div class="modal-footer">
           <p>Already have an account? <a href="#" class="switch-to-login">Login here</a></p>
         </div>

@@ -24,7 +24,7 @@ body {
    TOP NAVIGATION BAR
    ============================================ */
 .admin-navbar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
     padding: 15px 30px;
     display: flex;
     justify-content: space-between;
@@ -626,7 +626,7 @@ body {
     background: white;
     border-radius: 12px;
     padding: 20px;
-    border-left: 4px solid #667eea;
+    border-bottom: 2px solid red;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
 }
@@ -893,8 +893,8 @@ body {
 }
 
 .btn-update-status {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
+    /* background: linear-gradient(135deg, #667eea, #764ba2); */
+    color: black;
     border: none;
     padding: 10px 20px;
     border-radius: 8px;
@@ -1489,8 +1489,8 @@ body {
 }
 
 #transparent {
-    background: transparent;
-    border:  1px solid red;
+    background: rgba(255, 0, 0, 0.37);
+    /* border:  1px solid red; */
 }
 
 .stat-info .stat-subtext {
